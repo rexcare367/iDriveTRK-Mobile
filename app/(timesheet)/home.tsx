@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import {
@@ -11,29 +12,50 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../../components/EmptyState";
 import StatCard from "../../components/StatCard";
 import SubmitButton from "../../components/SubmitButton";
 import DateSection from "../../feature/timesheets/DateSection";
 import { submitForApproval } from "../../redux/actions/timesheetActions";
+import { ITruck, IUser } from "../../redux/types";
 import api from "../../utils/apiClient";
 
 // Type definitions
-interface ClockEntry {
+export interface IBreak {
   id: string;
-  type: string;
-  timestamp: string;
-  userId: string;
-  userName: string;
+  start: string;
+  end: string;
+}
+
+export interface ISchedule {
+  asignee: string;
+  color: string;
   created_at: string;
-  is_submitted?: boolean;
-  status?: string;
-  isEdited?: boolean;
-  editedAt?: string;
-  editedBy?: string;
-  originalTimestamp?: string;
+  description: string;
+  end_time: string;
+  id: string;
+  job_id: string;
+  scheduler_id: string;
+  start_time: string;
+  status: string;
+  stops: any[];
+  title: string;
+  type: string;
+}
+
+export interface ITimesheet {
+  id: string;
+  clockin_time: string;
+  clockout_time: string;
+  breaks: IBreak[];
+  created_at: string;
+  updated_at: string;
+  is_submitted: boolean;
+  status: string;
+  schedule: ISchedule;
+  truck: ITruck;
+  user: IUser;
 }
 
 export default function TimeSheetHomeScreen() {
@@ -42,7 +64,7 @@ export default function TimeSheetHomeScreen() {
   const { user } = useSelector((state: any) => state.auth);
 
   // Local state for timesheet data
-  const [clockEntries, setClockEntries] = useState<ClockEntry[]>([]);
+  const [clockEntries, setClockEntries] = useState<ITimesheet[]>([]);
   const [totalHours, setTotalHours] = useState(0);
   const [overtimeHours, setOvertimeHours] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -50,9 +72,10 @@ export default function TimeSheetHomeScreen() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<ClockEntry | null>(null);
-  const [editTime, setEditTime] = useState("");
-  const [editDate, setEditDate] = useState("");
+  const [editingEntry, setEditingEntry] = useState<ITimesheet | null>(null);
+  const [editClockIn, setEditClockIn] = useState("");
+  const [editClockOut, setEditClockOut] = useState("");
+  const [editBreaks, setEditBreaks] = useState<IBreak[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState(new Set<string>());
   const [approvalModalVisible, setApprovalModalVisible] = useState(false);
   const [approvalReason, setApprovalReason] = useState("");
@@ -85,9 +108,8 @@ export default function TimeSheetHomeScreen() {
         );
 
         if (response.data) {
-          console.log("response.data", response.data);
           // Update local state with fetched data
-          setClockEntries(response.data || []);
+          setClockEntries(response.data);
         }
       } catch (error: any) {
         console.error("Error fetching timesheets:", error);
@@ -141,40 +163,30 @@ export default function TimeSheetHomeScreen() {
     }
   };
 
-  const formatTime = (timestamp: string) => {
-    return moment(timestamp).format("h:mm A").toLowerCase();
-  };
-
-  const handleEditEntry = (entry: ClockEntry) => {
-    setEditingEntry(entry);
-    const entryDate = moment(entry.timestamp);
-    setEditDate(entryDate.format("YYYY-MM-DD"));
-    setEditTime(entryDate.format("HH:mm"));
-    setEditModalVisible(true);
+  const handleEditEntry = (entry: ITimesheet) => {
+    console.log("entry", entry);
+    // setEditingEntry(entry);
+    // setEditClockIn(entry.clockin_time);
+    // setEditClockOut(entry.clockout_time);
+    // setEditBreaks(entry.breaks.map((b) => ({ ...b })));
+    // setEditModalVisible(true);
   };
 
   const handleSaveEdit = () => {
-    if (!editingEntry || !editTime || !editDate) {
+    if (!editingEntry || !editClockIn || !editClockOut) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
-    const newTimestamp = moment(
-      `${editDate} ${editTime}`,
-      "YYYY-MM-DD HH:mm"
-    ).toISOString();
-
-    const updatedEntry = {
+    const updatedEntry: ITimesheet = {
       ...editingEntry,
-      timestamp: newTimestamp,
-      isEdited: true,
-      editedAt: moment().toISOString(),
-      editedBy: currentUser?.id || "1",
+      clockin_time: editClockIn,
+      clockout_time: editClockOut,
+      breaks: editBreaks,
+      updated_at: moment().toISOString(),
       status: "pending_approval",
-      originalTimestamp: editingEntry.timestamp,
     };
 
-    // Update local state instead of Redux
     setClockEntries((prevEntries) =>
       prevEntries.map((entry) =>
         entry.id === updatedEntry.id ? updatedEntry : entry
@@ -183,10 +195,10 @@ export default function TimeSheetHomeScreen() {
     setEditedEntries((prev) => new Set([...prev, updatedEntry.id]));
     setEditModalVisible(false);
     setEditingEntry(null);
-    setEditTime("");
-    setEditDate("");
+    setEditClockIn("");
+    setEditClockOut("");
+    setEditBreaks([]);
 
-    // Show approval submission modal
     setApprovalModalVisible(true);
   };
 
@@ -204,7 +216,7 @@ export default function TimeSheetHomeScreen() {
       status: "pending_approval",
     };
 
-    dispatch(submitForApproval(approvalData));
+    dispatch(submitForApproval(approvalData) as any);
     setPendingApprovals((prev) => new Set([...prev, editingEntry?.id || ""]));
     setApprovalModalVisible(false);
     setApprovalReason("");
@@ -216,21 +228,17 @@ export default function TimeSheetHomeScreen() {
     );
   };
 
-  const handleAddMissingEntry = (date: string, type: string) => {
-    const newEntry: ClockEntry = {
-      id: Date.now().toString(),
-      type: type,
-      timestamp: moment().toISOString(),
-      userId: currentUser?.id || "1",
-      userName: currentUser?.name || "User",
-      created_at: moment().toISOString(),
-    };
+  // const handleAddMissingEntry = (date: string, type: string) => {
+  //   const newEntry: ClockEntry = {
+  //     id: Date.now().toString(),
+  //     type: type,
+  //   };
 
-    setEditingEntry(newEntry);
-    setEditDate(moment(date).format("YYYY-MM-DD"));
-    setEditTime("09:00");
-    setEditModalVisible(true);
-  };
+  //   setEditingEntry(newEntry);
+  //   setEditDate(moment(date).format("YYYY-MM-DD"));
+  //   setEditTime("09:00");
+  //   setEditModalVisible(true);
+  // };
 
   const handleSubmitTimesheet = () => {
     Alert.alert(
@@ -243,9 +251,7 @@ export default function TimeSheetHomeScreen() {
           onPress: async () => {
             try {
               // Only submit timesheets that are not already submitted
-              const timesheetIds = clockEntries
-                .filter((entry) => !entry.is_submitted)
-                .map((entry) => entry.id);
+              const timesheetIds = clockEntries.map((entry) => entry.id);
 
               if (timesheetIds.length === 0) {
                 Alert.alert("Info", "No unsubmitted timesheets to submit.");
@@ -278,7 +284,7 @@ export default function TimeSheetHomeScreen() {
           <StatCard
             title="Total Hours Worked"
             value={`${totalHours}hrs`}
-            iconName="clock"
+            iconName="alarm-outline"
             backgroundColor="#002B49"
           />
           <StatCard
@@ -291,7 +297,7 @@ export default function TimeSheetHomeScreen() {
         </View>
 
         <View style={styles.searchContainer}>
-          <Icon
+          <Ionicons
             name="search"
             size={20}
             color="#666"
@@ -308,14 +314,14 @@ export default function TimeSheetHomeScreen() {
             onPress={refetchTimesheets}
             disabled={loading}
           >
-            <Icon
-              name="refresh-cw"
+            <Ionicons
+              name="refresh"
               size={20}
               color={loading ? "#ccc" : "#666"}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.calendarButton}>
-            <Icon name="calendar" size={20} color="#666" />
+            <Ionicons name="calendar" size={20} color="#666" />
           </TouchableOpacity>
         </View>
 
@@ -330,7 +336,7 @@ export default function TimeSheetHomeScreen() {
             </View>
           ) : error ? (
             <View style={styles.errorContainer}>
-              <Icon name="alert-triangle" size={48} color="#FF9800" />
+              <Ionicons name="alert-circle-outline" size={48} color="#FF9800" />
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity
                 style={styles.retryButton}
@@ -341,7 +347,7 @@ export default function TimeSheetHomeScreen() {
             </View>
           ) : clockEntries.length === 0 ? (
             <EmptyState
-              icon="clock"
+              icon="alarm-outline"
               text="No timesheet to submit"
               subtext="Clock in to start tracking your time"
             />
@@ -350,11 +356,10 @@ export default function TimeSheetHomeScreen() {
               return (
                 <DateSection
                   key={index}
-                  date={entry.created_at}
+                  date={entry.updated_at}
                   dayData={entry}
                   onEditEntry={handleEditEntry}
-                  onAddMissingEntry={handleAddMissingEntry}
-                  formatTime={formatTime}
+                  // onAddMissingEntry={handleAddMissingEntry}
                 />
               );
             })
@@ -379,38 +384,71 @@ export default function TimeSheetHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                Edit{" "}
-                {editingEntry?.type === "CLOCK_IN" ? "Clock In" : "Clock Out"}
-              </Text>
+              <Text style={styles.modalTitle}>Edit Timesheet</Text>
               <TouchableOpacity
                 onPress={() => setEditModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Icon name="x" size={24} color="#666" />
+                <Ionicons name="close-circle-outline" size={24} color="#666" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.modalBody}>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Date</Text>
+                <Text style={styles.inputLabel}>Clock In Time</Text>
                 <TextInput
                   style={styles.input}
-                  value={editDate}
-                  onChangeText={setEditDate}
-                  placeholder="YYYY-MM-DD"
+                  value={editClockIn}
+                  onChangeText={setEditClockIn}
+                  placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
                 />
               </View>
-
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Time</Text>
+                <Text style={styles.inputLabel}>Clock Out Time</Text>
                 <TextInput
                   style={styles.input}
-                  value={editTime}
-                  onChangeText={setEditTime}
-                  placeholder="HH:MM"
+                  value={editClockOut}
+                  onChangeText={setEditClockOut}
+                  placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
                 />
               </View>
+              <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
+                Breaks
+              </Text>
+              {editBreaks.map((br, idx) => (
+                <View key={br.id || idx} style={{ marginBottom: 12 }}>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Break Start</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={br.start}
+                      onChangeText={(val) => {
+                        setEditBreaks((breaks) =>
+                          breaks.map((b, i) =>
+                            i === idx ? { ...b, start: val } : b
+                          )
+                        );
+                      }}
+                      placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
+                    />
+                  </View>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Break End</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={br.end}
+                      onChangeText={(val) => {
+                        setEditBreaks((breaks) =>
+                          breaks.map((b, i) =>
+                            i === idx ? { ...b, end: val } : b
+                          )
+                        );
+                      }}
+                      placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
+                    />
+                  </View>
+                </View>
+              ))}
             </View>
 
             <View style={styles.modalFooter}>
@@ -431,6 +469,7 @@ export default function TimeSheetHomeScreen() {
         </View>
       </Modal>
 
+      {/* approval Modal */}
       <Modal
         visible={approvalModalVisible}
         transparent={true}
@@ -445,7 +484,7 @@ export default function TimeSheetHomeScreen() {
                 onPress={() => setApprovalModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Icon name="x" size={24} color="#666" />
+                <Ionicons name="close-circle-outline" size={24} color="#666" />
               </TouchableOpacity>
             </View>
 
@@ -480,7 +519,7 @@ export default function TimeSheetHomeScreen() {
                 style={styles.submitApprovalButton}
                 onPress={handleSubmitForApproval}
               >
-                <Icon
+                <Ionicons
                   name="send"
                   size={16}
                   color="#fff"

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import BottomTabBar from "../../components/BottomTabBar";
 import DateSelector from "../../components/DateSelector";
@@ -93,7 +93,7 @@ export default function SubmitTimeSheetScreen() {
         endDate,
         currentUser.id,
         currentUser.name
-      )
+      ) as any
     );
 
     setTimesheet(generatedTimesheet);
@@ -106,11 +106,11 @@ export default function SubmitTimeSheetScreen() {
     }
 
     try {
-      const submittedTimesheet = await dispatch(
+      dispatch(
         submitTimesheet({
           ...timesheet,
           note,
-        })
+        }) as any
       );
 
       Alert.alert("Success", "Timesheet submitted successfully", [
@@ -132,7 +132,7 @@ export default function SubmitTimeSheetScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Icon name="arrow-left" size={24} color="#000" />
+            <Ionicons name="arrow-back-outline" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Submit Time Sheet</Text>
           <View style={styles.placeholder} />

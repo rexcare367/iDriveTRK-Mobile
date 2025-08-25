@@ -1,9 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,12 +13,14 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
+import Header from "../../components/Header";
 import { confirmTrip } from "../../redux/actions/driverActions";
 import api from "../../utils/apiClient";
 
 export default function TripDetailsScreen() {
   const params = useLocalSearchParams();
   const { tripId, tripName, isAssigned } = params;
+  const mapRef = useRef<MapView>(null);
 
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.auth);
@@ -43,6 +44,31 @@ export default function TripDetailsScreen() {
         setLoading(false);
       });
   }, [tripId]);
+
+  // Extract route coordinates from tripDetails.job.routes if available
+  const getRouteCoordinates = () => {
+    if (tripDetail?.job?.routes && tripDetail?.job?.routes?.length > 0) {
+      return tripDetail.job.routes.map((route: any) => ({
+        latitude: route.lat,
+        longitude: route.lng,
+      }));
+    }
+    // Fallback to default coordinates
+    const origin = { latitude: 42.0631, longitude: -83.3852 };
+    const destination = { latitude: 44.6728, longitude: -83.3958 };
+    return [origin, destination];
+  };
+
+  const routeCoordinates = getRouteCoordinates();
+
+  const handleMapReady = () => {
+    if (mapRef.current && routeCoordinates.length > 0) {
+      mapRef.current.fitToCoordinates(routeCoordinates, {
+        edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
+        animated: true,
+      });
+    }
+  };
 
   const handleBack = () => {
     router.back();
@@ -69,27 +95,10 @@ export default function TripDetailsScreen() {
     id: r.id,
   }));
 
-  const polylineCoords = mapMarkers.map(
-    (m: { latitude: number; longitude: number }) => ({
-      latitude: m.latitude,
-      longitude: m.longitude,
-    })
-  );
-
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Feather name="arrow-left" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Trip Details</Text>
-        <View style={styles.profileOuterBorder}>
-          <View style={styles.profileInnerBorder}>
-            <Image source={{ uri: user.avatar }} style={styles.profileImage} />
-          </View>
-        </View>
-      </View>
+      <Header title="Trip Details" subtitle={tripName as string} />
       {loading ? (
         <View style={{ flex: 1, padding: 20 }}>
           {/* Simple skeleton loader */}
@@ -147,67 +156,68 @@ export default function TripDetailsScreen() {
             </View>
           </View>
           <View style={styles.mapContainer}>
-            {mapMarkers.length > 0 ? (
-              <MapView
-                style={StyleSheet.absoluteFill}
-                initialRegion={{
-                  latitude: mapMarkers[0].latitude,
-                  longitude: mapMarkers[0].longitude,
-                  latitudeDelta: 0.5,
-                  longitudeDelta: 0.5,
-                }}
-                liteMode={true}
-              >
-                {mapMarkers.map((marker: any) => (
+            <MapView
+              ref={mapRef}
+              style={StyleSheet.absoluteFill}
+              initialRegion={{
+                latitude:
+                  routeCoordinates.length > 0
+                    ? routeCoordinates[0].latitude
+                    : 40.7128,
+                longitude:
+                  routeCoordinates.length > 0
+                    ? routeCoordinates[0].longitude
+                    : -74.006,
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1,
+              }}
+              onMapReady={handleMapReady}
+            >
+              {tripDetail?.job?.routes ? (
+                // Render markers for each route point
+                tripDetail.job.routes.map((route: any, index: number) => (
                   <Marker
-                    key={marker.id}
+                    key={route.id}
                     coordinate={{
-                      latitude: marker.latitude,
-                      longitude: marker.longitude,
+                      latitude: route.lat,
+                      longitude: route.lng,
                     }}
-                    title={marker.label}
-                    description={marker.address}
+                    title={route.label}
+                    description={`Route point ${index + 1}`}
+                    image={
+                      index === 0
+                        ? require("../../assets/car.png")
+                        : index === tripDetail.job.routes.length - 1
+                        ? require("../../assets/marker.png")
+                        : require("../../assets/marker.png")
+                    }
                   />
-                ))}
-                {polylineCoords.length > 1 && (
-                  <Polyline
-                    coordinates={polylineCoords}
-                    strokeColor="#3498db"
-                    strokeWidth={3}
+                ))
+              ) : (
+                // Fallback to default markers
+                <>
+                  <Marker
+                    coordinate={routeCoordinates[0]}
+                    title="Start"
+                    image={require("../../assets/car.png")}
                   />
-                )}
-              </MapView>
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text>No route data</Text>
-              </View>
-            )}
-            <View style={styles.mapLegend}>
-              <View style={styles.legendItem}>
-                <View
-                  style={[styles.legendDot, { backgroundColor: "#e74c3c" }]}
-                />
-                <Text style={styles.legendText}>AM Stops</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View
-                  style={[styles.legendDot, { backgroundColor: "#3498db" }]}
-                />
-                <Text style={styles.legendText}>PM Stops</Text>
-              </View>
-            </View>
+                  <Marker
+                    coordinate={routeCoordinates[1]}
+                    title="End"
+                    image={require("../../assets/marker.png")}
+                  />
+                </>
+              )}
+              <Polyline
+                coordinates={routeCoordinates}
+                strokeColor="#082640"
+                strokeWidth={4}
+              />
+            </MapView>
             <View style={styles.distanceChip}>
               <Feather name="truck" size={16} color="#000" />
               <Text style={styles.distanceText}>
-                {tripDetail?.job?.driving_distance
-                  ? `${tripDetail.job.driving_distance} km`
-                  : "-"}
+                {tripDetail?.job?.driving_distance} km
               </Text>
             </View>
           </View>

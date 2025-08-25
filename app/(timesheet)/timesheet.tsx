@@ -8,12 +8,11 @@ import ManagerApprovalScreen from "./manager-approval";
 
 export default function TimeSheetScreen() {
   const { currentUser } = useSelector((state: any) => state.user);
-  const { user } = useSelector((state: any) => state.auth);
 
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <Header user={user} />
+      <Header />
       {currentUser.role === "MANAGER" ? (
         <ManagerApprovalScreen />
       ) : (

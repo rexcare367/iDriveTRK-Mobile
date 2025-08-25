@@ -1,18 +1,13 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 const PostTripFormVehicleInfo = () => {
@@ -72,18 +67,12 @@ const PostTripFormVehicleInfo = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Vehicle Inspection Report"
+        subtitle="As required by the DOT Federal Motor Carrier Service Regulations"
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Post-Trip Vehicle Inspection Report</Text>
-        <Text style={styles.subtitle}>
-          As required by the DOT Federal Motor Carrier Service Regulations
-        </Text>
-
         {renderProgressBar()}
 
         <CustomInput
@@ -95,7 +84,9 @@ const PostTripFormVehicleInfo = () => {
           }
           placeholder="Your Location"
           value={formData.location}
-          onChangeText={(text) => setFormData({ ...formData, location: text })}
+          onChangeText={(text: string) =>
+            setFormData({ ...formData, location: text })
+          }
           icon={<Ionicons name="location-outline" size={24} color="#666" />}
         />
 
@@ -108,7 +99,9 @@ const PostTripFormVehicleInfo = () => {
           }
           placeholder="Enter Power Unit"
           value={formData.powerUnit}
-          onChangeText={(text) => setFormData({ ...formData, powerUnit: text })}
+          onChangeText={(text: string) =>
+            setFormData({ ...formData, powerUnit: text })
+          }
           icon={
             <MaterialCommunityIcons
               name="engine-outline"
@@ -127,7 +120,7 @@ const PostTripFormVehicleInfo = () => {
           }
           placeholder="Enter Odometer Reading"
           value={formData.odometerReading}
-          onChangeText={(text) =>
+          onChangeText={(text: string) =>
             setFormData({ ...formData, odometerReading: text })
           }
           icon={

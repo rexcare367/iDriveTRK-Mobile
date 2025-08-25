@@ -4,7 +4,6 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +13,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
+import Header from "../../components/Header";
 import { updateClockInForm } from "../../redux/actions/driverActions";
 import { api } from "../../utils";
 
@@ -101,22 +101,9 @@ export default function TripSelectionScreen() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Image
-          source={{ uri: user.profilePicture }}
-          style={styles.profileImage}
-        />
-      </View>
+      <Header title="Select Trip" subtitle="Choose your trip for today" />
 
       <View style={styles.content}>
-        <Text style={styles.title}>Select Trip</Text>
-        <Text style={styles.subtitle}>
-          {routeName || "Choose your trip for today"}
-        </Text>
-
         <ScrollView style={styles.tripList}>
           <Text
             style={{ fontWeight: "bold", fontSize: 18, marginVertical: 12 }}

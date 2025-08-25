@@ -1,19 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomCheckBox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 const PostTripFormRearVehicle = () => {
@@ -59,7 +54,7 @@ const PostTripFormRearVehicle = () => {
     router.push("/post-trip-cab");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -125,17 +120,12 @@ const PostTripFormRearVehicle = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Rear of Vehicle"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Rear of Vehicle</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Rare of Vehicles includes: Exhaust, Muffler, Rear Door Latch, Padlock
         </Text>
@@ -184,7 +174,7 @@ const PostTripFormRearVehicle = () => {
             label="Exhaust Details"
             placeholder="Enter Exhaust Details"
             value={formData.exhaustDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, exhaustDetails: text })
             }
             icon={<Ionicons name="cloud-outline" size={20} color="#082640" />}
@@ -195,7 +185,7 @@ const PostTripFormRearVehicle = () => {
             label="Muffler Details"
             placeholder="Enter Muffler Details"
             value={formData.mufflerDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, mufflerDetails: text })
             }
             icon={
@@ -212,7 +202,7 @@ const PostTripFormRearVehicle = () => {
             label="Rear Door Details"
             placeholder="Enter Rear Door Details"
             value={formData.rearDoorDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, rearDoorDetails: text })
             }
             icon={
@@ -225,7 +215,7 @@ const PostTripFormRearVehicle = () => {
             label="Padlock Details"
             placeholder="Enter Padlock Details"
             value={formData.padlockDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, padlockDetails: text })
             }
             icon={<Ionicons name="key-outline" size={20} color="#082640" />}

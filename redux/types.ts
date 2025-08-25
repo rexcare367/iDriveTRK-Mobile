@@ -54,6 +54,38 @@ export interface IUser {
   };
 }
 
+export interface ITruck {
+  id: string;
+  scheduler_id: string;
+  name: string | null;
+  license_plate: string | null;
+  vin_number: string | null;
+  make: string | null;
+  model: string | null;
+  year: string | null;
+  color: string | null;
+  type: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  photo: string | null;
+  odometer: number | null;
+  fuel_type: string | null;
+  fuel_capacity: number | null;
+  fuel_efficiency: number | null;
+  transmission: string | null;
+  engine_hours: number | null;
+  tire_size: string | null;
+  payload_capacity: number | null;
+  brake_type: string | null;
+  insurance_policy_number: string | null;
+  insurance_expiration_date: string | null;
+  inspection_due_date: string | null;
+  registration_expiration_date: string | null;
+  last_service_date: string | null;
+  next_service_due_date: string | null;
+}
+
 export interface ITrip {}
 
 export interface UserState {

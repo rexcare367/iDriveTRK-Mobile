@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import {
   approveTimesheet,
@@ -28,10 +28,10 @@ export default function ManagerApprovalScreen() {
   const [showRejectionModal, setShowRejectionModal] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchTimesheets());
+    dispatch(fetchTimesheets() as any);
   }, [dispatch]);
 
-  const filteredTimesheets = timesheets.filter((timesheet) => {
+  const filteredTimesheets = timesheets.filter((timesheet: any) => {
     if (filter !== "ALL" && timesheet.status !== filter) {
       return false;
     }
@@ -47,7 +47,7 @@ export default function ManagerApprovalScreen() {
     return true;
   });
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: any) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -56,7 +56,7 @@ export default function ManagerApprovalScreen() {
     });
   };
 
-  const handleApprove = (timesheet) => {
+  const handleApprove = (timesheet: any) => {
     Alert.alert(
       "Approve Timesheet",
       `Are you sure you want to approve this timesheet for ${timesheet.userName}?`,
@@ -76,7 +76,7 @@ export default function ManagerApprovalScreen() {
     );
   };
 
-  const handleReject = (timesheet) => {
+  const handleReject = (timesheet: any) => {
     setSelectedTimesheet(timesheet);
     setRejectionReason("");
     setShowRejectionModal(true);
@@ -96,7 +96,7 @@ export default function ManagerApprovalScreen() {
     Alert.alert("Success", "Timesheet rejected successfully");
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: any) => {
     switch (status) {
       case "APPROVED":
         return "#28a745";
@@ -184,7 +184,7 @@ export default function ManagerApprovalScreen() {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.searchContainer}>
-          <Icon
+          <Ionicons
             name="search"
             size={20}
             color="#666"
@@ -206,7 +206,7 @@ export default function ManagerApprovalScreen() {
           ) : filteredTimesheets.length === 0 ? (
             <Text style={styles.emptyText}>No timesheets found</Text>
           ) : (
-            filteredTimesheets.map((timesheet) => (
+            filteredTimesheets.map((timesheet: any) => (
               <View key={timesheet.id} style={styles.timesheetCard}>
                 <View style={styles.timesheetHeader}>
                   <View>
@@ -269,7 +269,7 @@ export default function ManagerApprovalScreen() {
                       })
                     }
                   >
-                    <Icon name="eye" size={16} color="#002B49" />
+                    <Ionicons name="eye" size={16} color="#002B49" />
                     <Text style={styles.viewButtonText}>View Details</Text>
                   </TouchableOpacity>
 
@@ -279,7 +279,11 @@ export default function ManagerApprovalScreen() {
                         style={styles.rejectButton}
                         onPress={() => handleReject(timesheet)}
                       >
-                        <Icon name="x" size={16} color="#fff" />
+                        <Ionicons
+                          name="close-circle-outline"
+                          size={16}
+                          color="#fff"
+                        />
                         <Text style={styles.rejectButtonText}>Reject</Text>
                       </TouchableOpacity>
 
@@ -287,7 +291,11 @@ export default function ManagerApprovalScreen() {
                         style={styles.approveButton}
                         onPress={() => handleApprove(timesheet)}
                       >
-                        <Icon name="check" size={16} color="#fff" />
+                        <Ionicons
+                          name="checkmark-circle-outline"
+                          size={16}
+                          color="#fff"
+                        />
                         <Text style={styles.approveButtonText}>Approve</Text>
                       </TouchableOpacity>
                     </View>

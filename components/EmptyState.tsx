@@ -1,17 +1,25 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
+import { StyleSheet, Text, View } from "react-native";
+
+interface EmptyStateProps {
+  icon?: keyof typeof Ionicons.glyphMap;
+  iconSize?: any;
+  iconColor?: string;
+  text?: string;
+  subtext?: string;
+}
 
 const EmptyState = ({
-  icon = "clock",
+  icon = "alarm-outline",
   iconSize = 48,
   iconColor = "#ccc",
   text = "No data available",
   subtext = "Check back later",
-}) => {
+}: EmptyStateProps) => {
   return (
     <View style={styles.container}>
-      <Icon name={icon} size={iconSize} color={iconColor} />
+      <Ionicons name={icon} size={iconSize} color={iconColor} />
       <Text style={styles.text}>{text}</Text>
       <Text style={styles.subtext}>{subtext}</Text>
     </View>

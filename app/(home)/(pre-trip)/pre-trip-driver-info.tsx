@@ -1,18 +1,13 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 export default function PreTripFormDriverInfo() {
@@ -31,10 +26,6 @@ export default function PreTripFormDriverInfo() {
     lastName: preTripFormData?.lastName || user?.lastName || "",
     email: preTripFormData?.email || user?.email || "",
   });
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleNext = () => {
     dispatch(updatePreTripForm(formData));
@@ -79,25 +70,21 @@ export default function PreTripFormDriverInfo() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Vehicle Inspection Report"
+        subtitle="As required by the DOT Federal Motor Carrier Service Regulations"
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Pre-Trip Vehicle Inspection Report</Text>
-        <Text style={styles.subtitle}>
-          As required by the DOT Federal Motor Carrier Service Regulations
-        </Text>
-
         {renderProgressBar()}
 
         <CustomInput
           label="Today's Date"
           placeholder="Enter date"
           value={formData.date}
-          onChangeText={(text) => setFormData({ ...formData, date: text })}
+          onChangeText={(text: string) =>
+            setFormData({ ...formData, date: text })
+          }
           icon={<Ionicons name="calendar-outline" size={24} color="#666" />}
           type="date"
         />
@@ -111,7 +98,9 @@ export default function PreTripFormDriverInfo() {
           }
           placeholder="Enter First Name"
           value={formData.firstName}
-          onChangeText={(text) => setFormData({ ...formData, firstName: text })}
+          onChangeText={(text: string) =>
+            setFormData({ ...formData, firstName: text })
+          }
           icon={<Ionicons name="person-outline" size={24} color="#666" />}
         />
 
@@ -124,7 +113,9 @@ export default function PreTripFormDriverInfo() {
           }
           placeholder="Enter Last Name"
           value={formData.lastName}
-          onChangeText={(text) => setFormData({ ...formData, lastName: text })}
+          onChangeText={(text: string) =>
+            setFormData({ ...formData, lastName: text })
+          }
           icon={<Ionicons name="person-outline" size={24} color="#666" />}
         />
 
@@ -137,7 +128,9 @@ export default function PreTripFormDriverInfo() {
           }
           placeholder="Enter your email here"
           value={formData.email}
-          onChangeText={(text) => setFormData({ ...formData, email: text })}
+          onChangeText={(text: string) =>
+            setFormData({ ...formData, email: text })
+          }
           icon={
             <MaterialCommunityIcons
               name="email-outline"

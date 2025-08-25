@@ -1,7 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { useDispatch, useSelector } from "react-redux";
 import { PinKeypad } from "../../components/PinKeypad";
@@ -14,9 +21,7 @@ import {
 
 export default function PinScreen() {
   const dispatch = useDispatch();
-  const { loading, error, profilePicture, user } = useSelector(
-    (state: any) => state.auth
-  );
+  const { loading, error, user } = useSelector((state: any) => state.auth);
   const [pin, setPin] = useState(["", "", "", ""]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -37,8 +42,9 @@ export default function PinScreen() {
       }
     };
     loadUser();
-  }, [dispatch]);
+  }, []);
 
+  console.log("user", user);
   const hasPin = !!user?.pin;
 
   const handleKeyPress = (key: string) => {
@@ -106,29 +112,27 @@ export default function PinScreen() {
     router.push("/sign-in");
   };
 
+  const handleSignIn = () => {
+    router.push("/sign-in");
+  };
+
   return (
     <View style={styles.container}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#004B87" />
+        </View>
+      )}
       <View style={styles.content}>
         <View style={styles.profileContainer}>
-          {profilePicture ? (
-            <Image
-              source={
-                profilePicture
-                  ? { uri: profilePicture }
-                  : require("../../assets/profile-placeholder.png")
-              }
-              style={styles.profileImage}
-            />
-          ) : (
-            <Image
-              source={
-                user?.avatar
-                  ? { uri: user?.avatar }
-                  : require("../../assets/profile-placeholder.png")
-              }
-              style={styles.profileImage}
-            />
-          )}
+          <Image
+            source={
+              user?.avatar
+                ? { uri: user?.avatar }
+                : require("../../assets/profile-placeholder.png")
+            }
+            style={styles.profileImage}
+          />
         </View>
         <Text style={styles.title}>
           {hasPin ? "Enter Your Pin" : "Create Four Digit Pin"}
@@ -151,12 +155,12 @@ export default function PinScreen() {
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutContainer}>
-          <Text style={styles.logoutText}>
-            Not your account? Go to
+        <View style={styles.logoutContainer}>
+          <Text style={styles.logoutText}>Not your account? </Text>
+          <TouchableOpacity onPress={handleSignIn}>
             <Text style={styles.logoutLink}>Sign In</Text>
-          </Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -175,6 +179,17 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     marginBottom: 24,
+  },
+  loadingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
   profileImage: {
     width: 80,
@@ -220,12 +235,15 @@ const styles = StyleSheet.create({
   },
   logoutContainer: {
     marginTop: 40,
+    flexDirection: "row",
+    justifyContent: "center",
   },
   logoutText: {
     fontSize: 14,
     color: "#333",
   },
   logoutLink: {
+    fontSize: 14,
     color: "#004B87",
     fontWeight: "bold",
   },

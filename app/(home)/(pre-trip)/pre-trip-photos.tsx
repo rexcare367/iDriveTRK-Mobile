@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 import { api } from "../../../utils";
 
@@ -34,10 +35,6 @@ const PreTripFormPhotos = () => {
     !!formData.rearPhoto &&
     !!formData.rightSidePhoto;
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(updatePreTripForm({ ...preTripFormData, ...formData }));
     router.push("/pre-trip-engine");
@@ -45,12 +42,11 @@ const PreTripFormPhotos = () => {
 
   const handleUpload = async (photoType: any) => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    console.log("status", status);
+
     if (status !== "granted") {
       alert("Sorry, we need camera permissions to make this work!");
       return;
     }
-    console.log("photoType", photoType);
 
     let result;
     try {
@@ -63,7 +59,6 @@ const PreTripFormPhotos = () => {
       alert("Camera failed to launch. Please try again.");
       return;
     }
-    console.log("result", result);
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const uri = result.assets[0].uri;
@@ -71,17 +66,11 @@ const PreTripFormPhotos = () => {
         alert("No image returned from camera.");
         return;
       }
-      console.log("uri", uri);
 
       const response = await fetch(uri);
       const blob = await response.blob();
 
       let fileExtension = "jpg";
-      const uriParts = uri.split(".");
-      if (uriParts.length > 1) {
-        const ext = uriParts.pop();
-        if (ext) fileExtension = ext.toLowerCase();
-      }
       let mimeType;
 
       // Determine correct MIME type based on file extension
@@ -164,18 +153,12 @@ const PreTripFormPhotos = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Vehicle Inspection Report"
+        subtitle="As required by the DOT Federal Motor Carrier Service Regulations"
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Pre-Trip Vehicle Inspection Report</Text>
-        <Text style={styles.subtitle}>
-          As required by the DOT Federal Motor Carrier Service Regulations
-        </Text>
-
         {renderProgressBar()}
 
         <View style={styles.photoSection}>
@@ -277,7 +260,7 @@ const PreTripFormPhotos = () => {
         <CustomButton
           title="Next"
           onPress={handleNext}
-          disabled={allPhotosUploaded}
+          disabled={!allPhotosUploaded}
         />
       </ScrollView>
 

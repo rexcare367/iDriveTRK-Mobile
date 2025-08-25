@@ -14,6 +14,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
+import Header from "../../components/Header";
 import { clockIn, selectVehicle } from "../../redux/actions/driverActions";
 import { IVehicle } from "../../redux/types";
 import { api } from "../../utils";
@@ -96,22 +97,11 @@ const VehicleSelectionScreen = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.headerContainer}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack}>
-            <Feather name="arrow-left" size={24} color="#000" />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.title}>Confirm Trip</Text>
-            <Text style={styles.subtitle}>Choose to confirm trip or not</Text>
-          </View>
-        </View>
-        <View style={styles.profileOuterBorder}>
-          <View style={styles.profileInnerBorder}>
-            <Image source={{ uri: user.avatar }} style={styles.profileImage} />
-          </View>
-        </View>
-      </View>
+
+      <Header
+        title="Confirm Vehicle"
+        subtitle="Choose to confirm Vehicle or not"
+      />
 
       <View style={styles.content}>
         <View style={styles.confirmButtonContainer}>

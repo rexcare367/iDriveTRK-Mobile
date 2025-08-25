@@ -3,19 +3,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import Checkbox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 const PreTripFormChecklist = () => {
@@ -61,7 +56,7 @@ const PreTripFormChecklist = () => {
     router.push("/pre-trip-safety");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -125,17 +120,12 @@ const PreTripFormChecklist = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Check The Following"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Check The Following</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Checklist includes: Clutch, Parking Break, Service Break, Starter
         </Text>
@@ -184,7 +174,7 @@ const PreTripFormChecklist = () => {
             label="Clutch Details"
             placeholder="Enter Clutch Details"
             value={formData.clutchDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, clutchDetails: text })
             }
             icon={
@@ -197,7 +187,7 @@ const PreTripFormChecklist = () => {
             label="Parking Break Details"
             placeholder="Enter Parking Break Details"
             value={formData.parkingBreakDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, parkingBreakDetails: text })
             }
             icon={
@@ -210,7 +200,7 @@ const PreTripFormChecklist = () => {
             label="Service Break Details"
             placeholder="Enter Service Break Details"
             value={formData.serviceBreakDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, serviceBreakDetails: text })
             }
             icon={
@@ -223,7 +213,7 @@ const PreTripFormChecklist = () => {
             label="Starter Details"
             placeholder="Enter Starter Details"
             value={formData.starterDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, starterDetails: text })
             }
             icon={<Ionicons name="flash-outline" size={20} color="#082640" />}

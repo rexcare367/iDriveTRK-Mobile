@@ -108,7 +108,7 @@ export default function TripCompleteHistoryScreen() {
     <View style={styles.container}>
       <BackgroundEffects />
 
-      <Header user={user} />
+      <Header />
 
       <View style={styles.content}>
         <TripStatsContainer

@@ -1,13 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
@@ -15,6 +9,7 @@ import CustomButton from "../../../components/CustomButton";
 import CustomCheckbox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
 import CustomRadioButton from "../../../components/CustomRadioButton";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 const PostTripFormSafety = () => {
@@ -66,7 +61,7 @@ const PostTripFormSafety = () => {
     router.push("/post-trip-trailer");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -143,17 +138,12 @@ const PostTripFormSafety = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Safety Equipment"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Safety Equipment</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Safety Equipment includes: Fire Extinguisher, Flags - Flares - Fuses,
           Reflective Triangles
@@ -198,7 +188,7 @@ const PostTripFormSafety = () => {
             label="Fire Extinguisher Details"
             placeholder="Enter Fire Extinguisher Details"
             value={formData.fireExtinguisherDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, fireExtinguisherDetails: text })
             }
             icon={<Ionicons name="flame-outline" size={20} color="#082640" />}
@@ -209,7 +199,7 @@ const PostTripFormSafety = () => {
             label="Flags - Flares - Fuses Details"
             placeholder="Enter Flags - Flares - Fuses Details"
             value={formData.flagsFlaresDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, flagsFlaresDetails: text })
             }
             icon={<Ionicons name="flag-outline" size={20} color="#082640" />}
@@ -220,7 +210,7 @@ const PostTripFormSafety = () => {
             label="Reflective Triangles Details"
             placeholder="Enter Reflective Triangles Details"
             value={formData.reflectiveTrianglesDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, reflectiveTrianglesDetails: text })
             }
             icon={
@@ -254,7 +244,7 @@ const PostTripFormSafety = () => {
               label="Other Defect Details"
               placeholder="Enter details for other defect"
               value={formData.othersDefectDetails}
-              onChangeText={(text) =>
+              onChangeText={(text: string) =>
                 setFormData({ ...formData, othersDefectDetails: text })
               }
               icon={

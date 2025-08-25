@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useRef, useState } from "react";
 import {
@@ -21,6 +22,7 @@ import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import {
   completePostTrip,
   updatePostTripForm,
@@ -84,7 +86,7 @@ const PostTripFormSignature = () => {
           drawnSignature: formData.drawnSignature,
           typedSignatureImage,
         },
-      })
+      }) as any
     );
     setLoading(false);
     if (result?.success) {
@@ -156,16 +158,12 @@ const PostTripFormSignature = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Signature"
+        subtitle="Sign your signature and submit form"
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Signature</Text>
-        <Text style={styles.subtitle}>Sign your signature and submit form</Text>
-
         {renderProgressBar()}
 
         <View style={styles.inputContainer}>
@@ -178,7 +176,7 @@ const PostTripFormSignature = () => {
             }
             placeholder="Enter your name here"
             value={formData.signatureText}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, signatureText: text })
             }
             icon={<Ionicons name="person-outline" size={20} color="#082640" />}
@@ -303,7 +301,7 @@ const PostTripFormSignature = () => {
                   <TextInput
                     style={styles.typedSignatureInput}
                     value={formData.typedSignature}
-                    onChangeText={(text) =>
+                    onChangeText={(text: string) =>
                       setFormData({ ...formData, typedSignature: text })
                     }
                     placeholder="Type your signature"
@@ -402,7 +400,7 @@ const PostTripFormSignature = () => {
               }}
               onPress={() => {
                 setShowSuccessModal(false);
-                navigation.navigate("Home");
+                router.push("/(home)/home");
               }}
             >
               <Text

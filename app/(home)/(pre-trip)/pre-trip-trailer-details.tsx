@@ -3,19 +3,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
 import RadioButton from "../../../components/CustomRadioButton";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 const PreTripFormTrailerDetails = () => {
@@ -168,16 +163,9 @@ const PreTripFormTrailerDetails = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header title="Trailer(s)" subtitle="List of Trailers with Details" />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Trailer(s)</Text>
-        <Text style={styles.subtitle}>List of Trailers with Details</Text>
-
         {renderProgressBar()}
 
         {trailerComponents1.map((component) => (
@@ -207,7 +195,7 @@ const PreTripFormTrailerDetails = () => {
                   ""
                 )} Defect Details`}
                 value={formData[`${component.id}DefectDetails`]}
-                onChangeText={(text) =>
+                onChangeText={(text: string) =>
                   setFormData({
                     ...formData,
                     [`${component.id}DefectDetails`]: text,
@@ -252,7 +240,7 @@ const PreTripFormTrailerDetails = () => {
                   ""
                 )} Defect Details`}
                 value={formData[`${component.id}DefectDetails`]}
-                onChangeText={(text) =>
+                onChangeText={(text: string) =>
                   setFormData({
                     ...formData,
                     [`${component.id}DefectDetails`]: text,

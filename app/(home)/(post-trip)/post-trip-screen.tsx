@@ -1,15 +1,9 @@
 import { router } from "expo-router";
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
+import Header from "../../../components/Header";
 import { startPostTrip } from "../../../redux/actions/driverActions";
 
 export default function PostTripScreen() {
@@ -31,27 +25,10 @@ export default function PostTripScreen() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}></View>
-      <View style={styles.content}>
-        <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.title}>Confirm Trip Success</Text>
-            <Text style={styles.subtitle}>Choose to confirm trip or not</Text>
-          </View>
-          <View style={styles.profileOuterBorder}>
-            <View style={styles.profileInnerBorder}>
-              <Image
-                source={
-                  user?.avatar
-                    ? { uri: user.avatar }
-                    : require("../../../assets/profile-placeholder.png")
-                }
-                style={styles.profileImage}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
+      <Header
+        title="Pre-trip Inspection"
+        subtitle="Complete pre-trip inspection"
+      />
       <View style={styles.confirmButtonContainer}>
         <TouchableOpacity
           style={styles.confirmButtonOuter}

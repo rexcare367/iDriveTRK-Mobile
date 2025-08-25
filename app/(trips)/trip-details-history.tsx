@@ -2,19 +2,12 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
+import Header from "../../components/Header";
 import { api } from "../../utils";
 
 export default function TripDetailsHistoryScreen() {
@@ -146,22 +139,11 @@ export default function TripDetailsHistoryScreen() {
     },
   };
 
-  // Use API data if available, otherwise use default data
-  const displayTripDetails = tripDetails || defaultTripDetails;
-
   if (loading) {
     return (
       <View style={styles.container}>
         <BackgroundEffects />
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack}>
-            <Feather name="arrow-left" size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#082640" />
-          <Text style={styles.loadingText}>Loading trip details...</Text>
-        </View>
+        <Header />
       </View>
     );
   }
@@ -170,58 +152,21 @@ export default function TripDetailsHistoryScreen() {
     return (
       <View style={styles.container}>
         <BackgroundEffects />
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack}>
-            <Feather name="arrow-left" size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#ff6b6b" />
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={() => window.location.reload()}
-          >
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
+        <Header />
       </View>
     );
   }
 
+  const subTitle = `${moment(tripDetails.start_time).format(
+    "ddd, DD MMM YYYY  hh:mm A"
+  )} - ${moment(tripDetails.end_time).format("hh:mm A")}`;
+
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Feather name="arrow-left" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.title}>Trip Details</Text>
-            <Text style={styles.subtitle}>
-              {moment(tripDetails.start_time).format(
-                "ddd, DD MMM YYYY  hh:mm A"
-              )}{" "}
-              - {moment(tripDetails.end_time).format("hh:mm A")}
-            </Text>
-          </View>
-          <View style={styles.profileOuterBorder}>
-            <View style={styles.profileInnerBorder}>
-              <Image
-                source={
-                  user?.avatar
-                    ? { uri: user.avatar }
-                    : require("../../assets/profile-placeholder.png")
-                }
-                style={styles.profileImage}
-              />
-            </View>
-          </View>
-        </View>
+      <Header title="Trip Details" subtitle={subTitle} />
 
+      <View style={styles.content}>
         <View style={styles.mapContainer}>
           <MapView
             ref={mapRef}
@@ -288,7 +233,7 @@ export default function TripDetailsHistoryScreen() {
               {moment(tripDetails.end_time).diff(
                 moment(tripDetails.start_time),
                 "minutes"
-              )}
+              )}{" "}
               mins
             </Text>
           </View>

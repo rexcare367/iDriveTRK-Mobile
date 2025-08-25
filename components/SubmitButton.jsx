@@ -1,18 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  TouchableOpacity,
-  Text,
+  ActivityIndicator,
   StyleSheet,
-  ActivityIndicator
+  Text,
+  TouchableOpacity,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 
 const SubmitButton = ({
   onPress,
   title = "Submit",
   loading = false,
   disabled = false,
-  icon = "send"
+  icon = "send",
 }) => {
   return (
     <TouchableOpacity
@@ -24,7 +24,7 @@ const SubmitButton = ({
         <ActivityIndicator color="#fff" size="small" />
       ) : (
         <>
-          <Icon name={icon} size={20} color="#fff" style={styles.icon} />
+          <Ionicons name={icon} size={20} color="#fff" style={styles.icon} />
           <Text style={styles.text}>{title}</Text>
         </>
       )}
@@ -45,20 +45,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 3,
   },
   disabledButton: {
     backgroundColor: "#a0a0a0",
-    elevation: 0
+    elevation: 0,
   },
   text: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "500"
+    fontWeight: "500",
   },
   icon: {
-    marginRight: 8
-  }
+    marginRight: 8,
+  },
 });
 
 export default SubmitButton;

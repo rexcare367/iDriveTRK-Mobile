@@ -1,25 +1,14 @@
-import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
+import Header from "../../../components/Header";
 import { startPreTrip } from "../../../redux/actions/driverActions";
+
 export default function PreTripScreen() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
   const { clockInFormData } = useSelector((state: any) => state.driver);
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleStartPreTrip = () => {
     if (clockInFormData.truckId) {
@@ -33,38 +22,18 @@ export default function PreTripScreen() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Feather name="arrow-left" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.title}>Confirm Trip</Text>
-            <Text style={styles.subtitle}>Choose to confirm trip or not</Text>
-          </View>
-          <View style={styles.profileOuterBorder}>
-            <View style={styles.profileInnerBorder}>
-              <Image
-                source={
-                  user?.avatar
-                    ? { uri: user.avatar }
-                    : require("../../../assets/profile-placeholder.png")
-                }
-                style={styles.profileImage}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
+      <Header
+        title="Pre-trip Inspection"
+        subtitle="Complete pre-trip inspection"
+      />
       <View style={styles.confirmButtonContainer}>
         <TouchableOpacity
           style={styles.confirmButtonOuter}
           onPress={handleStartPreTrip}
         >
           <View style={styles.confirmButtonInner}>
-            <Text style={styles.confirmButtonText}>Perform Pre-trip</Text>
+            <Text style={styles.confirmButtonText}>Perform</Text>
+            <Text style={styles.confirmButtonText}>Pre-trip</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -158,6 +127,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    padding: 20,
   },
 });

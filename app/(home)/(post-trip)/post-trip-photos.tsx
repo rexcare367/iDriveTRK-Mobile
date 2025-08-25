@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
 import { api } from "../../../utils";
 
@@ -34,38 +35,48 @@ const PostTripFormPhotos = () => {
     !!formData.rearPhoto &&
     !!formData.rightSidePhoto;
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(updatePostTripForm({ ...postTripFormData, ...formData }));
     router.push("/post-trip-engine");
   };
 
-  const handleUpload = async (photoType) => {
-    console.log("photoType", photoType);
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const handleUpload = async (photoType: string) => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
     if (status !== "granted") {
       alert("Sorry, we need camera roll permissions to make this work!");
       return;
     }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.7,
-    });
+    let result;
+    try {
+      result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+      });
+    } catch {
+      alert("Camera failed to launch. Please try again.");
+      return;
+    }
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets && result.assets.length > 0) {
       const uri = result.assets[0].uri;
-      console.log("uri", uri);
+      if (!uri) {
+        alert("No image returned from camera.");
+        return;
+      }
 
       const response = await fetch(uri);
       const blob = await response.blob();
 
-      const fileExtension = uri.split(".").pop().toLowerCase();
+      let fileExtension = uri.split(".").pop().toLowerCase();
+      const uriParts = uri.split(".");
+      if (uriParts.length > 1) {
+        const ext = uriParts.pop();
+        if (ext) fileExtension = ext.toLowerCase();
+      }
+
       let mimeType;
 
       // Determine correct MIME type based on file extension
@@ -85,7 +96,7 @@ const PostTripFormPhotos = () => {
       }
       const filename = `${photoType}-${Date.now()}.${fileExtension}`;
 
-      const formDataUpload = new FormData();
+      const formDataUpload: any = new FormData();
 
       formDataUpload.append("file", {
         uri,
@@ -94,18 +105,12 @@ const PostTripFormPhotos = () => {
         data: blob,
       });
 
-      const uploadResponse = await api.post(
-        `/api/truck-inspection/upload-photo`,
-        formDataUpload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Accept: "application/json",
-          },
-        }
-      );
-
-      const { url } = uploadResponse.data;
+      await api.post(`/api/truck-inspection/upload-photo`, formDataUpload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Accept: "application/json",
+        },
+      });
 
       setFormData({
         ...formData,
@@ -152,18 +157,12 @@ const PostTripFormPhotos = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Vehicle Inspection Report"
+        subtitle="As required by the DOT Federal Motor Carrier Service Regulations"
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Post-Trip Vehicle Inspection Report</Text>
-        <Text style={styles.subtitle}>
-          As required by the DOT Federal Motor Carrier Service Regulations
-        </Text>
-
         {renderProgressBar()}
 
         <View style={styles.photoSection}>

@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import CustomInput from "../../components/CustomInput";
+import Header from "../../components/Header";
 
 export default function ChangePasswordScreen() {
   const [loading, setLoading] = useState(false);
@@ -96,16 +97,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Change Password</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <Header title="Change Password" />
 
       <ScrollView style={styles.content}>
         <View style={styles.section}>

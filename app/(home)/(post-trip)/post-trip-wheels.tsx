@@ -3,20 +3,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomCheckbox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
+
 export default function PostTripFormWheels() {
   const dispatch = useDispatch();
   const { postTripFormData } = useSelector((state: any) => state.driver);
@@ -64,7 +60,7 @@ export default function PostTripFormWheels() {
     router.push("/post-trip-rear-vehicle");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -133,17 +129,12 @@ export default function PostTripFormWheels() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Wheels & Tires"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Wheels & Tires</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Wheels and Tires includes: Wheels, Rims, Lugs, Tires, Lugs, Tire
           Chains
@@ -199,7 +190,7 @@ export default function PostTripFormWheels() {
             label="Wheels Details"
             placeholder="Enter Wheels Details"
             value={formData.wheelsDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, wheelsDetails: text })
             }
             icon={
@@ -212,7 +203,7 @@ export default function PostTripFormWheels() {
             label="Rims Details"
             placeholder="Enter Rim Details"
             value={formData.rimsDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, rimsDetails: text })
             }
             icon={<Ionicons name="disc-outline" size={20} color="#082640" />}
@@ -223,7 +214,7 @@ export default function PostTripFormWheels() {
             label="Lugs Details"
             placeholder="Enter Lugs Details"
             value={formData.lugsDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, lugsDetails: text })
             }
             icon={<Ionicons name="ellipse-outline" size={20} color="#082640" />}
@@ -234,7 +225,7 @@ export default function PostTripFormWheels() {
             label="Tires Details"
             placeholder="Enter Tires Details"
             value={formData.tiresDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, tiresDetails: text })
             }
             icon={
@@ -251,7 +242,7 @@ export default function PostTripFormWheels() {
             label="Tire Chains Details"
             placeholder="Enter Tire Chains Details"
             value={formData.tireChainsDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, tireChainsDetails: text })
             }
             icon={<Ionicons name="link-outline" size={20} color="#082640" />}

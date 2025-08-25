@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   ScrollView,
@@ -6,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { useSelector } from "react-redux";
 import BottomTabBar from "../../components/BottomTabBar";
 
@@ -122,7 +122,7 @@ export default function TimeSheetDetailsScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Icon name="arrow-left" size={24} color="#000" />
+          <Ionicons name="arrow-back-outline" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Submit Time Sheet</Text>
         <View style={styles.placeholder} />
@@ -193,8 +193,8 @@ export default function TimeSheetDetailsScreen() {
 
               <View style={styles.entryDetails}>
                 <View style={styles.entryTime}>
-                  <Icon
-                    name="clock"
+                  <Ionicons
+                    name="alarm-outline"
                     size={16}
                     color="#666"
                     style={styles.entryIcon}
@@ -205,7 +205,7 @@ export default function TimeSheetDetailsScreen() {
                 </View>
 
                 <View style={styles.entryHours}>
-                  <Icon
+                  <Ionicons
                     name="watch"
                     size={16}
                     color="#666"

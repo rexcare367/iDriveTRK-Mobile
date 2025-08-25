@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -12,7 +14,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import {
   calculatePayrollPeriod,
@@ -30,18 +31,18 @@ export default function PayrollSubmissionScreen() {
     (state: any) => state.payroll
   );
 
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<any>(null);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (clockEntries && clockEntries.length > 0) {
-      dispatch(calculatePayrollPeriod(clockEntries));
+      dispatch(calculatePayrollPeriod(clockEntries) as any);
     }
-    dispatch(fetchPayrollHistory("1")); // Using default user ID
+    dispatch(fetchPayrollHistory("1") as any); // Using default user ID
   }, [dispatch, clockEntries]);
 
-  const formatDate = (date) => {
+  const formatDate = (date: any) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -49,21 +50,25 @@ export default function PayrollSubmissionScreen() {
     });
   };
 
-  const formatHours = (hours) => {
+  const formatHours = (hours: any) => {
     return `${Math.floor(hours)}h ${Math.round((hours % 1) * 60)}m`;
   };
 
-  const calculateOvertimeHours = (regularHours) => {
+  const calculateOvertimeHours = (regularHours: any) => {
     return Math.max(0, regularHours - 80); // 80 hours = 2 weeks * 40 hours
   };
 
-  const calculateGrossPay = (regularHours, overtimeHours, hourlyRate = 25) => {
+  const calculateGrossPay = (
+    regularHours: any,
+    overtimeHours: any,
+    hourlyRate = 25
+  ) => {
     const regularPay = Math.min(regularHours, 80) * hourlyRate;
     const overtimePay = overtimeHours * (hourlyRate * 1.5);
     return regularPay + overtimePay;
   };
 
-  const handleSubmitPayroll = (period) => {
+  const handleSubmitPayroll = (period: any) => {
     setSelectedPeriod(period);
     setConfirmModalVisible(true);
   };
@@ -88,7 +93,7 @@ export default function PayrollSubmissionScreen() {
       status: "pending_review",
     };
 
-    dispatch(submitPayrollRequest(payrollData))
+    dispatch(submitPayrollRequest(payrollData) as any)
       .then(() => {
         Alert.alert(
           "Payroll Submitted",
@@ -96,7 +101,7 @@ export default function PayrollSubmissionScreen() {
           [{ text: "OK", onPress: () => setConfirmModalVisible(false) }]
         );
       })
-      .catch((error) => {
+      .catch(() => {
         Alert.alert(
           "Error",
           "Failed to submit payroll request. Please try again."
@@ -108,7 +113,7 @@ export default function PayrollSubmissionScreen() {
     setSelectedPeriod(null);
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: any) => {
     switch (status) {
       case "pending_review":
         return "#FF9800";
@@ -123,7 +128,7 @@ export default function PayrollSubmissionScreen() {
     }
   };
 
-  const getStatusText = (status) => {
+  const getStatusText = (status: any) => {
     switch (status) {
       case "pending_review":
         return "Pending Review";
@@ -142,10 +147,10 @@ export default function PayrollSubmissionScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color="#333" />
+          <Ionicons name="arrow-back-outline" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payroll Submission</Text>
         <View style={styles.placeholder} />
@@ -160,7 +165,7 @@ export default function PayrollSubmissionScreen() {
           </Text>
 
           {payrollPeriods && payrollPeriods.length > 0 ? (
-            payrollPeriods.map((period, index) => {
+            payrollPeriods.map((period: any, index: number) => {
               const overtimeHours = calculateOvertimeHours(period.totalHours);
               const grossPay = calculateGrossPay(
                 period.totalHours,
@@ -241,7 +246,7 @@ export default function PayrollSubmissionScreen() {
                       style={styles.submitButton}
                       onPress={() => handleSubmitPayroll(period)}
                     >
-                      <Icon name="send" size={16} color="#fff" />
+                      <Ionicons name="send" size={16} color="#fff" />
                       <Text style={styles.submitButtonText}>
                         Submit for Payroll
                       </Text>
@@ -260,7 +265,7 @@ export default function PayrollSubmissionScreen() {
             })
           ) : (
             <View style={styles.noPeriodsContainer}>
-              <Icon name="calendar" size={48} color="#ccc" />
+              <Ionicons name="calendar" size={48} color="#ccc" />
               <Text style={styles.noPeriodsText}>No pay periods available</Text>
               <Text style={styles.noPeriodsSubtext}>
                 Clock in to start tracking hours for payroll
@@ -277,7 +282,7 @@ export default function PayrollSubmissionScreen() {
           </Text>
 
           {payrollHistory && payrollHistory.length > 0 ? (
-            payrollHistory.map((submission, index) => (
+            payrollHistory.map((submission: any, index: number) => (
               <View key={submission.id || index} style={styles.historyCard}>
                 <View style={styles.historyHeader}>
                   <View style={styles.historyDates}>
@@ -328,7 +333,7 @@ export default function PayrollSubmissionScreen() {
             ))
           ) : (
             <View style={styles.noHistoryContainer}>
-              <Icon name="file-text" size={32} color="#ccc" />
+              <Ionicons name="document-text-outline" size={32} color="#ccc" />
               <Text style={styles.noHistoryText}>No payroll history</Text>
             </View>
           )}
@@ -353,7 +358,11 @@ export default function PayrollSubmissionScreen() {
                   onPress={() => setConfirmModalVisible(false)}
                   style={styles.closeButton}
                 >
-                  <Icon name="x" size={24} color="#666" />
+                  <Ionicons
+                    name="close-circle-outline"
+                    size={24}
+                    color="#666"
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -436,8 +445,8 @@ export default function PayrollSubmissionScreen() {
                   onPress={confirmSubmission}
                   disabled={isSubmitting}
                 >
-                  <Icon
-                    name="check"
+                  <Ionicons
+                    name="checkmark-circle-outline"
                     size={16}
                     color="#fff"
                     style={{ marginRight: 8 }}

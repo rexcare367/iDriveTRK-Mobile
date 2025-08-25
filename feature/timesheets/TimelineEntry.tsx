@@ -1,8 +1,18 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
-import { useDispatch, useSelector } from "react-redux";
+import { Feather } from "@expo/vector-icons";
 import moment from "moment";
+import React from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
+
+interface TimelineEntryProps {
+  type: any;
+  time: any;
+  start: any;
+  end: any;
+  label: any;
+  isLast: any;
+  onEditEntry: any;
+}
 
 const TimelineEntry = ({
   type,
@@ -12,15 +22,15 @@ const TimelineEntry = ({
   label,
   isLast,
   onEditEntry,
-}) => {
-  const { user } = useSelector((state) => state.auth);
+}: TimelineEntryProps) => {
+  const { user } = useSelector((state: any) => state.auth);
   // Dot color by type
   const dotColor =
     type === "clockin"
       ? "#4CAF50"
       : type === "clockout"
-        ? "#F44336"
-        : "#FFC107"; // break
+      ? "#F44336"
+      : "#FFC107"; // break
 
   // Time label
   let timeLabel = "";
@@ -59,24 +69,23 @@ const TimelineEntry = ({
             <View style={styles.userInfo}>
               <Image
                 source={{
-                  uri:
-                    user?.avatar ||
-                    "https://via.placeholder.com/40x40/4CAF50/FFFFFF?text=SO",
+                  uri: user?.avatar,
                 }}
                 style={styles.userAvatar}
               />
               <View style={styles.userDetails}>
                 <Text style={styles.userName}>
-                  {user?.name || user?.firstName || "User"}
+                  {user?.firstName + " " + user?.lastName}
                 </Text>
+                <Text style={styles.email}>{user?.email}</Text>
               </View>
             </View>
             <View style={styles.entryActions}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.editButton]}
-                onPress={onEditEntry ? () => onEditEntry() : undefined}
+                onPress={() => onEditEntry()}
               >
-                <Icon name="edit-2" size={16} color="#666" />
+                <Feather name="edit" size={16} color="#666" />
               </TouchableOpacity>
             </View>
           </View>
@@ -163,9 +172,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600",
     color: "#333",
+    marginBottom: 4,
+  },
+  email: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#555",
     marginBottom: 4,
   },
   entryActions: {

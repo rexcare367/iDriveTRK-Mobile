@@ -1,19 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomCheckBox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 const PreTripFormLights = () => {
@@ -61,7 +56,7 @@ const PreTripFormLights = () => {
     router.push("/pre-trip-checklist");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -134,17 +129,12 @@ const PreTripFormLights = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Lights"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Lights</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Lights includes: Head - Stop, Tail - Dash, Turn Indicators
         </Text>
@@ -187,7 +177,7 @@ const PreTripFormLights = () => {
             label="Head Stop Details"
             placeholder="Enter Head Stop Details"
             value={formData.headStopDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, headStopDetails: text })
             }
             icon={<Ionicons name="bulb-outline" size={20} color="#082640" />}
@@ -198,7 +188,7 @@ const PreTripFormLights = () => {
             label="Tail Dash Details"
             placeholder="Enter Tail Dash Details"
             value={formData.tailDashDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, tailDashDetails: text })
             }
             icon={<Ionicons name="car-outline" size={20} color="#082640" />}
@@ -209,7 +199,7 @@ const PreTripFormLights = () => {
             label="Turn Indicator Details"
             placeholder="Enter Turn Indicator Details"
             value={formData.turnIndicatorsDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, turnIndicatorsDetails: text })
             }
             icon={

@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { View, TextInput, StyleSheet } from "react-native"
+import { useEffect, useRef, useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
 
 const OTPInput = ({ length, onOTPChange }) => {
-  const [otp, setOtp] = useState(Array(length).fill(""))
-  const inputRefs = useRef([])
+  const [otp, setOtp] = useState(Array(length).fill(""));
+  const inputRefs = useRef([]);
 
   useEffect(() => {
     // Initialize refs array
-    inputRefs.current = inputRefs.current.slice(0, length)
-  }, [length])
+    inputRefs.current = inputRefs.current.slice(0, length);
+  }, [length]);
 
   const handleChange = (text, index) => {
-    const newOtp = [...otp]
-    newOtp[index] = text
-    setOtp(newOtp)
-    onOTPChange(newOtp.join(""))
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+    onOTPChange(newOtp.join(""));
 
     // Move to next input if current input is filled
     if (text && index < length - 1) {
-      inputRefs.current[index + 1]?.focus()
+      inputRefs.current[index + 1]?.focus();
     }
-  }
+  };
 
   const handleKeyPress = (e, index) => {
     // Move to previous input on backspace if current input is empty
     if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus()
+      inputRefs.current[index - 1]?.focus();
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -43,13 +43,13 @@ const OTPInput = ({ length, onOTPChange }) => {
             maxLength={1}
             keyboardType="number-pad"
             value={otp[index]}
-            onChangeText={(text) => handleChange(text, index)}
+            onChangeText={(text: string) => handleChange(text, index)}
             onKeyPress={(e) => handleKeyPress(e, index)}
           />
         ))}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -67,6 +67,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 24,
   },
-})
+});
 
-export default OTPInput
+export default OTPInput;

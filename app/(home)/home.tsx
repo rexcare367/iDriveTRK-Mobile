@@ -360,7 +360,7 @@ function HomeScreen() {
     <View style={styles.container}>
       <BackgroundEffects />
 
-      <Header user={user} />
+      <Header />
 
       <ScrollView style={styles.content}>
         <Text style={styles.greeting}>{getGreeting(currentTime)}</Text>
@@ -596,11 +596,11 @@ function HomeScreen() {
               Loading assigned trips...
             </Text>
           ) : schedulesError ? (
-            <Text
-              style={{ textAlign: "center", color: "red", marginVertical: 20 }}
-            >
-              {schedulesError}
-            </Text>
+            <EmptyState
+              icon="alarm-outline"
+              text={schedulesError}
+              subtext="Clock in to start tracking your time"
+            />
           ) : allSchedules.length > 0 ? (
             (() => {
               const schedule = allSchedules[0];
@@ -698,7 +698,7 @@ function HomeScreen() {
             })()
           ) : (
             <EmptyState
-              icon="clock"
+              icon="alarm-outline"
               text="No assigned trips for today."
               subtext="Clock in to start tracking your time"
             />

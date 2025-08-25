@@ -1,19 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import Checkbox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 export default function PostTripFormEngine() {
@@ -63,7 +58,7 @@ export default function PostTripFormEngine() {
     router.push("/post-trip-fluids");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -132,17 +127,12 @@ export default function PostTripFormEngine() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Engine Compartment"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Engine Compartment</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Engine Compartment includes: Engine, Alternator, Transmission, Battery
           and Belts
@@ -194,7 +184,7 @@ export default function PostTripFormEngine() {
             label="Engine Details"
             placeholder="Enter Engine Details"
             value={formData.engineDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, engineDetails: text })
             }
             icon={
@@ -207,7 +197,7 @@ export default function PostTripFormEngine() {
             label="Alternator Details"
             placeholder="Enter Alternator Details"
             value={formData.alternatorDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, alternatorDetails: text })
             }
             icon={<Ionicons name="flash-outline" size={20} color="#082640" />}
@@ -218,7 +208,7 @@ export default function PostTripFormEngine() {
             label="Transmission Details"
             placeholder="Enter Transmission Details"
             value={formData.transmissionDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, transmissionDetails: text })
             }
             icon={
@@ -235,7 +225,7 @@ export default function PostTripFormEngine() {
             label="Battery Details"
             placeholder="Enter Battery Details"
             value={formData.batteryDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, batteryDetails: text })
             }
             icon={
@@ -248,7 +238,7 @@ export default function PostTripFormEngine() {
             label="Belt and Hoses Details"
             placeholder="Enter Belt and Hoses Details"
             value={formData.beltAndHosesDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, beltAndHosesDetails: text })
             }
             icon={

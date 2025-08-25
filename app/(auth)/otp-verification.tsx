@@ -9,7 +9,7 @@ import { verifyOTP } from "../../redux/actions/authActions";
 
 export default function OTPVerificationScreen() {
   const dispatch = useDispatch();
-  const { loading, error, tempEmail } = useSelector((state) => state.auth);
+  const { loading, error, tempEmail } = useSelector((state: any) => state.auth);
 
   const [otp, setOtp] = useState("");
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes in seconds
@@ -33,7 +33,7 @@ export default function OTPVerificationScreen() {
   const handleVerifyOTP = async () => {
     if (otp.length !== 4) return;
 
-    const success = await dispatch(verifyOTP(otp));
+    const success = await dispatch(verifyOTP(otp) as any);
     if (success) {
       router.push("/pin");
     }

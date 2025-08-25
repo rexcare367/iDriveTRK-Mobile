@@ -84,7 +84,7 @@ export default function PTOScreen() {
         setLeaveRequests(grouped);
         console.log("[PTO] Grouped leave requests:", grouped);
       } catch (err) {
-        setError("Failed to load leave requests");
+        setError("Failed to load requests");
         console.log("[PTO] Error fetching leave requests:", err);
       } finally {
         setLoading(false);
@@ -162,7 +162,7 @@ export default function PTOScreen() {
             <Text style={{ color: "red" }}>{error}</Text>
           ) : leaveRequests[activeTab as keyof LeaveRequests]?.length === 0 ? (
             <EmptyState
-              icon="clock"
+              icon="alarm-outline"
               text={`No ${activeTab} reqeust.`}
               subtext="make request"
             />

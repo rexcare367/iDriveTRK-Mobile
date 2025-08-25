@@ -1,19 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import Checkbox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 const PreTripFormEngine = () => {
@@ -49,10 +44,6 @@ const PreTripFormEngine = () => {
     (!formData.battery || formData.batteryDetails.trim() !== "") &&
     (!formData.beltAndHoses || formData.beltAndHosesDetails.trim() !== "");
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({
@@ -63,7 +54,7 @@ const PreTripFormEngine = () => {
     router.push("/pre-trip-fluids");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -132,17 +123,12 @@ const PreTripFormEngine = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Engine Compartment"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Engine Compartment</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Engine Compartment includes: Engine, Alternator, Transmission, Battery
           and Belts
@@ -194,7 +180,7 @@ const PreTripFormEngine = () => {
             label="Engine Details"
             placeholder="Enter Engine Details"
             value={formData.engineDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, engineDetails: text })
             }
             icon={
@@ -207,7 +193,7 @@ const PreTripFormEngine = () => {
             label="Alternator Details"
             placeholder="Enter Alternator Details"
             value={formData.alternatorDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, alternatorDetails: text })
             }
             icon={<Ionicons name="flash-outline" size={20} color="#082640" />}
@@ -218,7 +204,7 @@ const PreTripFormEngine = () => {
             label="Transmission Details"
             placeholder="Enter Transmission Details"
             value={formData.transmissionDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, transmissionDetails: text })
             }
             icon={
@@ -235,7 +221,7 @@ const PreTripFormEngine = () => {
             label="Battery Details"
             placeholder="Enter Battery Details"
             value={formData.batteryDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, batteryDetails: text })
             }
             icon={
@@ -248,7 +234,7 @@ const PreTripFormEngine = () => {
             label="Belt and Hoses Details"
             placeholder="Enter Belt and Hoses Details"
             value={formData.beltAndHosesDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, beltAndHosesDetails: text })
             }
             icon={

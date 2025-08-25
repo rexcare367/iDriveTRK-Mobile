@@ -3,19 +3,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
 import CustomButton from "../../../components/CustomButton";
 import CustomCheckBox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
+import Header from "../../../components/Header";
 import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 const PreTripFormCab = () => {
@@ -73,7 +68,7 @@ const PreTripFormCab = () => {
     defrostHeater: "defrostHeaterDetails",
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -141,17 +136,12 @@ const PreTripFormCab = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Inside the Cab"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Inside the Cab</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Cab Interior includes: Windshield Clean, Wipers Functional, Gauges,
           Horn, Defrost/Heater
@@ -207,7 +197,7 @@ const PreTripFormCab = () => {
             label="Windshield Clean & Not Cracked Details"
             placeholder="Enter Windshield Clean & Not Cracked Details"
             value={formData.windshieldDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, windshieldDetails: text })
             }
             icon={
@@ -220,7 +210,7 @@ const PreTripFormCab = () => {
             label="Wipers Functional Details"
             placeholder="Enter Wipers Functional Details"
             value={formData.wipersDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, wipersDetails: text })
             }
             icon={<Ionicons name="rainy-outline" size={20} color="#082640" />}
@@ -231,7 +221,7 @@ const PreTripFormCab = () => {
             label="Gauges Details"
             placeholder="Enter Gauges Details"
             value={formData.gaugesDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, gaugesDetails: text })
             }
             icon={
@@ -244,7 +234,7 @@ const PreTripFormCab = () => {
             label="Horn Details"
             placeholder="Enter Horn Details"
             value={formData.hornDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, hornDetails: text })
             }
             icon={
@@ -257,7 +247,7 @@ const PreTripFormCab = () => {
             label="Defrost / Heater Details"
             placeholder="Enter Defrost / Heater Details"
             value={formData.defrostHeaterDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, defrostHeaterDetails: text })
             }
             icon={<Ionicons name="snow-outline" size={20} color="#082640" />}

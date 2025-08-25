@@ -93,7 +93,7 @@ const PostTripFormTrailer = () => {
             label="Trailer Number 1"
             placeholder="Enter Trailer Number Details"
             value={formData.trailerNumber1}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, trailerNumber1: text })
             }
             icon={<Ionicons name="apps-outline" size={20} color="#082640" />}
@@ -105,7 +105,7 @@ const PostTripFormTrailer = () => {
             label="Trailer Number 2"
             placeholder="Enter Trailer Number Details"
             value={formData.trailerNumber2}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, trailerNumber2: text })
             }
             icon={<Ionicons name="apps-outline" size={20} color="#082640" />}

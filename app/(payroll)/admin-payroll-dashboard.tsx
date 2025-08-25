@@ -1,5 +1,5 @@
-import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import {
@@ -29,14 +28,14 @@ export default function AdminPayrollDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [selectedSubmission, setSelectedSubmission] = useState(null);
-  const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+  const [exportModalVisible, setExportModalVisible] = useState<any>(false);
 
   useEffect(() => {
-    dispatch(fetchAllPayrollSubmissions());
+    dispatch(fetchAllPayrollSubmissions() as any);
   }, [dispatch]);
 
-  const formatDate = (date) => {
+  const formatDate = (date: any) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -44,15 +43,15 @@ export default function AdminPayrollDashboard() {
     });
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: any) => {
     return `$${amount.toFixed(2)}`;
   };
 
-  const formatHours = (hours) => {
+  const formatHours = (hours: any) => {
     return `${Math.floor(hours)}h ${Math.round((hours % 1) * 60)}m`;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: any) => {
     switch (status) {
       case "pending":
         return "#FF9800";
@@ -67,7 +66,7 @@ export default function AdminPayrollDashboard() {
     }
   };
 
-  const handleApprove = (submission) => {
+  const handleApprove = (submission: any) => {
     Alert.alert(
       "Approve Payroll",
       `Approve payroll submission for ${submission.userName}?`,
@@ -76,14 +75,14 @@ export default function AdminPayrollDashboard() {
         {
           text: "Approve",
           onPress: () => {
-            dispatch(approvePayrollSubmission(submission.id));
+            dispatch(approvePayrollSubmission(submission.id) as any);
           },
         },
       ]
     );
   };
 
-  const handleReject = (submission) => {
+  const handleReject = (submission: any) => {
     Alert.alert(
       "Reject Payroll",
       `Reject payroll submission for ${submission.userName}?`,
@@ -93,45 +92,45 @@ export default function AdminPayrollDashboard() {
           text: "Reject",
           style: "destructive",
           onPress: () => {
-            dispatch(rejectPayrollSubmission(submission.id));
+            dispatch(rejectPayrollSubmission(submission.id) as any);
           },
         },
       ]
     );
   };
 
-  const handleExportToSpreadsheet = async (format = "csv") => {
-    try {
-      const filteredSubmissions = getFilteredSubmissions();
-      const csvData = generateCSVData(filteredSubmissions);
+  // const handleExportToSpreadsheet = async (format = "csv") => {
+  //   try {
+  //     const filteredSubmissions = getFilteredSubmissions();
+  //     const csvData = generateCSVData(filteredSubmissions);
 
-      const fileName = `payroll_export_${
-        new Date().toISOString().split("T")[0]
-      }.${format}`;
-      const fileUri = FileSystem.documentDirectory + fileName;
+  //     const fileName = `payroll_export_${
+  //       new Date().toISOString().split("T")[0]
+  //     }.${format}`;
+  //     const fileUri = FileSystem.documentDirectory + fileName;
 
-      await FileSystem.writeAsStringAsync(fileUri, csvData, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
+  //     await FileSystem.writeAsStringAsync(fileUri, csvData, {
+  //       encoding: FileSystem.EncodingType.UTF8,
+  //     });
 
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri, {
-          mimeType: format === "csv" ? "text/csv" : "application/vnd.ms-excel",
-          dialogTitle: "Export Payroll Data",
-        });
-      }
+  //     if (await Sharing.isAvailableAsync()) {
+  //       await Sharing.shareAsync(fileUri, {
+  //         mimeType: format === "csv" ? "text/csv" : "application/vnd.ms-excel",
+  //         dialogTitle: "Export Payroll Data",
+  //       });
+  //     }
 
-      setExportModalVisible(false);
-      Alert.alert("Success", "Payroll data exported successfully!");
-    } catch (error) {
-      Alert.alert("Error", "Failed to export payroll data");
-    }
-  };
+  //     setExportModalVisible(false);
+  //     Alert.alert("Success", "Payroll data exported successfully!");
+  //   } catch (error) {
+  //     Alert.alert("Error", "Failed to export payroll data");
+  //   }
+  // };
 
   const getFilteredSubmissions = () => {
     if (!payrollSubmissions) return [];
 
-    return payrollSubmissions.filter((submission) => {
+    return payrollSubmissions.filter((submission: any) => {
       const matchesSearch = submission.userName
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
@@ -141,9 +140,9 @@ export default function AdminPayrollDashboard() {
     });
   };
 
-  const calculateTotals = (submissions) => {
+  const calculateTotals = (submissions: any) => {
     return submissions.reduce(
-      (totals, submission) => ({
+      (totals: any, submission: any) => ({
         totalEmployees: totals.totalEmployees + 1,
         totalHours:
           totals.totalHours +
@@ -159,7 +158,7 @@ export default function AdminPayrollDashboard() {
   const filteredSubmissions = getFilteredSubmissions();
   const totals = calculateTotals(filteredSubmissions);
 
-  const renderSubmissionRow = ({ item: submission }) => (
+  const renderSubmissionRow = ({ item: submission }: any) => (
     <TouchableOpacity
       style={styles.submissionRow}
       onPress={() => {
@@ -219,17 +218,17 @@ export default function AdminPayrollDashboard() {
       <BackgroundEffects />
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Icon name="arrow-left" size={24} color="#333" />
+          <Ionicons name="arrow-back-outline" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payroll Dashboard</Text>
         <TouchableOpacity
           style={styles.exportButton}
           onPress={() => setExportModalVisible(true)}
         >
-          <Icon name="download" size={20} color="#4CAF50" />
+          <Ionicons name="download" size={20} color="#4CAF50" />
           <Text style={styles.exportButtonText}>Export</Text>
         </TouchableOpacity>
       </View>
@@ -263,7 +262,7 @@ export default function AdminPayrollDashboard() {
       {/* Filters */}
       <View style={styles.filtersContainer}>
         <View style={styles.searchContainer}>
-          <Icon
+          <Ionicons
             name="search"
             size={20}
             color="#666"
@@ -317,7 +316,7 @@ export default function AdminPayrollDashboard() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Icon name="file-text" size={48} color="#ccc" />
+            <Ionicons name="document-text-outline" size={48} color="#ccc" />
             <Text style={styles.emptyText}>No payroll submissions found</Text>
           </View>
         }
@@ -338,7 +337,7 @@ export default function AdminPayrollDashboard() {
                 onPress={() => setDetailModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Icon name="x" size={24} color="#666" />
+                <Ionicons name="close-circle-outline" size={24} color="#666" />
               </TouchableOpacity>
             </View>
 
@@ -469,16 +468,20 @@ export default function AdminPayrollDashboard() {
                 onPress={() => setExportModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Icon name="x" size={24} color="#666" />
+                <Ionicons name="close-circle-outline" size={24} color="#666" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.exportOptions}>
               <TouchableOpacity
                 style={styles.exportOption}
-                onPress={() => handleExportToSpreadsheet("csv")}
+                // onPress={() => handleExportToSpreadsheet("csv")}
               >
-                <Icon name="file-text" size={32} color="#4CAF50" />
+                <Ionicons
+                  name="document-text-outline"
+                  size={32}
+                  color="#4CAF50"
+                />
                 <Text style={styles.exportOptionTitle}>Export as CSV</Text>
                 <Text style={styles.exportOptionDescription}>
                   Compatible with Excel, Google Sheets, and other spreadsheet
@@ -488,9 +491,9 @@ export default function AdminPayrollDashboard() {
 
               <TouchableOpacity
                 style={styles.exportOption}
-                onPress={() => handleExportToSpreadsheet("xlsx")}
+                // onPress={() => handleExportToSpreadsheet("xlsx")}
               >
-                <Icon name="file" size={32} color="#2196F3" />
+                <Ionicons name="document-outline" size={32} color="#2196F3" />
                 <Text style={styles.exportOptionTitle}>Export as Excel</Text>
                 <Text style={styles.exportOptionDescription}>
                   Native Excel format with formatting and formulas
@@ -515,6 +518,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 30,
+  },
+  backButton: {
+    padding: 16,
   },
   headerTitle: {
     fontSize: 20,

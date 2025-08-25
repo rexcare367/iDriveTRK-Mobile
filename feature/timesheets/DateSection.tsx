@@ -1,13 +1,25 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
-import TimelineEntry from "./TimelineEntry";
+import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+import React, { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import TimelineEntry from "./TimelineEntry";
 
-const DateSection = ({ date, dayData, onEditEntry, formatTime }) => {
+interface DateSectionProps {
+  date: any;
+  dayData: any;
+  onEditEntry: any;
+  // onAddMissingEntry: any;
+}
+
+const DateSection = ({
+  date,
+  dayData,
+  onEditEntry,
+}: // onAddMissingEntry,
+DateSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const formatDateHeader = (dateString) => {
+  const formatDateHeader = (dateString: any) => {
     const date = moment(dateString);
     return date.format("dddd, MMMM Do, YYYY");
   };
@@ -24,7 +36,7 @@ const DateSection = ({ date, dayData, onEditEntry, formatTime }) => {
     let total = moment.duration(end.diff(start));
     let breakDuration = moment.duration(0);
     if (Array.isArray(dayData.breaks)) {
-      dayData.breaks.forEach((b) => {
+      dayData.breaks.forEach((b: any) => {
         if (b.start && b.end) {
           const bStart = moment(b.start);
           const bEnd = moment(b.end);
@@ -48,8 +60,8 @@ const DateSection = ({ date, dayData, onEditEntry, formatTime }) => {
       >
         <View style={styles.dateHeaderContent}>
           <View style={styles.dateIconContainer}>
-            <Icon
-              name={isExpanded ? "chevron-down" : "chevron-right"}
+            <Ionicons
+              name={isExpanded ? "arrow-down" : "arrow-forward"}
               size={16}
               color="#fff"
             />
@@ -67,10 +79,6 @@ const DateSection = ({ date, dayData, onEditEntry, formatTime }) => {
         <View style={styles.timelineContent}>
           {/* Individual Clock Entries */}
           <View style={styles.entriesSection}>
-            <View style={styles.entriesHeader}>
-              <Text style={styles.entriesTitle}>Timeline</Text>
-            </View>
-
             {(() => {
               const timeline = [
                 dayData.clockin_time && {
@@ -79,7 +87,7 @@ const DateSection = ({ date, dayData, onEditEntry, formatTime }) => {
                   label: "Clock In",
                   id: "clockin",
                 },
-                ...dayData.breaks.map((b, idx) => ({
+                ...dayData.breaks.map((b: any, idx: number) => ({
                   type: "break",
                   start: b.start,
                   end: b.end,
@@ -103,7 +111,6 @@ const DateSection = ({ date, dayData, onEditEntry, formatTime }) => {
                   label={item.label}
                   isLast={idx === timeline.length - 1}
                   onEditEntry={onEditEntry}
-                  formatTime={formatTime}
                 />
               ));
             })()}

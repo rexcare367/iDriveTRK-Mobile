@@ -1,13 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../../components/BackgroundEffects";
 import BottomTabBar from "../../../components/BottomTabBar";
@@ -15,6 +9,7 @@ import CustomButton from "../../../components/CustomButton";
 import CustomCheckbox from "../../../components/CustomCheckbox";
 import CustomInput from "../../../components/CustomInput";
 import CustomRadioButton from "../../../components/CustomRadioButton";
+import Header from "../../../components/Header";
 import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 export default function PostTripFormFluids() {
@@ -68,7 +63,7 @@ export default function PostTripFormFluids() {
     router.push("/post-trip-wheels");
   };
 
-  const handleCheckboxToggle = (field) => {
+  const handleCheckboxToggle = (field: string) => {
     if (field === "allFunctioning") {
       const newValue = !formData.allFunctioning;
       setFormData({
@@ -145,17 +140,12 @@ export default function PostTripFormFluids() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Fluid Levels & Leaks"
+        subtitle="Check to ensure that all are functioning."
+      />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Fluid Levels & Leaks</Text>
-        <Text style={styles.subtitle}>
-          Check to ensure that all are functioning.
-        </Text>
         <Text style={styles.description}>
           Check for Frame & Assembly, Front Axle / A-Frame, Drive Line
         </Text>
@@ -198,7 +188,7 @@ export default function PostTripFormFluids() {
             label="Frame Assembly Details"
             placeholder="Enter Frame Assembly Details"
             value={formData.frameAssemblyDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, frameAssemblyDetails: text })
             }
             icon={<Ionicons name="build-outline" size={20} color="#082640" />}
@@ -209,7 +199,7 @@ export default function PostTripFormFluids() {
             label="Front Axle/A-Frame Details"
             placeholder="Enter Front Axle/A-Frame Details"
             value={formData.frontAxleDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, frontAxleDetails: text })
             }
             icon={<Ionicons name="car-outline" size={20} color="#082640" />}
@@ -220,7 +210,7 @@ export default function PostTripFormFluids() {
             label="Drive Line Details"
             placeholder="Enter Drive Line Details"
             value={formData.driveLineDetails}
-            onChangeText={(text) =>
+            onChangeText={(text: string) =>
               setFormData({ ...formData, driveLineDetails: text })
             }
             icon={
@@ -254,7 +244,7 @@ export default function PostTripFormFluids() {
               label="Suspension System Defect Details"
               placeholder="Enter Suspension System Defect Details"
               value={formData.suspensionSystemDefectDetails}
-              onChangeText={(text) =>
+              onChangeText={(text: string) =>
                 setFormData({
                   ...formData,
                   suspensionSystemDefectDetails: text,
@@ -295,7 +285,7 @@ export default function PostTripFormFluids() {
               label="Steering Defect Details"
               placeholder="Enter Steering Defect Details"
               value={formData.steeringDefectDetails}
-              onChangeText={(text) =>
+              onChangeText={(text: string) =>
                 setFormData({ ...formData, steeringDefectDetails: text })
               }
               icon={

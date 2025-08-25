@@ -17,6 +17,7 @@ import {
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 import { useDispatch, useSelector } from "react-redux";
+import Header from "../../components/Header";
 import { logout } from "../../redux/actions/authActions";
 import { switchUserRole } from "../../redux/actions/userActions";
 import { api } from "../../utils";
@@ -143,16 +144,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <Header title="Profile" subtitle="Manage your account settings" />
 
       <ScrollView style={styles.content}>
         <View style={styles.profileSection}>

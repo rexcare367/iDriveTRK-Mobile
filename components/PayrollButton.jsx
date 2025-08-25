@@ -1,10 +1,10 @@
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
+import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 const PayrollButton = ({ onPress, style }) => {
   return (
     <TouchableOpacity style={[styles.payrollButton, style]} onPress={onPress}>
-      <Icon name="dollar-sign" size={16} color="#fff" />
+      <Ionicons name="dollar-sign" size={16} color="#fff" />
       <Text style={styles.payrollButtonText}>Submit Payroll</Text>
     </TouchableOpacity>
   );
@@ -20,13 +20,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     gap: 8,
-    marginTop: 16
+    marginTop: 16,
   },
   payrollButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 });
 
 export default PayrollButton;
