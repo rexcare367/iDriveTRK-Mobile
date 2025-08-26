@@ -1,3 +1,5 @@
+import CurrentActiveSchedule from "@/feature/home/CurrentActiveSchedule";
+import NextSchedule from "@/feature/home/NextSchedule";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import moment from "moment";
@@ -20,20 +22,20 @@ import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
-import EmptyState from "../../components/EmptyState";
 import Header from "../../components/Header";
 import InsufficientBreakModal from "../../components/InsufficientBreakModal";
-import {
-  clockOut,
-  selectTrip,
-  updateClockInForm,
-} from "../../redux/actions/driverActions";
+import { updateClockInForm } from "../../redux/actions/driverActions";
 import { api } from "../../utils";
 import { getLastClockOutTime } from "../../utils/firestore";
+import {
+  formatDate,
+  formatDuration,
+  formatTime,
+  getGreeting,
+} from "../../utils/helpers";
 
 function HomeScreen() {
   const dispatch = useDispatch();
-
   const { user } = useSelector((state: any) => state.auth);
   const { clockInFormData } = useSelector((state: any) => state.driver);
 
@@ -50,10 +52,9 @@ function HomeScreen() {
     clockInFormData &&
     clockInFormData.status &&
     clockInFormData.status !== "pending";
-
   const [isOnBreak, setIsOnBreak] = useState(false);
+  const fullname = user?.firstName + " " + user?.lastName;
 
-  // Update isOnBreak whenever clockInFormData changes
   useEffect(() => {
     if (
       clockInFormData &&
@@ -67,7 +68,6 @@ function HomeScreen() {
       setIsOnBreak(false);
     }
   }, [clockInFormData]);
-
   const ripple = useSharedValue(0);
 
   useEffect(() => {
@@ -76,21 +76,19 @@ function HomeScreen() {
       setCurrentTime(now);
       setTimeDisplay(formatTime(now));
 
-      if (isOnBreak) {
+      if (isOnBreak && clockInFormData && clockInFormData.breaks.length > 0) {
         const breakStart = moment(
           clockInFormData.breaks[clockInFormData.breaks.length - 1].start
         );
         const breakDurationMs = now.diff(breakStart);
         setBreakDuration(Math.floor(breakDurationMs / 60000));
       }
-      if (isClockedIn && clockInFormData.clockin_time) {
+      if (isClockedIn && clockInFormData && clockInFormData.clockin_time) {
         const clockInTimeDate = moment(clockInFormData.clockin_time);
-
         const workDurationMs = now.diff(clockInTimeDate);
         setWorkDuration(Math.floor(workDurationMs / 60000));
       }
     }, 1000);
-
     return () => clearInterval(timer);
   }, [isOnBreak, isClockedIn, clockInFormData]);
 
@@ -113,7 +111,6 @@ function HomeScreen() {
             start_time
           )}&end_time=${encodeURIComponent(end_time)}&status=scheduled`
         );
-        console.log("response.data", response.data);
         setAllSchedules(response.data || []);
       } catch (err) {
         setSchedulesError("Failed to fetch schedules");
@@ -162,26 +159,6 @@ function HomeScreen() {
     ripple.value = withRepeat(withTiming(1, { duration: 1000 }), -1, false);
     fetchTimesheetAndSchedule();
   }, [user?.id]);
-
-  const formatTime = (dateOrMoment: any) => {
-    const m = moment.isMoment(dateOrMoment)
-      ? dateOrMoment
-      : moment(dateOrMoment);
-    return m.format("h:mm a");
-  };
-
-  const formatDate = (dateOrMoment: any) => {
-    const m = moment.isMoment(dateOrMoment)
-      ? dateOrMoment
-      : moment(dateOrMoment);
-    return m.format("dddd Do MMMM, YYYY");
-  };
-
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
 
   const handleClockIn = async () => {
     try {
@@ -239,29 +216,7 @@ function HomeScreen() {
   };
 
   const handleClockOut = async () => {
-    try {
-      await (dispatch as any)(clockOut());
-
-      const clockOutData = {
-        clockout_time: moment().toISOString(),
-        status: "clockOut",
-      };
-
-      const apiResult = await api.patch(
-        `api/timesheets/by-id/${clockInFormData.id}`,
-        clockOutData
-      );
-
-      if (apiResult?.data?.success || apiResult?.status === 200) {
-        console.log("Clock-out successful");
-        // Refresh timesheet and schedule data
-        await fetchTimesheetAndSchedule();
-      } else {
-        console.error("Failed to save clock-out data", apiResult);
-      }
-    } catch (error) {
-      console.error("Error during clock-out:", error);
-    }
+    router.push("/(home)/(post-trip)/post-trip-screen");
   };
 
   const handleInsufficientBreakCancel = () => {
@@ -318,43 +273,32 @@ function HomeScreen() {
     setBreakModalVisible(false);
   };
 
-  const chartData = {
-    labels: ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43, 50],
-        color: (opacity = 1) => `rgba(0, 75, 135, ${opacity})`,
-        strokeWidth: 2,
-      },
-    ],
-  };
+  // const chartData = {
+  //   labels: ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"],
+  //   datasets: [
+  //     {
+  //       data: [20, 45, 28, 80, 99, 43, 50],
+  //       color: (opacity = 1) => `rgba(0, 75, 135, ${opacity})`,
+  //       strokeWidth: 2,
+  //     },
+  //   ],
+  // };
 
-  const chartConfig = {
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
-    decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(0, 75, 135, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
-    propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#082640",
-    },
-  };
-
-  const getGreeting = (date: any) => {
-    const m = moment.isMoment(date) ? date : moment(date);
-    const hour = m.hour();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
-
-  const firstName = user?.firstName || "";
-  const lastName = user?.lastName || "";
+  // const chartConfig = {
+  //   backgroundGradientFrom: "#ffffff",
+  //   backgroundGradientTo: "#ffffff",
+  //   decimalPlaces: 0,
+  //   color: (opacity = 1) => `rgba(0, 75, 135, ${opacity})`,
+  //   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  //   style: {
+  //     borderRadius: 16,
+  //   },
+  //   propsForDots: {
+  //     r: "6",
+  //     strokeWidth: "2",
+  //     stroke: "#082640",
+  //   },
+  // };
 
   return (
     <View style={styles.container}>
@@ -364,15 +308,10 @@ function HomeScreen() {
 
       <ScrollView style={styles.content}>
         <Text style={styles.greeting}>{getGreeting(currentTime)}</Text>
-        <Text style={styles.name}>
-          {firstName} {lastName}!
-        </Text>
+        <Text style={styles.name}>{fullname}!</Text>
         {isClockedIn ? (
           <View style={styles.clockedInContainer}>
-            <TouchableOpacity
-              style={styles.statusContainer}
-              onPress={handleClockIn}
-            >
+            <TouchableOpacity style={styles.statusContainer}>
               <View style={styles.statusIndicator}>
                 <View
                   style={[
@@ -436,274 +375,9 @@ function HomeScreen() {
         )}
         <Text style={styles.dateText}>{formatDate(currentTime)}</Text>
 
-        {activeSchedule ? (
-          <View style={styles.todaysTripContainer}>
-            <View style={styles.todaysTripHeader}>
-              <Text style={styles.todaysTripTitle}>Your current Trip</Text>
-            </View>
+        <CurrentActiveSchedule schedule={activeSchedule} />
 
-            <View style={styles.tripCard}>
-              {(() => {
-                try {
-                  if (!activeSchedule.job) {
-                    throw new Error("Job information is missing");
-                  }
-
-                  return (
-                    <>
-                      <View style={styles.tripHeader}>
-                        <Text style={styles.tripName}>
-                          {activeSchedule.job?.name || "Untitled Trip"}
-                        </Text>
-                        <View style={styles.tripTime}>
-                          <Ionicons
-                            name="time-outline"
-                            size={16}
-                            color="#082640"
-                          />
-                          <Text style={styles.tripTimeText}>
-                            {activeSchedule.start_time
-                              ? `${moment(activeSchedule.start_time).format(
-                                  "h:mm A"
-                                )} - ${moment(activeSchedule.end_time).format(
-                                  "h:mm A"
-                                )}`
-                              : "Time not set"}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {activeSchedule.job.description && (
-                        <Text
-                          style={{
-                            fontSize: 13,
-                            color: "#666",
-                            marginBottom: 8,
-                          }}
-                        >
-                          {activeSchedule.job.description}
-                        </Text>
-                      )}
-
-                      {Array.isArray(activeSchedule.job.routes) &&
-                        activeSchedule.job.routes.length > 0 && (
-                          <View style={styles.tripStops}>
-                            {activeSchedule.job.routes.map(
-                              (stop: any, index: number) => (
-                                <View key={index} style={styles.tripStop}>
-                                  <View style={styles.stopDot} />
-                                  <Text style={styles.stopName}>
-                                    {stop?.label || "Unnamed Stop"}
-                                  </Text>
-                                </View>
-                              )
-                            )}
-                          </View>
-                        )}
-
-                      <View style={styles.tripMeta}>
-                        {activeSchedule.job.driving_distance && (
-                          <View style={styles.tripMetaItem}>
-                            <Ionicons
-                              name="speedometer-outline"
-                              size={14}
-                              color="#666"
-                            />
-                            <Text style={styles.tripMetaText}>
-                              {activeSchedule.job.driving_distance}
-                            </Text>
-                          </View>
-                        )}
-                        {activeSchedule.start_time &&
-                          activeSchedule.end_time && (
-                            <View style={styles.tripMetaItem}>
-                              <Ionicons
-                                name="hourglass-outline"
-                                size={14}
-                                color="#666"
-                              />
-                              <Text style={styles.tripMetaText}>
-                                {`${moment(activeSchedule.end_time).diff(
-                                  moment(activeSchedule.start_time),
-                                  "minutes"
-                                )} min`}
-                              </Text>
-                            </View>
-                          )}
-                      </View>
-
-                      <TouchableOpacity
-                        style={styles.viewTripButton}
-                        // onPress={() =>
-                        //   navigation.navigate("TripDetailsHistory", {
-                        //     tripId: activeSchedule.id,
-                        //   })
-                        // }
-
-                        onPress={() => {
-                          dispatch(selectTrip(activeSchedule, []));
-                          // For now, navigate to trip-selection since trip-stops doesn't exist
-                          router.push({
-                            pathname: "/(home)/trip-details",
-                            params: {
-                              tripId: activeSchedule.id,
-                              tripName: activeSchedule.name,
-                              isAssigned: "true",
-                            },
-                          });
-                        }}
-                      >
-                        <Text style={styles.viewTripButtonText}>
-                          View Trip Details
-                        </Text>
-                        <Ionicons
-                          name="arrow-forward"
-                          size={16}
-                          color="#082640"
-                        />
-                      </TouchableOpacity>
-                    </>
-                  );
-                } catch (error) {
-                  console.error("Error rendering trip card:", error);
-                  return (
-                    <View style={styles.errorContainer}>
-                      <Text style={styles.errorText}>
-                        Unable to display trip details. Please try again later.
-                      </Text>
-                    </View>
-                  );
-                }
-              })()}
-            </View>
-          </View>
-        ) : null}
-
-        <View style={styles.todaysTripContainer}>
-          <View style={styles.todaysTripHeader}>
-            <Text style={styles.todaysTripTitle}>Next Scheduled Trip</Text>
-            <TouchableOpacity
-              onPress={() => router.push("/(home)/trip-selection")}
-            >
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
-          </View>
-
-          {schedulesLoading ? (
-            <Text
-              style={{ textAlign: "center", color: "#888", marginVertical: 20 }}
-            >
-              Loading assigned trips...
-            </Text>
-          ) : schedulesError ? (
-            <EmptyState
-              icon="alarm-outline"
-              text={schedulesError}
-              subtext="Clock in to start tracking your time"
-            />
-          ) : allSchedules.length > 0 ? (
-            (() => {
-              const schedule = allSchedules[0];
-              const job = schedule.job || {};
-              const scheduler = schedule.scheduler || {};
-              const tripName = job.name || scheduler.title || "Trip";
-              const description = job.description || "";
-              const startTime = schedule.start_time
-                ? moment(schedule.start_time)
-                : null;
-              const endTime = schedule.end_time
-                ? moment(schedule.end_time)
-                : null;
-              const timeStr =
-                startTime && endTime
-                  ? `${startTime.format("h:mm A")} - ${endTime.format(
-                      "h:mm A"
-                    )}`
-                  : "";
-              const stops = Array.isArray(job.routes) ? job.routes : [];
-              const distance = job.driving_distance
-                ? `${job.driving_distance} km`
-                : "";
-              return (
-                <View style={styles.tripCard}>
-                  <View style={styles.tripHeader}>
-                    <Text style={styles.tripName}>{tripName}</Text>
-                    <View style={styles.tripTime}>
-                      <Ionicons name="time-outline" size={16} color="#082640" />
-                      <Text style={styles.tripTimeText}>{timeStr}</Text>
-                    </View>
-                  </View>
-                  {description ? (
-                    <Text
-                      style={{ fontSize: 13, color: "#666", marginBottom: 8 }}
-                    >
-                      {description}
-                    </Text>
-                  ) : null}
-                  {stops.length > 0 && (
-                    <View style={styles.tripStops}>
-                      {stops.map((stop: any, index: number) => (
-                        <View key={index} style={styles.tripStop}>
-                          <View style={styles.stopDot} />
-                          <Text style={styles.stopName}>{stop.label}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-                  <View style={styles.tripMeta}>
-                    {distance && (
-                      <View style={styles.tripMetaItem}>
-                        <Ionicons
-                          name="speedometer-outline"
-                          size={14}
-                          color="#666"
-                        />
-                        <Text style={styles.tripMetaText}>{distance}</Text>
-                      </View>
-                    )}
-                    {startTime && endTime && (
-                      <View style={styles.tripMetaItem}>
-                        <Ionicons
-                          name="hourglass-outline"
-                          size={14}
-                          color="#666"
-                        />
-                        <Text style={styles.tripMetaText}>{`${endTime.diff(
-                          startTime,
-                          "minutes"
-                        )} min`}</Text>
-                      </View>
-                    )}
-                  </View>
-                  <TouchableOpacity
-                    style={styles.viewTripButton}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/(home)/trip-details",
-                        params: {
-                          tripId: schedule.id,
-                          tripName: schedule.name,
-                          isAssigned: "false",
-                        },
-                      })
-                    }
-                  >
-                    <Text style={styles.viewTripButtonText}>
-                      View Trip Details
-                    </Text>
-                    <Ionicons name="arrow-forward" size={16} color="#082640" />
-                  </TouchableOpacity>
-                </View>
-              );
-            })()
-          ) : (
-            <EmptyState
-              icon="alarm-outline"
-              text="No assigned trips for today."
-              subtext="Clock in to start tracking your time"
-            />
-          )}
-        </View>
+        <NextSchedule />
 
         {/* <View style={styles.tripOverviewContainer}>
           <View style={styles.tripOverviewHeader}>
@@ -780,73 +454,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 10,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  notificationContainer: {
-    marginRight: 15,
-    position: "relative",
-  },
-  bellBackground: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    elevation: 2,
-    position: "relative",
-  },
-  notificationBadge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    backgroundColor: "#F44336",
-    borderRadius: 9,
-    width: 18,
-    height: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#fff",
-    zIndex: 2,
-  },
-  notificationCount: {
-    color: "white",
-    fontSize: 11,
-    fontWeight: "bold",
-    lineHeight: 13,
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  profileOuterBorder: {
-    borderWidth: 1,
-    borderColor: "#082640",
-    borderRadius: 25,
-    padding: 1,
-  },
-  profileInnerBorder: {
-    borderWidth: 1,
-    borderColor: "#fff",
-    borderRadius: 23,
-    overflow: "hidden",
   },
   content: {
     flex: 1,
@@ -941,7 +548,6 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
-
   clockInContainer: {
     alignItems: "center",
     marginBottom: 20,
@@ -975,162 +581,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "500",
   },
-  todaysTripContainer: {
-    marginBottom: 20,
-  },
-  todaysTripHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  todaysTripTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  viewAllText: {
-    fontSize: 14,
-    color: "#082640",
-  },
-  tripCard: {
-    backgroundColor: "#f8fbff",
-    borderRadius: 10,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: "#e0eaf9",
-  },
-  tripHeader: {
-    marginBottom: 10,
-  },
-  tripName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 5,
-  },
-  tripTime: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  tripTimeText: {
-    fontSize: 14,
-    marginLeft: 5,
-    color: "#082640",
-    fontWeight: "500",
-  },
-  tripStops: {
-    marginBottom: 10,
-  },
-  tripStop: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  stopDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#082640",
-    marginRight: 8,
-  },
-  stopName: {
-    fontSize: 14,
-  },
-  tripMeta: {
-    flexDirection: "row",
-    marginBottom: 15,
-  },
-  tripMetaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 15,
-  },
-  tripMetaText: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 4,
-  },
-  viewTripButton: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#e0eaf9",
-  },
-  viewTripButtonText: {
-    fontSize: 14,
-    color: "#082640",
-    fontWeight: "500",
-    marginRight: 5,
-  },
-  tripOverviewContainer: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  tripOverviewHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  tripOverviewTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  dropdownContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  dropdownText: {
-    fontSize: 14,
-    marginRight: 5,
-  },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
-  },
-  legendContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
-  checkInDot: {
-    backgroundColor: "#082640",
-  },
-  checkOutDot: {
-    backgroundColor: "#ccc",
-  },
-  legendText: {
-    fontSize: 12,
-    color: "#666",
-  },
-  errorContainer: {
-    padding: 16,
-    alignItems: "center",
-  },
-  errorText: {
-    color: "#FF6B6B",
-    fontSize: 14,
-    textAlign: "center",
-  },
-
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

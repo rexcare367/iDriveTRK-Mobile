@@ -104,8 +104,6 @@ export default function ProfileScreen() {
         }
       );
 
-      console.log("uploadResponse.data", uploadResponse.data);
-
       const { success } = uploadResponse.data;
 
       if (success) {
@@ -139,8 +137,6 @@ export default function ProfileScreen() {
     setModalVisible(false);
     setSelectedImage(null);
   };
-
-  console.log("user?.avatar", user?.avatar);
 
   return (
     <SafeAreaView style={styles.container}>

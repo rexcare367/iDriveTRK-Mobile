@@ -12,12 +12,7 @@ import {
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { useDispatch, useSelector } from "react-redux";
 import { PinKeypad } from "../../components/PinKeypad";
-import {
-  createPIN,
-  logout,
-  signIn,
-  verifyPIN,
-} from "../../redux/actions/authActions";
+import { createPIN, signIn, verifyPIN } from "../../redux/actions/authActions";
 
 export default function PinScreen() {
   const dispatch = useDispatch();
@@ -31,7 +26,6 @@ export default function PinScreen() {
         const storedUser = await AsyncStorage.getItem("user");
         if (storedUser) {
           const userObj = JSON.parse(storedUser);
-          console.log("userObj", userObj);
           // Fetch full user info from backend
           dispatch(signIn(userObj.email, userObj.password) as any);
         } else {
@@ -44,7 +38,6 @@ export default function PinScreen() {
     loadUser();
   }, []);
 
-  console.log("user", user);
   const hasPin = !!user?.pin;
 
   const handleKeyPress = (key: string) => {
@@ -105,11 +98,6 @@ export default function PinScreen() {
       setPin(["", "", "", ""]);
       setCurrentIndex(0);
     }
-  };
-
-  const handleLogout = () => {
-    dispatch(logout() as any);
-    router.push("/sign-in");
   };
 
   const handleSignIn = () => {

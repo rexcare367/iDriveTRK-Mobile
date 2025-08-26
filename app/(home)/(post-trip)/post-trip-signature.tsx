@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Signature from "react-native-signature-canvas";
 import ViewShot from "react-native-view-shot";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,13 +23,18 @@ import CustomButton from "../../../components/CustomButton";
 import CustomInput from "../../../components/CustomInput";
 import Header from "../../../components/Header";
 import {
+  clockOut,
   completePostTrip,
-  updatePostTripForm,
 } from "../../../redux/actions/driverActions";
+
+import moment from "moment";
+import { api } from "../../../utils";
 
 const PostTripFormSignature = () => {
   const dispatch = useDispatch();
-  const { postTripFormData } = useSelector((state: any) => state.driver);
+  const { postTripFormData, clockInFormData } = useSelector(
+    (state: any) => state.driver
+  );
 
   const signatureRef = useRef(null);
   const typedSignatureViewRef = useRef(null);
@@ -49,10 +53,6 @@ const PostTripFormSignature = () => {
     !formData.signatureText ||
     (!formData.drawnSignature && !formData.typedSignature);
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleSubmit = async () => {
     setLoading(true);
     let typedSignatureImage = formData.typedSignatureImage || "";
@@ -64,39 +64,22 @@ const PostTripFormSignature = () => {
       }
     }
 
-    dispatch(
-      updatePostTripForm({
-        ...postTripFormData,
-        signature: {
-          signatureType: formData.signatureType,
-          typedSignature: formData.typedSignature,
-          signatureText: formData.signatureText,
-          drawnSignature: formData.drawnSignature,
-          typedSignatureImage,
-        },
-      })
-    );
-    const result = await dispatch(
-      completePostTrip({
-        ...postTripFormData,
-        signature: {
-          signatureType: formData.signatureType,
-          typedSignature: formData.typedSignature,
-          signatureText: formData.signatureText,
-          drawnSignature: formData.drawnSignature,
-          typedSignatureImage,
-        },
-      }) as any
-    );
+    const updatedPostTripFormData = {
+      ...postTripFormData,
+      signature: {
+        signatureType: formData.signatureType,
+        typedSignature: formData.typedSignature,
+        signatureText: formData.signatureText,
+        drawnSignature: formData.drawnSignature,
+        typedSignatureImage,
+      },
+    };
+
+    dispatch(completePostTrip(updatedPostTripFormData) as any);
+
     setLoading(false);
-    if (result?.success) {
-      setShowSuccessModal(true);
-    } else {
-      Toast.show({
-        type: ALERT_TYPE.DANGER,
-        textBody: "Failed to save trip. Please try again.",
-      });
-    }
+    setShowSuccessModal(true);
+    await handleClockOut();
   };
 
   const handleSignature = (signature: any) => {
@@ -118,6 +101,30 @@ const PostTripFormSignature = () => {
       typedSignature: "",
       drawnSignature: "",
     });
+  };
+
+  const handleClockOut = async () => {
+    try {
+      dispatch(clockOut());
+
+      const clockOutData = {
+        clockout_time: moment().toISOString(),
+        status: "clockOut",
+      };
+
+      const apiResult = await api.patch(
+        `api/timesheets/by-id/${clockInFormData.id}`,
+        clockOutData
+      );
+
+      if (apiResult?.data?.success || apiResult?.status === 200) {
+        console.log("Clock-out successful");
+      } else {
+        console.error("Failed to save clock-out data", apiResult);
+      }
+    } catch (error) {
+      console.error("Error during clock-out:", error);
+    }
   };
 
   const progressSteps = [
@@ -398,8 +405,9 @@ const PostTripFormSignature = () => {
                 paddingHorizontal: 32,
                 width: "100%",
               }}
-              onPress={() => {
+              onPress={async () => {
                 setShowSuccessModal(false);
+
                 router.push("/(home)/home");
               }}
             >

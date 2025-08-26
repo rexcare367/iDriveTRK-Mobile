@@ -46,10 +46,6 @@ const PreTripFormWheels = () => {
     (!formData.tires || formData.tiresDetails.trim() !== "") &&
     (!formData.tireChains || formData.tireChainsDetails.trim() !== "");
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({

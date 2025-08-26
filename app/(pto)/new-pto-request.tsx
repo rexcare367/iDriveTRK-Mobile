@@ -86,7 +86,6 @@ export default function NewPTORequestScreen() {
         status: "pending",
         assigned_id: user.id,
       };
-      console.log("payload", payload);
       await api.post("/api/pto", payload);
       setShowSuccessModal(true);
     } catch (error) {

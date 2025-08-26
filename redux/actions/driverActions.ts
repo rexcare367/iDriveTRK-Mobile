@@ -177,8 +177,7 @@ export const completePostTrip =
   (formData: any) => async (dispatch: any, getState: any) => {
     const { auth, driver } = getState();
     const userId = auth?.user?.id || "testUser";
-    const selectedVehicle = driver?.selectedVehicle;
-    const selectedTrip = driver?.selectedTrip;
+    const scheduleId = driver?.clockInFormData?.scheduleId;
 
     try {
       console.log("formData, dateString", formData);
@@ -191,19 +190,10 @@ export const completePostTrip =
 
       console.log("Post-trip inspection saved to backend:", response.data);
 
-      // Update vehicle status to 'free'
-      if (selectedVehicle?.id) {
-        try {
-          console.log("Vehicle status updated to 'free'");
-        } catch (vehicleError) {
-          console.error("Error updating vehicle status:", vehicleError);
-        }
-      }
-
       // Update schedule status to 'completed'
-      if (selectedTrip?.id) {
+      if (scheduleId) {
         try {
-          await api.patch(`api/schedules/${selectedTrip.id}`, {
+          await api.patch(`api/schedules/${scheduleId}`, {
             status: "completed",
           });
           console.log("Schedule status updated to 'completed'");
@@ -249,33 +239,27 @@ export const updateTripStopStatus = (stopId: any, actualTime: any) => ({
 });
 
 export const clockOut = () => async (dispatch: any, getState: any) => {
-  const state = getState();
+  // const { driver } = getState();
   // Get relevant data from state
-  const { breakHistory, isOnBreak } = state.driver;
+  // const { breakHistory, isOnBreak } = driver;
 
-  // Calculate total break duration (in milliseconds)
-  let totalBreakDurationMs = 0;
-  breakHistory.forEach((breakPeriod: any) => {
-    if (breakPeriod.end) {
-      totalBreakDurationMs +=
-        new Date(breakPeriod.end) - new Date(breakPeriod.start);
-    } else {
-      // If currently on break, include the ongoing break
-      totalBreakDurationMs += isOnBreak
-        ? new Date() - new Date(breakPeriod.start)
-        : 0;
-    }
+  // Calculate total break duration (in milliseconds) using moment
+  // let totalBreakDurationMs = 0;
+  // breakHistory.forEach((breakPeriod: any) => {
+  //   if (breakPeriod.end) {
+  //     totalBreakDurationMs += moment(breakPeriod.end).diff(
+  //       moment(breakPeriod.start)
+  //     );
+  //   } else {
+  //     // If currently on break, include the ongoing break
+  //     totalBreakDurationMs += isOnBreak
+  //       ? moment().diff(moment(breakPeriod.start))
+  //       : 0;
+  //   }
+  // });
+
+  dispatch({
+    type: UPDATE_CLOCK_IN_FORM,
+    payload: {},
   });
-
-  try {
-    dispatch({
-      type: UPDATE_CLOCK_IN_FORM,
-      payload: {},
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error saving clock-out data:", error);
-    return { success: false, error };
-  }
 };

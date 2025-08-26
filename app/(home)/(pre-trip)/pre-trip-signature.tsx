@@ -49,10 +49,6 @@ const PreTripFormSignature = () => {
     !formData.signatureText ||
     (!formData.drawnSignature && !formData.typedSignature);
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleSubmit = async () => {
     setLoading(true);
     let typedSignatureImage = formData.typedSignatureImage || "";

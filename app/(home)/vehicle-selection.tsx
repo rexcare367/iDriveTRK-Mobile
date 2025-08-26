@@ -21,7 +21,6 @@ import { api } from "../../utils";
 
 const VehicleSelectionScreen = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
   const { clockInFormData } = useSelector((state: any) => state.driver);
   const [vehicles, setVehicles] = useState<IVehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,10 +38,6 @@ const VehicleSelectionScreen = () => {
     );
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleVehicleSelect = (vehicle: any) => {
     setSelectedVehicle(vehicle);
   };
@@ -54,6 +49,7 @@ const VehicleSelectionScreen = () => {
         truckId: selectedVehicle?.id,
         status: "clockIn",
       };
+      console.log("handleConfirmVehicle formData", formData);
       dispatch(clockIn(formData));
 
       try {

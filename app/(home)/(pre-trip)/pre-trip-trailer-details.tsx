@@ -73,11 +73,6 @@ const PreTripFormTrailerDetails = () => {
     wheelsRims2DefectDetails:
       preTripFormData?.trailerDetails?.wheelsRims2DefectDetails || "",
   });
-
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({

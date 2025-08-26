@@ -19,10 +19,6 @@ const PreTripFormTrailer = () => {
     trailerNumber2: preTripFormData?.trailer?.trailerNumber2 || "",
   });
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({

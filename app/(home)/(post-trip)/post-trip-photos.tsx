@@ -70,12 +70,7 @@ const PostTripFormPhotos = () => {
       const response = await fetch(uri);
       const blob = await response.blob();
 
-      let fileExtension = uri.split(".").pop().toLowerCase();
-      const uriParts = uri.split(".");
-      if (uriParts.length > 1) {
-        const ext = uriParts.pop();
-        if (ext) fileExtension = ext.toLowerCase();
-      }
+      let fileExtension = "jpg";
 
       let mimeType;
 

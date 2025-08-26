@@ -40,10 +40,6 @@ const PreTripFormRearVehicle = () => {
     (!formData.rearDoorLatch || formData.rearDoorDetails.trim() !== "") &&
     (!formData.padlock || formData.padlockDetails.trim() !== "");
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({

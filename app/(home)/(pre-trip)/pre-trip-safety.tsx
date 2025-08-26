@@ -47,10 +47,6 @@ const PreTripFormSafety = () => {
 
   const isNextDisabled = !isAnyChecked || !areDetailsValid;
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({

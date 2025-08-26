@@ -8,14 +8,11 @@ import { startPostTrip } from "../../../redux/actions/driverActions";
 
 export default function PostTripScreen() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
   const { clockInFormData } = useSelector((state: any) => state.driver);
 
-  console.log("user", user);
-
   const handleStartPostTrip = () => {
-    if (clockInFormData.truck.id) {
-      dispatch(startPostTrip(clockInFormData.truck.id));
+    if (clockInFormData.truck_id) {
+      dispatch(startPostTrip(clockInFormData.truck_id));
       router.push("/post-trip-driver-info");
     } else {
       Alert.alert("Alert", "Truck info is missed");

@@ -135,7 +135,6 @@ export const setupAccount = (
 
     try {
       // Call server API for signup
-      console.log("tempEmail, tempphone, uid", tempEmail, tempPhone, uid);
       try {
         // If profilePicture is provided, upload it first
         let avatarUrl = null;

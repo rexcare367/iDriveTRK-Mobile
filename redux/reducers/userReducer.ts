@@ -21,7 +21,7 @@ const initialState = {
   isAuthenticated: true, // Set to true for demo purposes
 };
 
-const userReducer = (state = initialState, action) => {
+const userReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case FETCH_USER_REQUEST:
       return {

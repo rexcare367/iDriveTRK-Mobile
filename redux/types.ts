@@ -86,6 +86,23 @@ export interface ITruck {
   next_service_due_date: string | null;
 }
 
+export interface ISchedule {
+  asignee: string;
+  color: string;
+  created_at: string;
+  description: string;
+  end_time: string;
+  id: string;
+  job_id: string;
+  scheduler_id: string;
+  start_time: string;
+  status: string;
+  stops: any[];
+  name: string;
+  type: string;
+  job: any;
+}
+
 export interface ITrip {}
 
 export interface UserState {
@@ -140,6 +157,11 @@ export const CREATE_PIN_FAILURE = "CREATE_PIN_FAILURE";
 export const LOGOUT = "LOGOUT";
 
 // User Types
+
+export const FETCH_USER_FAILURE = "FETCH_USER_FAILURE";
+export const FETCH_USER_REQUEST = "FETCH_USER_REQUEST";
+export const FETCH_USER_SUCCESS = "FETCH_USER_SUCCESS";
+
 export const UPDATE_USER_REQUEST = "UPDATE_USER_REQUEST";
 export const UPDATE_USER_SUCCESS = "UPDATE_USER_SUCCESS";
 export const UPDATE_USER_FAILURE = "UPDATE_USER_FAILURE";

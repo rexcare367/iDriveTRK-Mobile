@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import {
@@ -32,16 +32,15 @@ interface Schedule {
 }
 
 export default function TripSelectionScreen() {
-  const params = useLocalSearchParams();
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.auth);
   const { clockInFormData } = useSelector((state: any) => state.driver);
-  const { routeName } = params;
 
   // Fetch schedules for the current user for today
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [schedulesLoading, setSchedulesLoading] = useState(false);
   const [schedulesError, setSchedulesError] = useState<string | null>(null);
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -56,7 +55,6 @@ export default function TripSelectionScreen() {
             start_time
           )}&end_time=${encodeURIComponent(end_time)}&status=scheduled`
         );
-        console.log("=====", response.data);
         setSchedules(response.data || []);
       } catch (err) {
         setSchedulesError("Failed to fetch schedules");
@@ -67,10 +65,6 @@ export default function TripSelectionScreen() {
     };
     fetchSchedules();
   }, [user?.id]);
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleTripDetailView = (trip: Schedule) => {
     router.push({
@@ -137,10 +131,13 @@ export default function TripSelectionScreen() {
               : null;
             const tripId = schedule.id.split("-")[0];
             return (
-              <TouchableOpacity
+              <View
                 key={schedule.id}
-                style={styles.tripCard}
-                onPress={() => handleTripSelect(schedule)}
+                style={
+                  selectedTripId === schedule.id
+                    ? styles.activeTripCard
+                    : styles.tripCard
+                }
               >
                 <View style={styles.tripHeader}>
                   <Ionicons
@@ -183,21 +180,82 @@ export default function TripSelectionScreen() {
                     </Text>
                   </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.viewDetailButton}
-                  onPress={() => handleTripDetailView(schedule)}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons
-                      name="eye-outline"
-                      size={18}
-                      color="white"
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={styles.viewDetailButtonText}>View Detail</Text>
-                  </View>
-                </TouchableOpacity>
-              </TouchableOpacity>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <TouchableOpacity
+                    style={[styles.viewDetailButton, { flex: 1 }]}
+                    onPress={() => handleTripDetailView(schedule)}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Ionicons
+                        name="eye-outline"
+                        size={18}
+                        color="white"
+                        style={{ marginRight: 6 }}
+                      />
+                      <Text style={styles.viewDetailButtonText}>
+                        View Detail
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  {selectedTripId === schedule.id ? (
+                    <TouchableOpacity
+                      style={[
+                        styles.viewDetailButton,
+                        { flex: 1, backgroundColor: "#4CAF50" },
+                      ]}
+                      onPress={() => handleTripSelect(schedule)}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name="checkmark"
+                          size={18}
+                          color="white"
+                          style={{ marginRight: 6 }}
+                        />
+                        <Text style={styles.viewDetailButtonText}>Confirm</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={[
+                        styles.viewDetailButton,
+                        { flex: 1, backgroundColor: "#1967D2" },
+                      ]}
+                      onPress={() => setSelectedTripId(schedule.id)}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name="checkmark-circle-outline"
+                          size={18}
+                          color="white"
+                          style={{ marginRight: 6 }}
+                        />
+                        <Text style={styles.viewDetailButtonText}>
+                          Select Trip
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
             );
           })}
         </ScrollView>
@@ -255,6 +313,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
+  },
+  activeTripCard: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    borderWidth: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+    borderColor: "#666",
   },
   tripHeader: {
     flexDirection: "row",

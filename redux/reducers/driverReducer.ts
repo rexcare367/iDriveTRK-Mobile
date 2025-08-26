@@ -1,24 +1,24 @@
 import {
   CLOCK_IN,
   CLOCK_OUT,
-  START_BREAK,
+  COMPLETE_POST_TRIP,
+  COMPLETE_PRE_TRIP,
+  COMPLETE_STOP,
+  CONFIRM_TRIP,
   END_BREAK,
   GO_OFF_DUTY,
   GO_ON_DUTY,
   SELECT_ROUTE,
   SELECT_TRIP,
-  CONFIRM_TRIP,
-  SELECT_VEHICLE,
-  START_PRE_TRIP,
-  UPDATE_PRE_TRIP_FORM,
-  COMPLETE_PRE_TRIP,
-  START_POST_TRIP,
-  UPDATE_POST_TRIP_FORM,
-  COMPLETE_POST_TRIP,
   SELECT_TRIP_STOP,
-  COMPLETE_STOP,
-  UPDATE_TRIP_STOP_STATUS,
+  SELECT_VEHICLE,
+  START_BREAK,
+  START_POST_TRIP,
+  START_PRE_TRIP,
   UPDATE_CLOCK_IN_FORM,
+  UPDATE_POST_TRIP_FORM,
+  UPDATE_PRE_TRIP_FORM,
+  UPDATE_TRIP_STOP_STATUS,
 } from "../types";
 
 const initialState = {
@@ -200,7 +200,7 @@ const initialState = {
   completedStops: [],
 };
 
-const driverReducer = (state = initialState, action) => {
+const driverReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case CLOCK_IN:
       return {
@@ -387,6 +387,7 @@ const driverReducer = (state = initialState, action) => {
       return {
         ...state,
         isPreTripStarted: true,
+        preTripFormData: action.payload.formData,
       };
     case UPDATE_PRE_TRIP_FORM:
       return {
@@ -403,6 +404,7 @@ const driverReducer = (state = initialState, action) => {
       return {
         ...state,
         isPostTripStarted: true,
+        postTripFormData: action.payload.formData,
       };
     case UPDATE_POST_TRIP_FORM:
       return {
