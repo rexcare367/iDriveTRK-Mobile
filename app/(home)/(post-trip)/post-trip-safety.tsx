@@ -1,16 +1,16 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomCheckbox from "@/components/CustomCheckbox";
+import CustomInput from "@/components/CustomInput";
+import CustomRadioButton from "@/components/CustomRadioButton";
+import Header from "@/components/Header";
+import { updatePostTripForm } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomCheckbox from "../../../components/CustomCheckbox";
-import CustomInput from "../../../components/CustomInput";
-import CustomRadioButton from "../../../components/CustomRadioButton";
-import Header from "../../../components/Header";
-import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 const PostTripFormSafety = () => {
   const dispatch = useDispatch();
@@ -46,10 +46,6 @@ const PostTripFormSafety = () => {
       formData.othersDefectDetails.trim() !== "");
 
   const isNextDisabled = !isAnyChecked || !areDetailsValid;
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleNext = () => {
     dispatch(

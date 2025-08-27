@@ -5,25 +5,14 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 
 interface TimelineEntryProps {
-  type: any;
-  time: any;
-  start: any;
-  end: any;
-  label: any;
+  entry: any;
   isLast: any;
   onEditEntry: any;
 }
 
-const TimelineEntry = ({
-  type,
-  time,
-  start,
-  end,
-  label,
-  isLast,
-  onEditEntry,
-}: TimelineEntryProps) => {
+const TimelineEntry = ({ entry, isLast, onEditEntry }: TimelineEntryProps) => {
   const { user } = useSelector((state: any) => state.auth);
+  const { type, time, start, end, label } = entry;
   // Dot color by type
   const dotColor =
     type === "clockin"
@@ -83,7 +72,7 @@ const TimelineEntry = ({
             <View style={styles.entryActions}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.editButton]}
-                onPress={() => onEditEntry()}
+                onPress={() => onEditEntry(entry)}
               >
                 <Feather name="edit" size={16} color="#666" />
               </TouchableOpacity>

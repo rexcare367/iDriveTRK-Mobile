@@ -99,7 +99,7 @@ export default function NewPTORequestScreen() {
 
   const handleContinue = () => {
     setShowSuccessModal(false);
-    router.push("/(pto)/pto");
+    router.push("/(pto)/pto-dashboard");
   };
 
   const leaveTypeIcons: LeaveTypeIcons = {
@@ -351,35 +351,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 10,
   },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  notificationContainer: {
-    marginRight: 15,
-    position: "relative",
-  },
-  notificationBadge: {
-    position: "absolute",
-    top: -5,
-    right: -5,
-    backgroundColor: "red",
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  notificationCount: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
+
   content: {
     flex: 1,
     paddingHorizontal: 20,
@@ -396,52 +368,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 15,
   },
-  dropdown: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  dropdownText: {
-    fontSize: 16,
-  },
-  dropdownMenu: {
-    position: "absolute",
-    top: 160,
-    left: 0,
-    right: 0,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    marginTop: 5,
-    elevation: 3,
-    width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    zIndex: 100,
-  },
-  dropdownItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  dropdownItemText: {
-    fontSize: 16,
-  },
-  dateContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dateColumn: {
-    width: "48%",
-  },
+
   dateInput: {
     backgroundColor: "white",
     borderWidth: 1,
@@ -455,44 +382,7 @@ const styles = StyleSheet.create({
   calendarContainer: {
     marginTop: 15,
   },
-  calendarHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  calendarMonth: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  calendarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  calendarDay: {
-    width: "14.28%",
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-    padding: 10,
-    fontSize: 14,
-  },
-  startCalendarDay: {
-    backgroundColor: "#082640",
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  endCalendarDay: {
-    backgroundColor: "#082640",
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  selectedCalendarDay: {
-    backgroundColor: "#e0eaff",
-    borderRadius: 20,
-    overflow: "hidden",
-  },
+
   descriptionInput: {
     backgroundColor: "white",
     borderWidth: 1,
@@ -535,15 +425,7 @@ const styles = StyleSheet.create({
     width: "80%",
     alignItems: "center",
   },
-  successIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#4CAF50",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-  },
+
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -583,13 +465,5 @@ const styles = StyleSheet.create({
   typeBadgeText: {
     fontWeight: "bold",
     fontSize: 16,
-  },
-  daysSelectedLabel: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginTop: 18,
-    marginBottom: 10,
-    color: "#082640",
-    textAlign: "center",
   },
 });

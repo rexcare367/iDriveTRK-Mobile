@@ -131,15 +131,11 @@ export const completePreTrip =
     const userId = auth?.user?.id || "testUser";
 
     try {
-      console.log("formData, dateString", formData);
-
       // Call backend API to store pre-trip inspection
-      const response = await api.post("api/truck-inspection", {
+      await api.post("api/truck-inspection", {
         userId,
         ...formData,
       });
-
-      console.log("Pre-trip inspection saved to backend:", response.data);
 
       dispatch({
         type: COMPLETE_PRE_TRIP,
@@ -173,48 +169,15 @@ export const updatePostTripForm = (formData: any) => {
   };
 };
 
-export const completePostTrip =
-  (formData: any) => async (dispatch: any, getState: any) => {
-    const { auth, driver } = getState();
-    const userId = auth?.user?.id || "testUser";
-    const scheduleId = driver?.clockInFormData?.scheduleId;
-
-    try {
-      console.log("formData, dateString", formData);
-
-      // Call backend API to store post-trip inspection
-      const response = await api.post("api/truck-inspection", {
-        userId,
-        ...formData,
-      });
-
-      console.log("Post-trip inspection saved to backend:", response.data);
-
-      // Update schedule status to 'completed'
-      if (scheduleId) {
-        try {
-          await api.patch(`api/schedules/${scheduleId}`, {
-            status: "completed",
-          });
-          console.log("Schedule status updated to 'completed'");
-        } catch (scheduleError) {
-          console.error("Error updating schedule status:", scheduleError);
-        }
-      }
-
-      dispatch({
-        type: COMPLETE_POST_TRIP,
-        payload: {
-          ...formData,
-          timestamp: new Date().toISOString(),
-        },
-      });
-      return { success: true };
-    } catch (error) {
-      console.error("Error saving post-trip to Firestore:", error);
-      return { success: false, error };
-    }
+export const completePostTrip = (formData: any) => {
+  return {
+    type: COMPLETE_POST_TRIP,
+    payload: {
+      ...formData,
+      timestamp: new Date().toISOString(),
+    },
   };
+};
 
 export const selectTripStop = (stop: any) => {
   return {
@@ -238,28 +201,7 @@ export const updateTripStopStatus = (stopId: any, actualTime: any) => ({
   payload: { stopId, actualTime },
 });
 
-export const clockOut = () => async (dispatch: any, getState: any) => {
-  // const { driver } = getState();
-  // Get relevant data from state
-  // const { breakHistory, isOnBreak } = driver;
-
-  // Calculate total break duration (in milliseconds) using moment
-  // let totalBreakDurationMs = 0;
-  // breakHistory.forEach((breakPeriod: any) => {
-  //   if (breakPeriod.end) {
-  //     totalBreakDurationMs += moment(breakPeriod.end).diff(
-  //       moment(breakPeriod.start)
-  //     );
-  //   } else {
-  //     // If currently on break, include the ongoing break
-  //     totalBreakDurationMs += isOnBreak
-  //       ? moment().diff(moment(breakPeriod.start))
-  //       : 0;
-  //   }
-  // });
-
-  dispatch({
-    type: UPDATE_CLOCK_IN_FORM,
-    payload: {},
-  });
-};
+export const clockOut = () => ({
+  type: UPDATE_CLOCK_IN_FORM,
+  payload: {},
+});

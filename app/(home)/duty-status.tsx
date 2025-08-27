@@ -1,3 +1,5 @@
+import BottomTabBar from "@/components/BottomTabBar";
+import { goOffDuty, goOnDuty } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -11,8 +13,6 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BottomTabBar from "../../components/BottomTabBar";
-import { goOffDuty, goOnDuty } from "../../redux/actions/driverActions";
 
 const DutyStatusScreen = () => {
   const params = useLocalSearchParams();
@@ -152,7 +152,7 @@ const DutyStatusScreen = () => {
           source={
             user?.avatar
               ? { uri: user.avatar }
-              : require("../../assets/profile-placeholder.png")
+              : require("@/assets/profile-placeholder.png")
           }
           style={styles.profileImage}
         />

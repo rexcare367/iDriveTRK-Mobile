@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
-import AdminPayrollDashboard from "./admin-payroll-dashboard";
-import PayrollSubmissionScreen from "./submission";
+import PayrollSubmissionScreen from "./employee-payroll-submission";
+import AdminPayrollDashboard from "./manager-payroll-approval";
 
 export default function PayrollScreen() {
   const { currentUser } = useSelector((state: any) => state.user);

@@ -1,3 +1,7 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import Header from "@/components/Header";
+import { selectRoute } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
@@ -9,18 +13,10 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
-import { selectRoute } from "../../redux/actions/driverActions";
 
 const RouteSelectionScreen = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
   const { assignedRoute } = useSelector((state: any) => state.driver);
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleRouteSelect = (route: any) => {
     dispatch(selectRoute(route));
@@ -70,19 +66,7 @@ const RouteSelectionScreen = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Image
-          source={
-            user?.avatar
-              ? { uri: user.avatar }
-              : require("../../assets/profile-placeholder.png")
-          }
-          style={styles.profileImage}
-        />
-      </View>
+      <Header />
 
       <View style={styles.content}>
         <Text style={styles.title}>Select Route</Text>
@@ -128,7 +112,7 @@ const RouteSelectionScreen = () => {
             >
               <View style={styles.routeHeader}>
                 <Image
-                  source={require("../../assets/car.png")}
+                  source={require("@/assets/car.png")}
                   style={{
                     width: 38,
                     height: 23,

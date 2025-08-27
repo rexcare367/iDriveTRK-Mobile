@@ -1,9 +1,11 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import Header from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Animated,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,16 +14,13 @@ import {
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
 
-import { selectTripStop } from "../../redux/actions/driverActions";
+import { selectTripStop } from "@/redux/actions/driverActions";
 
 export default function TripStopsScreen() {
   const params = useLocalSearchParams();
   const { trip, tripName } = params as { trip: any; tripName: string };
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
   const { tripStops } = useSelector((state: any) => state.driver);
   const [mapExpanded, setMapExpanded] = useState(false);
   const mapHeight = useRef(new Animated.Value(150)).current;
@@ -33,10 +32,6 @@ export default function TripStopsScreen() {
   const filteredTripStops = tripStops.filter((stop: any) =>
     isAMTrip ? stop?.tripType === "AM" : stop?.tripType === "PM"
   );
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleStopSelect = (stop: any) => {
     // if (stop?.status === "next") {
@@ -91,19 +86,7 @@ export default function TripStopsScreen() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Image
-          source={
-            user?.avatar
-              ? { uri: user.avatar }
-              : require("../../assets/profile-placeholder.png")
-          }
-          style={styles.profileImage}
-        />
-      </View>
+      <Header />
 
       <View style={styles.content}>
         <Text style={styles.title}>{trip?.job?.name}</Text>

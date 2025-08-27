@@ -1,3 +1,4 @@
+import checkAnimation from "@/assets/lottie/check.json";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useRef, useState } from "react";
@@ -15,18 +16,17 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Signature from "react-native-signature-canvas";
 import ViewShot from "react-native-view-shot";
 import { useDispatch, useSelector } from "react-redux";
-import checkAnimation from "../../../assets/lottie/check.json";
 
-import { router } from "expo-router";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
-import Header from "../../../components/Header";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
 import {
   completePreTrip,
   updatePreTripForm,
-} from "../../../redux/actions/driverActions";
+} from "@/redux/actions/driverActions";
+import { router } from "expo-router";
 
 const PreTripFormSignature = () => {
   const dispatch = useDispatch();

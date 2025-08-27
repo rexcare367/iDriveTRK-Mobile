@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
 import Header from "../../components/Header";
-import TimeSheetHomeScreen from "./home";
-import ManagerApprovalScreen from "./manager-approval";
+import TimeSheetHomeScreen from "./employee-timesheet-view";
+import ManagerApprovalScreen from "./manager-timesheet-approval";
 
 export default function TimeSheetScreen() {
   const { currentUser } = useSelector((state: any) => state.user);

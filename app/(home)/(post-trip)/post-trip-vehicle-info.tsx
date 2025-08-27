@@ -3,12 +3,14 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
-import Header from "../../../components/Header";
-import { updatePostTripForm } from "../../../redux/actions/driverActions";
+
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
+
+import { updatePostTripForm } from "@/redux/actions/driverActions";
 
 const PostTripFormVehicleInfo = () => {
   const dispatch = useDispatch();
@@ -19,10 +21,6 @@ const PostTripFormVehicleInfo = () => {
     powerUnit: postTripFormData?.powerUnit || "",
     odometerReading: postTripFormData?.odometerReading || "",
   });
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleNext = () => {
     dispatch(updatePostTripForm({ ...postTripFormData, ...formData }));

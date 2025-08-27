@@ -95,14 +95,14 @@ export default function PTOScreen() {
   }, [user?.id]);
 
   const handlePTOButtonPress = () => {
-    router.push("/(pto)/leave-type-selection");
+    router.push("./pto-type-selection");
   };
 
   return (
     <View style={styles.container}>
       <BackgroundEffects />
 
-      <Header user={user} />
+      <Header />
 
       <View style={styles.content}>
         {/* PTO Title Row with PTO Button */}
@@ -420,28 +420,5 @@ const styles = StyleSheet.create({
   descriptionText: {
     fontSize: 14,
     color: "#666",
-  },
-  // PTO Button Styles (old floating button, now unused)
-  ptoButtonContainer: {
-    display: "none",
-  },
-  ptoCircleButton: {
-    display: "none",
-  },
-  ptoNextText: {
-    marginTop: 8,
-    color: "#1976D2",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  // Hide old request button
-  buttonContainer: {
-    display: "none",
-  },
-  requestButton: {
-    display: "none",
-  },
-  requestButtonText: {
-    display: "none",
   },
 });

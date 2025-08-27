@@ -46,10 +46,6 @@ export default function PostTripFormCab() {
     (!formData.horn || formData.hornDetails.trim() !== "") &&
     (!formData.defrostHeater || formData.defrostHeaterDetails.trim() !== "");
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePostTripForm({

@@ -387,7 +387,7 @@ const driverReducer = (state = initialState, action: any) => {
       return {
         ...state,
         isPreTripStarted: true,
-        preTripFormData: action.payload.formData,
+        preTripFormData: action.payload,
       };
     case UPDATE_PRE_TRIP_FORM:
       return {
@@ -398,13 +398,13 @@ const driverReducer = (state = initialState, action: any) => {
       return {
         ...state,
         isPreTripCompleted: true,
-        preTripFormData: action.payload.formData,
+        preTripFormData: action.payload,
       };
     case START_POST_TRIP:
       return {
         ...state,
         isPostTripStarted: true,
-        postTripFormData: action.payload.formData,
+        postTripFormData: action.payload,
       };
     case UPDATE_POST_TRIP_FORM:
       return {
@@ -415,7 +415,7 @@ const driverReducer = (state = initialState, action: any) => {
       return {
         ...state,
         isPostTripCompleted: true,
-        postTripFormData: action.payload.formData,
+        postTripFormData: action.payload,
       };
     case SELECT_TRIP_STOP:
       return {

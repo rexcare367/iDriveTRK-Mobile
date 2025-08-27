@@ -1,17 +1,17 @@
 "use client";
 
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomCheckBox from "@/components/CustomCheckbox";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
+import { updatePreTripForm } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomCheckBox from "../../../components/CustomCheckbox";
-import CustomInput from "../../../components/CustomInput";
-import Header from "../../../components/Header";
-import { updatePreTripForm } from "../../../redux/actions/driverActions";
 
 const PreTripFormCab = () => {
   const dispatch = useDispatch();

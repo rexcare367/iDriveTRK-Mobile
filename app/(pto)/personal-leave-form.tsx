@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
 import Header from "../../components/Header";
@@ -36,12 +35,15 @@ interface LeaveRequests {
   Rejected: LeaveRequest[];
 }
 
-export default function SickLeaveScreen() {
-  const { user } = useSelector((state: any) => state.auth);
+export default function PersonalScreen() {
   const [activeTab, setActiveTab] = useState("Approved");
 
+  // const handleRequestLeave = () => {
+  //   router.push("/(pto)/new-pto-request");
+  // };
+
   const handlePTOButtonPress = () => {
-    router.push("/(pto)/leave-type-selection");
+    router.push("./pto-type-selection");
   };
 
   const leaveBalances: LeaveBalance[] = [
@@ -50,9 +52,9 @@ export default function SickLeaveScreen() {
       type: "Sick Leave",
       days: 3,
       icon: "thermometer-outline",
-      color: "#082640",
+      color: "#E0E0E0",
     },
-    { type: "Personal", days: 2, icon: "person-outline", color: "#E0E0E0" },
+    { type: "Personal", days: 2, icon: "person-outline", color: "#082640" },
   ];
 
   const leaveRequests: LeaveRequests = {
@@ -60,33 +62,33 @@ export default function SickLeaveScreen() {
       {
         id: "1",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Approved",
       },
       {
         id: "2",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Approved",
       },
       {
         id: "3",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Approved",
       },
       {
         id: "4",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Approved",
       },
     ],
@@ -94,17 +96,17 @@ export default function SickLeaveScreen() {
       {
         id: "3",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Pending",
       },
       {
         id: "4",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Pending",
       },
     ],
@@ -112,17 +114,17 @@ export default function SickLeaveScreen() {
       {
         id: "5",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Rejected",
       },
       {
         id: "6",
         dateRange: "Jul 7th - Jul 9th",
-        type: "Sick Leave",
+        type: "Personal",
         hours: 48,
-        description: "Sick leave for a cold",
+        description: "Personal leave for a doctor appointment",
         status: "Rejected",
       },
     ],
@@ -132,7 +134,7 @@ export default function SickLeaveScreen() {
     <View style={styles.container}>
       <BackgroundEffects />
 
-      <Header user={user} />
+      <Header />
 
       <View style={styles.content}>
         <Text style={styles.title}>Paid Time Off</Text>
@@ -145,26 +147,26 @@ export default function SickLeaveScreen() {
                 styles.balanceCard,
                 {
                   backgroundColor:
-                    leave.type === "Sick Leave" ? leave.color : "#fff",
+                    leave.type === "Personal" ? leave.color : "#fff",
                 },
               ]}
               onPress={() =>
                 leave.type === "PTO"
-                  ? router.push("/(pto)/pto")
+                  ? router.push("./pto-dashboard")
                   : leave.type === "Sick Leave"
-                  ? router.push("/(pto)/sick-leave")
-                  : router.push("/(pto)/personal")
+                  ? router.push("./sick-leave-form")
+                  : router.push("./personal-leave-form")
               }
             >
               <Ionicons
                 name={leave.icon}
                 size={24}
-                color={leave.type === "Sick Leave" ? "#fff" : "#000"}
+                color={leave.type === "Personal" ? "#fff" : "#000"}
               />
               <Text
                 style={[
                   styles.balanceDays,
-                  { color: leave.type === "Sick Leave" ? "#fff" : "#000" },
+                  { color: leave.type === "Personal" ? "#fff" : "#000" },
                 ]}
               >
                 {leave.days} Days
@@ -172,7 +174,7 @@ export default function SickLeaveScreen() {
               <Text
                 style={[
                   styles.balanceType,
-                  { color: leave.type === "Sick Leave" ? "#fff" : "#666" },
+                  { color: leave.type === "Personal" ? "#fff" : "#666" },
                 ]}
               >
                 {leave.type}
@@ -203,36 +205,38 @@ export default function SickLeaveScreen() {
             ))}
           </View>
           <ScrollView style={{ maxHeight: 420 }}>
-            {leaveRequests[activeTab as keyof LeaveRequests].map((request) => (
-              <View key={request.id} style={styles.requestCard}>
-                <View style={styles.requestHeader}>
-                  <Text style={styles.requestDate}>{request.dateRange}</Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      request.status === "Approved"
-                        ? styles.approvedBadge
-                        : request.status === "Pending"
-                        ? styles.pendingBadge
-                        : styles.rejectedBadge,
-                    ]}
-                  >
-                    <Text style={styles.statusText}>{request.status}</Text>
+            {leaveRequests[activeTab as keyof LeaveRequests].map(
+              (request: LeaveRequest) => (
+                <View key={request.id} style={styles.requestCard}>
+                  <View style={styles.requestHeader}>
+                    <Text style={styles.requestDate}>{request.dateRange}</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        request.status === "Approved"
+                          ? styles.approvedBadge
+                          : request.status === "Pending"
+                          ? styles.pendingBadge
+                          : styles.rejectedBadge,
+                      ]}
+                    >
+                      <Text style={styles.statusText}>{request.status}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.requestDetails}>
+                    <Text style={styles.requestType}>
+                      Type: {request.type} | No. of Hours: {request.hours}hrs
+                    </Text>
+                  </View>
+                  <View style={styles.requestDescription}>
+                    <Text style={styles.descriptionLabel}>Description:</Text>
+                    <Text style={styles.descriptionText}>
+                      {request.description}
+                    </Text>
                   </View>
                 </View>
-                <View style={styles.requestDetails}>
-                  <Text style={styles.requestType}>
-                    Type: {request.type} | No. of Hours: {request.hours}hrs
-                  </Text>
-                </View>
-                <View style={styles.requestDescription}>
-                  <Text style={styles.descriptionLabel}>Description:</Text>
-                  <Text style={styles.descriptionText}>
-                    {request.description}
-                  </Text>
-                </View>
-              </View>
-            ))}
+              )
+            )}
             <View style={{ height: 80 }}></View>
           </ScrollView>
         </View>
@@ -250,7 +254,7 @@ export default function SickLeaveScreen() {
         {/* <Text style={styles.ptoNextText}>Click Next</Text> */}
       </View>
 
-      <BottomTabBar activeTab="PTO" />
+      <BottomTabBar activeTab="PaidTimeOff" />
     </View>
   );
 }
@@ -268,35 +272,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 10,
   },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  notificationContainer: {
-    marginRight: 15,
-    position: "relative",
-  },
-  notificationBadge: {
-    position: "absolute",
-    top: -5,
-    right: -5,
-    backgroundColor: "red",
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  notificationCount: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
+
   content: {
     flex: 1,
     paddingHorizontal: 20,

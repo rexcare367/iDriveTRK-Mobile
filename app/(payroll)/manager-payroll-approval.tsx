@@ -641,9 +641,6 @@ const styles = StyleSheet.create({
   employeeHeader: {
     flex: 2,
   },
-  periodHeader: {
-    flex: 2,
-  },
   hoursHeader: {
     flex: 1.5,
     textAlign: "center",
@@ -653,10 +650,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   statusHeader: {
-    flex: 1.5,
-    textAlign: "center",
-  },
-  actionsHeader: {
     flex: 1.5,
     textAlign: "center",
   },
@@ -685,19 +678,7 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 2,
   },
-  periodInfo: {
-    flex: 2,
-  },
-  periodText: {
-    fontSize: 12,
-    color: "#333",
-    fontWeight: "500",
-  },
-  submittedText: {
-    fontSize: 11,
-    color: "#666",
-    marginTop: 2,
-  },
+
   hoursInfo: {
     flex: 1.5,
     alignItems: "center",
@@ -735,29 +716,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
   },
-  actionsInfo: {
-    flex: 1.5,
-    alignItems: "center",
-  },
-  actionButtons: {
-    flexDirection: "row",
-    gap: 4,
-  },
-  actionButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   approveButton: {
     backgroundColor: "#4CAF50",
   },
   rejectButton: {
     backgroundColor: "#F44336",
-  },
-  viewButton: {
-    padding: 6,
   },
   emptyContainer: {
     alignItems: "center",

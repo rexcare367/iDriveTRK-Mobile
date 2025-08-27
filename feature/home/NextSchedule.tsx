@@ -129,7 +129,7 @@ function NextSchedule() {
                 style={styles.viewTripButton}
                 onPress={() =>
                   router.push({
-                    pathname: "/(home)/trip-details",
+                    pathname: "./trip-details",
                     params: {
                       tripId: schedule.id,
                       tripName: schedule.name,

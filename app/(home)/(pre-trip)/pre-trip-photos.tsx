@@ -1,3 +1,9 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import Header from "@/components/Header";
+import { updatePreTripForm } from "@/redux/actions/driverActions";
+import { api } from "@/utils";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -11,12 +17,6 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import Header from "../../../components/Header";
-import { updatePreTripForm } from "../../../redux/actions/driverActions";
-import { api } from "../../../utils";
 
 const PreTripFormPhotos = () => {
   const dispatch = useDispatch();
@@ -260,7 +260,7 @@ const PreTripFormPhotos = () => {
         <CustomButton
           title="Next"
           onPress={handleNext}
-          disabled={!allPhotosUploaded}
+          // disabled={!allPhotosUploaded}
         />
       </ScrollView>
 

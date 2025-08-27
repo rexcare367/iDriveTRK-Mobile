@@ -262,7 +262,7 @@ export default function ManagerApprovalScreen() {
                     style={styles.viewButton}
                     onPress={() =>
                       router.push({
-                        pathname: "/details",
+                        pathname: "./timesheet-details",
                         params: {
                           timesheetId: timesheet.id,
                         },

@@ -19,10 +19,10 @@ const BottomTabBar = ({ activeTab, onTabPress }: BottomTabBarProps) => {
         router.push("/(home)/home");
         break;
       case "PTO":
-        router.push("/(pto)/pto");
+        router.push("/(pto)/pto-dashboard");
         break;
       case "TimeSheet":
-        router.push("/(timesheet)/timesheet");
+        router.push("/(timesheet)/timesheet-dashboard");
         break;
       case "Trips":
         router.push("/(trips)/assigned-trips");

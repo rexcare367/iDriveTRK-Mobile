@@ -79,8 +79,8 @@ export default function TripSelectionScreen() {
     dispatch(
       updateClockInForm({
         ...clockInFormData,
-        scheduleId: trip.id,
-        schedulerId: trip.scheduler.id,
+        schedule_id: trip.id,
+        scheduler_id: trip.scheduler.id,
       })
     );
 

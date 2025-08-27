@@ -46,10 +46,6 @@ export default function PostTripFormWheels() {
     (!formData.tires || formData.tiresDetails.trim() !== "") &&
     (!formData.tireChains || formData.tireChainsDetails.trim() !== "");
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePostTripForm({

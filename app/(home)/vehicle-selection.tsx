@@ -46,7 +46,7 @@ const VehicleSelectionScreen = () => {
     if (selectedVehicle) {
       const formData = {
         ...clockInFormData,
-        truckId: selectedVehicle?.id,
+        truck_id: selectedVehicle?.id,
         status: "clockIn",
       };
       console.log("handleConfirmVehicle formData", formData);
@@ -56,7 +56,7 @@ const VehicleSelectionScreen = () => {
         await api.post("api/timesheets", formData);
 
         // Update schedule status to 'running'
-        await api.patch(`api/schedules/${clockInFormData.scheduleId}`, {
+        await api.patch(`api/schedules/${clockInFormData.schedule_id}`, {
           status: "running",
         });
       } catch (error) {
@@ -75,7 +75,7 @@ const VehicleSelectionScreen = () => {
         setIsLoading(true);
         setError(null);
         const res = await api.get(
-          `/api/trucks?scheduler_id=${clockInFormData.schedulerId}`
+          `/api/trucks?scheduler_id=${clockInFormData.scheduler_id}`
         );
         setVehicles(res.data);
       } catch (err) {

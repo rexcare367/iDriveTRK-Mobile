@@ -1,18 +1,18 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import Header from "@/components/Header";
+import { startPreTrip } from "@/redux/actions/driverActions";
 import { router } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import Header from "../../../components/Header";
-import { startPreTrip } from "../../../redux/actions/driverActions";
 
 export default function PreTripScreen() {
   const dispatch = useDispatch();
   const { clockInFormData } = useSelector((state: any) => state.driver);
 
   const handleStartPreTrip = () => {
-    if (clockInFormData.truckId) {
-      dispatch(startPreTrip(clockInFormData.truckId));
+    if (clockInFormData.truck_id) {
+      dispatch(startPreTrip(clockInFormData.truck_id));
       router.push("/pre-trip-driver-info");
     } else {
       Alert.alert("Alert", "Truck info is missed");

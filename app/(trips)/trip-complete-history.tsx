@@ -11,12 +11,13 @@ import {
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
-import api from "../../utils/apiClient";
 
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
-import Header from "../../components/Header";
-import TripStatsContainer from "../../components/TripStatsContainer";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import Header from "@/components/Header";
+import TripStatsContainer from "@/components/TripStatsContainer";
+
+import api from "@/utils/apiClient";
 
 export default function TripCompleteHistoryScreen() {
   const { user } = useSelector((state: any) => state.auth);
@@ -193,52 +194,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 10,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  notificationContainer: {
-    marginRight: 15,
-    position: "relative",
-  },
-  notificationBadge: {
-    position: "absolute",
-    top: -5,
-    right: -5,
-    backgroundColor: "red",
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  notificationCount: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 20,
   },
 
   searchContainer: {

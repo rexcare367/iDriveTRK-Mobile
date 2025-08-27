@@ -1,3 +1,6 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
@@ -17,8 +20,6 @@ import {
   View,
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
-import CustomInput from "../../components/CustomInput";
-import Header from "../../components/Header";
 
 export default function ChangePasswordScreen() {
   const [loading, setLoading] = useState(false);
@@ -97,6 +98,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <BackgroundEffects />
       <Header title="Change Password" />
 
       <ScrollView style={styles.content}>

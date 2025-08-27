@@ -71,7 +71,7 @@ export default function LeaveTypeSelectionScreen() {
         disabled={!selected}
         onPress={() =>
           router.push({
-            pathname: "/(pto)/new-pto-request",
+            pathname: "./pto-request-form",
             params: { leaveType: selected },
           })
         }

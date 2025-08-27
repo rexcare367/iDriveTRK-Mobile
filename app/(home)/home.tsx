@@ -1,5 +1,3 @@
-import CurrentActiveSchedule from "@/feature/home/CurrentActiveSchedule";
-import NextSchedule from "@/feature/home/NextSchedule";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import moment from "moment";
@@ -20,19 +18,22 @@ import {
 } from "react-native-reanimated";
 import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
-import Header from "../../components/Header";
-import InsufficientBreakModal from "../../components/InsufficientBreakModal";
-import { updateClockInForm } from "../../redux/actions/driverActions";
-import { api } from "../../utils";
-import { getLastClockOutTime } from "../../utils/firestore";
+
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import Header from "@/components/Header";
+import InsufficientBreakModal from "@/components/InsufficientBreakModal";
+import CurrentActiveSchedule from "@/feature/home/CurrentActiveSchedule";
+import NextSchedule from "@/feature/home/NextSchedule";
+import { updateClockInForm } from "@/redux/actions/driverActions";
+import { api } from "@/utils";
+import { getLastClockOutTime } from "@/utils/firestore";
 import {
   formatDate,
   formatDuration,
   formatTime,
   getGreeting,
-} from "../../utils/helpers";
+} from "@/utils/helpers";
 
 function HomeScreen() {
   const dispatch = useDispatch();
@@ -129,6 +130,7 @@ function HomeScreen() {
         `/api/timesheets/by-user/${user.id}/working`
       );
       if (response.data) {
+        console.log("updateClockInForm .data", response.data);
         dispatch(updateClockInForm(response.data));
 
         // If timesheet has a schedule_id, fetch that specific schedule
@@ -198,7 +200,7 @@ function HomeScreen() {
         updateClockInForm({
           id: uuid.v4(),
           status: "pending",
-          userId: user?.id,
+          user_id: user?.id,
           created_at: moment().toISOString(),
           breaks: [],
         })
@@ -247,6 +249,19 @@ function HomeScreen() {
         breaks: updatedBreaks,
       };
       dispatch(updateClockInForm(updatedClockInFormData));
+
+      await api.post(`api/breaks`, {
+        timesheet_id: clockInFormData.id,
+        break_start: updatedBreaks[updatedBreaks.length - 1].start,
+        break_end: moment().toISOString(),
+        break_type: "break",
+        is_active: true,
+        break_minutes: moment().diff(
+          updatedBreaks[updatedBreaks.length - 1].start,
+          "minutes"
+        ),
+      });
+
       await api.patch(`api/timesheets/by-id/${clockInFormData.id}`, {
         breaks: updatedBreaks,
       });

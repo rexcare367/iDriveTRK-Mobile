@@ -1,14 +1,15 @@
+import idriveLogo from "@/assets/logo/idrive.png";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import Header from "@/components/Header";
+import { updateTripStopStatus } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { useDispatch, useSelector } from "react-redux";
-import idriveLogo from "../../assets/logo/idrive.png";
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
-import CustomButton from "../../components/CustomButton";
-import { updateTripStopStatus } from "../../redux/actions/driverActions";
 
 export default function ScanTagScreen() {
   const params = useLocalSearchParams();
@@ -24,10 +25,6 @@ export default function ScanTagScreen() {
   const filteredTripStops = tripStops.filter((stop: any) =>
     isAMTrip ? stop.tripType === "AM" : stop.tripType === "PM"
   );
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleScan = () => {
     setScanning(true);
@@ -78,19 +75,7 @@ export default function ScanTagScreen() {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Image
-          source={
-            user?.avatar
-              ? { uri: user.avatar }
-              : require("../../assets/profile-placeholder.png")
-          }
-          style={styles.profileImage}
-        />
-      </View>
+      <Header />
 
       <View style={styles.content}>
         <Text style={styles.title}>Scan Tag</Text>

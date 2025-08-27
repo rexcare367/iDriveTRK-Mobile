@@ -1,6 +1,8 @@
+import checkAnimation from "@/assets/lottie/check.json";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
+import moment from "moment";
 import { useRef, useState } from "react";
 import {
   Image,
@@ -15,31 +17,25 @@ import {
 import Signature from "react-native-signature-canvas";
 import ViewShot from "react-native-view-shot";
 import { useDispatch, useSelector } from "react-redux";
-import checkAnimation from "../../../assets/lottie/check.json";
 
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
-import Header from "../../../components/Header";
-import {
-  clockOut,
-  completePostTrip,
-} from "../../../redux/actions/driverActions";
-
-import moment from "moment";
-import { api } from "../../../utils";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
+import { clockOut, completePostTrip } from "@/redux/actions/driverActions";
+import { api } from "@/utils";
 
 const PostTripFormSignature = () => {
   const dispatch = useDispatch();
-  const { postTripFormData, clockInFormData } = useSelector(
+  const { user, postTripFormData, clockInFormData } = useSelector(
     (state: any) => state.driver
   );
 
   const signatureRef = useRef(null);
   const typedSignatureViewRef = useRef(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     signatureText: postTripFormData?.signature?.signatureText || "",
     signatureType: postTripFormData?.signature?.signatureType || "typing",
     drawnSignature: postTripFormData?.signature?.drawnSignature || "",
@@ -75,7 +71,20 @@ const PostTripFormSignature = () => {
       },
     };
 
-    dispatch(completePostTrip(updatedPostTripFormData) as any);
+    const userId = user?.id;
+    const schedule_id = clockInFormData?.schedule_id;
+
+    // Call backend API to store post-trip inspection
+    await api.post("api/truck-inspection", {
+      userId,
+      ...updatedPostTripFormData,
+    });
+
+    // Update schedule status to 'completed'
+    await api.patch(`api/schedules/${schedule_id}`, {
+      status: "completed",
+    });
+    dispatch(completePostTrip(updatedPostTripFormData));
 
     setLoading(false);
     setShowSuccessModal(true);
@@ -105,8 +114,6 @@ const PostTripFormSignature = () => {
 
   const handleClockOut = async () => {
     try {
-      dispatch(clockOut());
-
       const clockOutData = {
         clockout_time: moment().toISOString(),
         status: "clockOut",
@@ -118,7 +125,7 @@ const PostTripFormSignature = () => {
       );
 
       if (apiResult?.data?.success || apiResult?.status === 200) {
-        console.log("Clock-out successful");
+        dispatch(clockOut());
       } else {
         console.error("Failed to save clock-out data", apiResult);
       }

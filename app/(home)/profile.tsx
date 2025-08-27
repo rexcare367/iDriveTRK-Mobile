@@ -16,11 +16,11 @@ import {
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
+import Header from "@/components/Header";
+import { logout } from "@/redux/actions/authActions";
+import { switchUserRole } from "@/redux/actions/userActions";
+import { api } from "@/utils";
 import { useDispatch, useSelector } from "react-redux";
-import Header from "../../components/Header";
-import { logout } from "../../redux/actions/authActions";
-import { switchUserRole } from "../../redux/actions/userActions";
-import { api } from "../../utils";
 
 export default function ProfileScreen() {
   const dispatch = useDispatch();
@@ -149,7 +149,7 @@ export default function ProfileScreen() {
               source={
                 user?.avatar
                   ? { uri: user?.avatar }
-                  : require("../../assets/logo/logo.png")
+                  : require("@/assets/logo/logo.png")
               }
               style={styles.profileImage}
               resizeMode="cover"

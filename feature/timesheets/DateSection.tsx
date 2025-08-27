@@ -2,11 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { IBreak, ITimesheet } from "../../redux/types";
 import TimelineEntry from "./TimelineEntry";
 
 interface DateSectionProps {
   date: any;
-  dayData: any;
+  dayData: ITimesheet;
   onEditEntry: any;
   // onAddMissingEntry: any;
 }
@@ -82,33 +83,33 @@ DateSectionProps) => {
             {(() => {
               const timeline = [
                 dayData.clockin_time && {
+                  timesheet_id: dayData.id,
                   type: "clockin",
                   time: dayData.clockin_time,
                   label: "Clock In",
                   id: "clockin",
                 },
-                ...dayData.breaks.map((b: any, idx: number) => ({
-                  type: "break",
-                  start: b.start,
-                  end: b.end,
+                ...dayData.breaks.map((b: IBreak, idx: number) => ({
+                  timesheet_id: dayData.id,
+                  type: b.break_type,
+                  start: b.break_start,
+                  end: b.break_end,
                   label: `Break ${idx + 1}`,
                   id: b.id,
                 })),
                 dayData.clockout_time && {
+                  timesheet_id: dayData.id,
                   type: "clockout",
                   time: dayData.clockout_time,
                   label: "Clock Out",
                   id: "clockout",
                 },
               ].filter(Boolean);
-              return timeline.map((item, idx) => (
+              console.log("timeline", timeline);
+              return timeline.map((item: any, idx: number) => (
                 <TimelineEntry
                   key={item.id}
-                  type={item.type}
-                  time={item.time}
-                  start={item.start}
-                  end={item.end}
-                  label={item.label}
+                  entry={item}
                   isLast={idx === timeline.length - 1}
                   onEditEntry={onEditEntry}
                 />

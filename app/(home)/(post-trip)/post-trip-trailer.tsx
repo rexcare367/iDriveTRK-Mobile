@@ -1,19 +1,14 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
+import { updatePostTripForm } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
-import { updatePostTripForm } from "../../../redux/actions/driverActions";
 
 const PostTripFormTrailer = () => {
   const dispatch = useDispatch();
@@ -23,10 +18,6 @@ const PostTripFormTrailer = () => {
     trailerNumber1: postTripFormData?.trailer?.trailerNumber1 || "",
     trailerNumber2: postTripFormData?.trailer?.trailerNumber2 || "",
   });
-
-  const handleBack = () => {
-    router.back();
-  };
 
   const handleNext = () => {
     dispatch(
@@ -76,16 +67,9 @@ const PostTripFormTrailer = () => {
   return (
     <View style={styles.container}>
       <BackgroundEffects />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <Header title="Trailer(s)" subtitle="List of Trailers with Details" />
 
       <ScrollView style={styles.content}>
-        <Text style={styles.title}>Trailer(s)</Text>
-        <Text style={styles.subtitle}>List of Trailers with Details</Text>
-
         {renderProgressBar()}
 
         <View style={styles.inputContainer}>

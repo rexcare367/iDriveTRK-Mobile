@@ -1,5 +1,5 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -76,14 +76,14 @@ export default function TripDetailsHistoryScreen() {
       }
     };
 
-    const fetchTimesheet = async (scheduleId: string) => {
+    const fetchTimesheet = async (schedule_id: string) => {
       if (!user?.id) return;
       try {
         setTimesheetLoading(true);
         setTimesheetError(null);
 
         const timesheetResponse = await api.get(
-          `/api/timesheets/by-schedule/${scheduleId}`
+          `/api/timesheets/by-schedule/${schedule_id}`
         );
 
         if (timesheetResponse.data) {
@@ -109,34 +109,6 @@ export default function TripDetailsHistoryScreen() {
         animated: true,
       });
     }
-  };
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  // Default trip details if API data is not available
-  const defaultTripDetails = {
-    id: tripId,
-    date: "Fri, 12th Jan 2025",
-    distance: "45km",
-    duration: "8hours",
-    origin: {
-      name: "Iyanaipaja, Lagos",
-      time: "10:15am",
-    },
-    destination: {
-      name: "Lekki phase 1, Lagos",
-      time: "07:15pm",
-    },
-    tripId: "#1265AYT",
-    truck: "LAG-123XZ",
-    load: "Electronics",
-    truckDetails: {
-      id: "LAG-123XZ",
-      speed: "12km/hr",
-      fuel: "50ltrs",
-    },
   };
 
   if (loading) {
@@ -300,7 +272,7 @@ export default function TripDetailsHistoryScreen() {
                 style={styles.truckImage}
               />
               <View style={styles.truckDetails}>
-                <Text style={styles.truckId}>{timesheet?.truck?.name}</Text>
+                <Text style={styles.truckName}>{timesheet?.truck?.name}</Text>
                 <View style={styles.truckSpecs}>
                   <View style={styles.truckSpec}>
                     <Ionicons
@@ -504,7 +476,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
   },
-  truckId: {
+  truckName: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,

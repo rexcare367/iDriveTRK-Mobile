@@ -1,3 +1,8 @@
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import Header from "@/components/Header";
+import { confirmTrip } from "@/redux/actions/driverActions";
+import api from "@/utils/apiClient";
 import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import moment from "moment";
@@ -10,12 +15,7 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
-import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
-import Header from "../../components/Header";
-import { confirmTrip } from "../../redux/actions/driverActions";
-import api from "../../utils/apiClient";
+import { useDispatch } from "react-redux";
 
 export default function TripDetailsScreen() {
   const params = useLocalSearchParams();
@@ -23,7 +23,6 @@ export default function TripDetailsScreen() {
   const mapRef = useRef<MapView>(null);
 
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
 
   const [tripDetail, setTripDetail] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -68,10 +67,6 @@ export default function TripDetailsScreen() {
         animated: true,
       });
     }
-  };
-
-  const handleBack = () => {
-    router.back();
   };
 
   const handleConfirmTrip = () => {
@@ -186,10 +181,10 @@ export default function TripDetailsScreen() {
                     description={`Route point ${index + 1}`}
                     image={
                       index === 0
-                        ? require("../../assets/car.png")
+                        ? require("@/assets/car.png")
                         : index === tripDetail.job.routes.length - 1
-                        ? require("../../assets/marker.png")
-                        : require("../../assets/marker.png")
+                        ? require("@/assets/marker.png")
+                        : require("@/assets/marker.png")
                     }
                   />
                 ))
@@ -199,12 +194,12 @@ export default function TripDetailsScreen() {
                   <Marker
                     coordinate={routeCoordinates[0]}
                     title="Start"
-                    image={require("../../assets/car.png")}
+                    image={require("@/assets/car.png")}
                   />
                   <Marker
                     coordinate={routeCoordinates[1]}
                     title="End"
-                    image={require("../../assets/marker.png")}
+                    image={require("@/assets/marker.png")}
                   />
                 </>
               )}

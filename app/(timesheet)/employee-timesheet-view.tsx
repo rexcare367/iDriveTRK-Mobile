@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import {
@@ -18,45 +19,8 @@ import StatCard from "../../components/StatCard";
 import SubmitButton from "../../components/SubmitButton";
 import DateSection from "../../feature/timesheets/DateSection";
 import { submitForApproval } from "../../redux/actions/timesheetActions";
-import { ITruck, IUser } from "../../redux/types";
+import { IBreak, ITimesheet } from "../../redux/types";
 import api from "../../utils/apiClient";
-
-// Type definitions
-export interface IBreak {
-  id: string;
-  start: string;
-  end: string;
-}
-
-export interface ISchedule {
-  asignee: string;
-  color: string;
-  created_at: string;
-  description: string;
-  end_time: string;
-  id: string;
-  job_id: string;
-  scheduler_id: string;
-  start_time: string;
-  status: string;
-  stops: any[];
-  title: string;
-  type: string;
-}
-
-export interface ITimesheet {
-  id: string;
-  clockin_time: string;
-  clockout_time: string;
-  breaks: IBreak[];
-  created_at: string;
-  updated_at: string;
-  is_submitted: boolean;
-  status: string;
-  schedule: ISchedule;
-  truck: ITruck;
-  user: IUser;
-}
 
 export default function TimeSheetHomeScreen() {
   const dispatch = useDispatch();
@@ -72,7 +36,7 @@ export default function TimeSheetHomeScreen() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<ITimesheet | null>(null);
+  const [editingEntry, setEditingEntry] = useState<any | null>(null);
   const [editClockIn, setEditClockIn] = useState("");
   const [editClockOut, setEditClockOut] = useState("");
   const [editBreaks, setEditBreaks] = useState<IBreak[]>([]);
@@ -80,6 +44,49 @@ export default function TimeSheetHomeScreen() {
   const [approvalModalVisible, setApprovalModalVisible] = useState(false);
   const [approvalReason, setApprovalReason] = useState("");
   const [editedEntries, setEditedEntries] = useState(new Set<string>());
+  const [show, setShow] = useState(false);
+  const [date, setDate] = useState(new Date());
+
+  // Add new state for DateTimePicker
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+  const [currentEditingField, setCurrentEditingField] = useState<string>("");
+  const [currentEditingValue, setCurrentEditingValue] = useState<Date>(
+    new Date()
+  );
+
+  // Add function to handle DateTimePicker change
+  const handleDateTimeChange = (event: any, selectedDate?: Date) => {
+    setShowDateTimePicker(false);
+
+    if (selectedDate && currentEditingField) {
+      const formattedDate = selectedDate.toISOString();
+
+      if (currentEditingField === "clockin") {
+        setEditClockIn(formattedDate);
+      } else if (currentEditingField === "clockout") {
+        setEditClockOut(formattedDate);
+      } else if (currentEditingField === "breakstart") {
+        setEditBreaks((prev) =>
+          prev.map((br, idx) =>
+            idx === 0 ? { ...br, break_start: formattedDate } : br
+          )
+        );
+      } else if (currentEditingField === "breakend") {
+        setEditBreaks((prev) =>
+          prev.map((br, idx) =>
+            idx === 0 ? { ...br, break_end: formattedDate } : br
+          )
+        );
+      }
+    }
+  };
+
+  // Add function to show DateTimePicker for specific field
+  const showDateTimePickerForField = (field: string, currentValue: string) => {
+    setCurrentEditingField(field);
+    setCurrentEditingValue(currentValue ? new Date(currentValue) : new Date());
+    setShowDateTimePicker(true);
+  };
 
   useEffect(() => {
     const fetchTimesheets = async () => {
@@ -108,7 +115,6 @@ export default function TimeSheetHomeScreen() {
         );
 
         if (response.data) {
-          // Update local state with fetched data
           setClockEntries(response.data);
         }
       } catch (error: any) {
@@ -163,43 +169,179 @@ export default function TimeSheetHomeScreen() {
     }
   };
 
-  const handleEditEntry = (entry: ITimesheet) => {
+  const handleEditEntry = (entry: any) => {
     console.log("entry", entry);
-    // setEditingEntry(entry);
-    // setEditClockIn(entry.clockin_time);
-    // setEditClockOut(entry.clockout_time);
-    // setEditBreaks(entry.breaks.map((b) => ({ ...b })));
-    // setEditModalVisible(true);
+
+    // Set the editing entry and populate modal fields based on type
+    setEditingEntry(entry);
+
+    if (entry.type === "clockin") {
+      setEditClockIn(entry.time);
+      setEditClockOut(""); // Clear clock out for clock in edits
+      setEditBreaks([]); // No breaks for clock in edits
+    } else if (entry.type === "clockout") {
+      setEditClockIn(""); // Clear clock in for clock out edits
+      setEditClockOut(entry.time);
+      setEditBreaks([]); // No breaks for clock out edits
+    } else if (entry.type === "break") {
+      setEditClockIn(""); // Clear clock times for break edits
+      setEditClockOut("");
+      setEditBreaks([
+        {
+          id: entry.id,
+          break_start: entry.start,
+          break_end: entry.end,
+          break_type: "break",
+          break_minutes: Math.round(
+            moment
+              .duration(moment(entry.end).diff(moment(entry.start)))
+              .asMinutes()
+          ),
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          timesheet_id: entry.timesheet_id,
+        },
+      ]);
+    }
+
+    // Show the edit modal
+    setEditModalVisible(true);
   };
 
-  const handleSaveEdit = () => {
-    if (!editingEntry || !editClockIn || !editClockOut) {
-      Alert.alert("Error", "Please fill in all fields");
+  const handleSaveEdit = async () => {
+    if (!editingEntry) {
+      Alert.alert("Error", "No entry selected for editing");
       return;
     }
 
-    const updatedEntry: ITimesheet = {
-      ...editingEntry,
-      clockin_time: editClockIn,
-      clockout_time: editClockOut,
-      breaks: editBreaks,
-      updated_at: moment().toISOString(),
-      status: "pending_approval",
-    };
+    try {
+      if (editingEntry.type === "clockin") {
+        if (!editClockIn) {
+          Alert.alert("Error", "Please enter clock in time");
+          return;
+        }
 
-    setClockEntries((prevEntries) =>
-      prevEntries.map((entry) =>
-        entry.id === updatedEntry.id ? updatedEntry : entry
-      )
-    );
-    setEditedEntries((prev) => new Set([...prev, updatedEntry.id]));
-    setEditModalVisible(false);
-    setEditingEntry(null);
-    setEditClockIn("");
-    setEditClockOut("");
-    setEditBreaks([]);
+        // Update clockin_time in the database
+        await api.patch(`api/timesheets/by-id/${editingEntry.timesheet_id}`, {
+          clockin_time: editClockIn,
+        });
 
-    setApprovalModalVisible(true);
+        // Update local state
+        setClockEntries((prevEntries) =>
+          prevEntries.map((timesheet) =>
+            timesheet.id === editingEntry.timesheet_id
+              ? {
+                  ...timesheet,
+                  clockin_time: editClockIn,
+                  updated_at: moment().toISOString(),
+                }
+              : timesheet
+          )
+        );
+
+        Alert.alert("Success", "Clock in time updated successfully!");
+      } else if (editingEntry.type === "clockout") {
+        if (!editClockOut) {
+          Alert.alert("Error", "Please enter clock out time");
+          return;
+        }
+
+        // Update clockout_time in the database
+        await api.patch(`api/timesheets/by-id/${editingEntry.timesheet_id}`, {
+          clockout_time: editClockOut,
+        });
+
+        // Update local state
+        setClockEntries((prevEntries) =>
+          prevEntries.map((timesheet) =>
+            timesheet.id === editingEntry.timesheet_id
+              ? {
+                  ...timesheet,
+                  clockout_time: editClockOut,
+                  updated_at: moment().toISOString(),
+                }
+              : timesheet
+          )
+        );
+
+        Alert.alert("Success", "Clock out time updated successfully!");
+      } else if (editingEntry.type === "break") {
+        if (
+          !editBreaks.length ||
+          !editBreaks[0].break_start ||
+          !editBreaks[0].break_end
+        ) {
+          Alert.alert("Error", "Please enter both break start and end times");
+          return;
+        }
+
+        const breakData = editBreaks[0];
+        const breakMinutes = Math.round(
+          moment
+            .duration(
+              moment(breakData.break_end).diff(moment(breakData.break_start))
+            )
+            .asMinutes()
+        );
+
+        // Update break information in the database
+        await api.patch(`api/breaks/${editingEntry.id}`, {
+          break_start: breakData.break_start,
+          break_end: breakData.break_end,
+          break_minutes: breakMinutes,
+        });
+
+        // Update local state - find the timesheet and update the specific break
+        setClockEntries((prevEntries) =>
+          prevEntries.map((timesheet) => {
+            if (timesheet.id === editingEntry.timesheet_id) {
+              const updatedBreaks = timesheet.breaks.map((breakItem) =>
+                breakItem.id === editingEntry.id
+                  ? {
+                      ...breakItem,
+                      break_start: breakData.break_start,
+                      break_end: breakData.break_end,
+                      break_minutes: breakMinutes,
+                      updated_at: moment().toISOString(),
+                    }
+                  : breakItem
+              );
+
+              return {
+                ...timesheet,
+                breaks: updatedBreaks,
+                updated_at: moment().toISOString(),
+              };
+            }
+            return timesheet;
+          })
+        );
+
+        Alert.alert("Success", "Break time updated successfully!");
+      }
+
+      // Mark as edited for approval tracking
+      setEditedEntries(
+        (prev) =>
+          new Set([...prev, editingEntry.timesheet_id || editingEntry.id])
+      );
+
+      // Close modal and reset state
+      setEditModalVisible(false);
+      setEditingEntry(null);
+      setEditClockIn("");
+      setEditClockOut("");
+      setEditBreaks([]);
+    } catch (error: any) {
+      console.error("Error updating entry:", error);
+      Alert.alert(
+        "Update Failed",
+        error.response?.data?.message ||
+          "Failed to update the entry. Please try again.",
+        [{ text: "OK" }]
+      );
+    }
   };
 
   const handleSubmitForApproval = () => {
@@ -352,7 +494,7 @@ export default function TimeSheetHomeScreen() {
               subtext="Clock in to start tracking your time"
             />
           ) : (
-            clockEntries.map((entry, index) => {
+            clockEntries.map((entry: ITimesheet, index: number) => {
               return (
                 <DateSection
                   key={index}
@@ -384,7 +526,11 @@ export default function TimeSheetHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Edit Timesheet</Text>
+              <Text style={styles.modalTitle}>
+                {editingEntry?.type === "clockin" && "Edit Clock In Time"}
+                {editingEntry?.type === "clockout" && "Edit Clock Out Time"}
+                {editingEntry?.type === "break" && "Edit Break Time"}
+              </Text>
               <TouchableOpacity
                 onPress={() => setEditModalVisible(false)}
                 style={styles.closeButton}
@@ -394,61 +540,102 @@ export default function TimeSheetHomeScreen() {
             </View>
 
             <View style={styles.modalBody}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Clock In Time</Text>
-                <TextInput
-                  style={styles.input}
-                  value={editClockIn}
-                  onChangeText={setEditClockIn}
-                  placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
-                />
-              </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Clock Out Time</Text>
-                <TextInput
-                  style={styles.input}
-                  value={editClockOut}
-                  onChangeText={setEditClockOut}
-                  placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
-                />
-              </View>
-              <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
-                Breaks
-              </Text>
-              {editBreaks.map((br, idx) => (
-                <View key={br.id || idx} style={{ marginBottom: 12 }}>
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Break Start</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={br.start}
-                      onChangeText={(val) => {
-                        setEditBreaks((breaks) =>
-                          breaks.map((b, i) =>
-                            i === idx ? { ...b, start: val } : b
-                          )
-                        );
-                      }}
-                      placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
-                    />
-                  </View>
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Break End</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={br.end}
-                      onChangeText={(val) => {
-                        setEditBreaks((breaks) =>
-                          breaks.map((b, i) =>
-                            i === idx ? { ...b, end: val } : b
-                          )
-                        );
-                      }}
-                      placeholder="YYYY-MM-DDTHH:mm:ss.sssZ"
-                    />
-                  </View>
+              {editingEntry?.type === "clockin" && (
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Clock In Time</Text>
+                  <TouchableOpacity
+                    style={styles.dateTimeInput}
+                    onPress={() =>
+                      showDateTimePickerForField("clockin", editClockIn)
+                    }
+                  >
+                    <Text style={styles.dateTimeInputText}>
+                      {editClockIn
+                        ? moment(editClockIn).format("MMM DD, YYYY HH:mm")
+                        : "Select Date & Time"}
+                    </Text>
+                    <Ionicons name="calendar-outline" size={20} color="#666" />
+                  </TouchableOpacity>
                 </View>
-              ))}
+              )}
+
+              {editingEntry?.type === "clockout" && (
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Clock Out Time</Text>
+                  <TouchableOpacity
+                    style={styles.dateTimeInput}
+                    onPress={() =>
+                      showDateTimePickerForField("clockout", editClockOut)
+                    }
+                  >
+                    <Text style={styles.dateTimeInputText}>
+                      {editClockOut
+                        ? moment(editClockOut).format("MMM DD, YYYY HH:mm")
+                        : "Select Date & Time"}
+                    </Text>
+                    <Ionicons name="calendar-outline" size={20} color="#666" />
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {editingEntry?.type === "break" && (
+                <>
+                  <Text style={{ fontWeight: "bold", marginBottom: 8 }}>
+                    Break Time
+                  </Text>
+                  {editBreaks.map((br, idx) => (
+                    <View key={br.id || idx} style={{ marginBottom: 12 }}>
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.inputLabel}>Break Start</Text>
+                        <TouchableOpacity
+                          style={styles.dateTimeInput}
+                          onPress={() =>
+                            showDateTimePickerForField(
+                              "breakstart",
+                              br.break_start
+                            )
+                          }
+                        >
+                          <Text style={styles.dateTimeInputText}>
+                            {br.break_start
+                              ? moment(br.break_start).format(
+                                  "MMM DD, YYYY HH:mm"
+                                )
+                              : "Select Date & Time"}
+                          </Text>
+                          <Ionicons
+                            name="calendar-outline"
+                            size={20}
+                            color="#666"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.inputLabel}>Break End</Text>
+                        <TouchableOpacity
+                          style={styles.dateTimeInput}
+                          onPress={() =>
+                            showDateTimePickerForField("breakend", br.break_end)
+                          }
+                        >
+                          <Text style={styles.dateTimeInputText}>
+                            {br.break_end
+                              ? moment(br.break_end).format(
+                                  "MMM DD, YYYY HH:mm"
+                                )
+                              : "Select Date & Time"}
+                          </Text>
+                          <Ionicons
+                            name="calendar-outline"
+                            size={20}
+                            color="#666"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </>
+              )}
             </View>
 
             <View style={styles.modalFooter}>
@@ -533,6 +720,16 @@ export default function TimeSheetHomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {showDateTimePicker && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={currentEditingValue}
+          mode="time"
+          display="default"
+          onChange={handleDateTimeChange}
+        />
+      )}
     </View>
   );
 }
@@ -734,5 +931,20 @@ const styles = StyleSheet.create({
   },
   refreshButton: {
     padding: 8,
+  },
+  dateTimeInput: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: "#fff",
+  },
+  dateTimeInputText: {
+    fontSize: 16,
+    color: "#333",
+    flex: 1,
   },
 });

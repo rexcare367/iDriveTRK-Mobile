@@ -1,4 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import Header from "@/components/Header";
+import { PinKeypad } from "@/components/PinKeypad";
+import { createPIN, verifyPIN } from "@/redux/actions/authActions";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -6,13 +9,10 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { useDispatch } from "react-redux";
-import { PinKeypad } from "../../components/PinKeypad";
-import { createPIN, verifyPIN } from "../../redux/actions/authActions";
 
 export default function ChangePinScreen() {
   const dispatch = useDispatch();
@@ -169,16 +169,8 @@ export default function ChangePinScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Change PIN</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <BackgroundEffects />
+      <Header title="Change PIN" />
 
       <View style={styles.progressContainer}>
         <View

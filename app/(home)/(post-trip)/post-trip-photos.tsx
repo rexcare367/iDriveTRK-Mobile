@@ -11,12 +11,15 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import Header from "../../../components/Header";
-import { updatePostTripForm } from "../../../redux/actions/driverActions";
-import { api } from "../../../utils";
+
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import Header from "@/components/Header";
+
+import { updatePostTripForm } from "@/redux/actions/driverActions";
+
+import { api } from "@/utils";
 
 const PostTripFormPhotos = () => {
   const dispatch = useDispatch();
@@ -259,7 +262,7 @@ const PostTripFormPhotos = () => {
         <CustomButton
           title="Next"
           onPress={handleNext}
-          disabled={!allPhotosUploaded}
+          // disabled={!allPhotosUploaded}
         />
       </ScrollView>
 

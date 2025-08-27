@@ -3,12 +3,12 @@ import { Stack } from "expo-router";
 export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* PTO & Leave Management */}
-      <Stack.Screen name="pto" />
-      <Stack.Screen name="sick-leave" />
-      <Stack.Screen name="personal" />
-      <Stack.Screen name="new-pto-request" />
-      <Stack.Screen name="leave-type-selection" />
+      {/* PTO */}
+      <Stack.Screen name="pto-dashboard" />
+      <Stack.Screen name="pto-request-form" />
+      <Stack.Screen name="pto-type-selection" />
+      <Stack.Screen name="personal-leave-form" />
+      <Stack.Screen name="sick-leave-form" />
     </Stack>
   );
 }

@@ -1,3 +1,6 @@
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import { updateUser } from "@/redux/actions/authActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -13,9 +16,6 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
 import { ThunkDispatch } from "redux-thunk";
-import CustomButton from "../../components/CustomButton";
-import CustomInput from "../../components/CustomInput";
-import { updateUser } from "../../redux/actions/authActions";
 
 interface FormData {
   firstName: string;

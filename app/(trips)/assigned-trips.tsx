@@ -741,7 +741,7 @@ export default function AssignedTripsScreen() {
     <View style={styles.container}>
       <BackgroundEffects />
 
-      <Header user={user} />
+      <Header />
 
       <View style={styles.content}>
         <TripStatsContainer

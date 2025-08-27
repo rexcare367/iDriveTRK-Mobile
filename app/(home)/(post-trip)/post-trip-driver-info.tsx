@@ -3,12 +3,14 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundEffects from "../../../components/BackgroundEffects";
-import BottomTabBar from "../../../components/BottomTabBar";
-import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
-import Header from "../../../components/Header";
-import { updatePostTripForm } from "../../../redux/actions/driverActions";
+
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
+
+import { updatePostTripForm } from "@/redux/actions/driverActions";
 
 export default function PostTripFormDriverInfo() {
   const dispatch = useDispatch();
@@ -27,12 +29,8 @@ export default function PostTripFormDriverInfo() {
     email: postTripFormData?.email || user?.email || "",
   });
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
-    dispatch(updatePostTripForm(formData));
+    dispatch(updatePostTripForm({ ...postTripFormData, ...formData }));
     router.push("/post-trip-vehicle-info");
   };
 

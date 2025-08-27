@@ -103,6 +103,32 @@ export interface ISchedule {
   job: any;
 }
 
+export interface IBreak {
+  id: string;
+  break_start: string;
+  break_end: string;
+  break_type: string;
+  break_minutes: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  timesheet_id: string;
+}
+
+export interface ITimesheet {
+  id: string;
+  clockin_time: string;
+  clockout_time: string;
+  breaks: IBreak[];
+  created_at: string;
+  updated_at: string;
+  is_submitted: boolean;
+  status: string;
+  schedule: ISchedule;
+  truck: ITruck;
+  user: IUser;
+}
+
 export interface ITrip {}
 
 export interface UserState {
