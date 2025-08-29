@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import BottomTabBar from "../../components/BottomTabBar";
 
@@ -116,7 +117,7 @@ export default function TimeSheetDetailsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -269,7 +270,7 @@ export default function TimeSheetDetailsScreen() {
         </View>
       </ScrollView>
       <BottomTabBar activeTab={"TimeSheet"} />
-    </View>
+    </SafeAreaView>
   );
 }
 

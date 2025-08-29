@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 const DutyStatusScreen = () => {
@@ -142,7 +143,7 @@ const DutyStatusScreen = () => {
   const lastName = user?.lastName || "";
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="arrow-back" size={24} color="#000" />
@@ -315,7 +316,7 @@ const DutyStatusScreen = () => {
       </Modal>
 
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 };
 

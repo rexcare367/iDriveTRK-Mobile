@@ -4,14 +4,9 @@ import { PinKeypad } from "@/components/PinKeypad";
 import { createPIN, verifyPIN } from "@/redux/actions/authActions";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 
 export default function ChangePinScreen() {

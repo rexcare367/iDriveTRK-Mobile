@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
 import Header from "../../components/Header";
@@ -131,7 +132,7 @@ export default function PersonalScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <Header />
@@ -255,7 +256,7 @@ export default function PersonalScreen() {
       </View>
 
       <BottomTabBar activeTab="PaidTimeOff" />
-    </View>
+    </SafeAreaView>
   );
 }
 

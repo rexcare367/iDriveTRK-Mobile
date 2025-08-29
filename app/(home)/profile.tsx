@@ -6,7 +6,6 @@ import {
   Alert,
   Image,
   Modal,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Switch,
@@ -15,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import Header from "@/components/Header";
 import { logout } from "@/redux/actions/authActions";

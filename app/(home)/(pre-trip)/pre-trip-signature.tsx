@@ -1,10 +1,21 @@
 import checkAnimation from "@/assets/lottie/check.json";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import BottomTabBar from "@/components/BottomTabBar";
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import Header from "@/components/Header";
+import {
+  completePreTrip,
+  updatePreTripForm,
+} from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useRef, useState } from "react";
 import {
   Image,
   Modal,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,17 +27,6 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Signature from "react-native-signature-canvas";
 import ViewShot from "react-native-view-shot";
 import { useDispatch, useSelector } from "react-redux";
-
-import BackgroundEffects from "@/components/BackgroundEffects";
-import BottomTabBar from "@/components/BottomTabBar";
-import CustomButton from "@/components/CustomButton";
-import CustomInput from "@/components/CustomInput";
-import Header from "@/components/Header";
-import {
-  completePreTrip,
-  updatePreTripForm,
-} from "@/redux/actions/driverActions";
-import { router } from "expo-router";
 
 const PreTripFormSignature = () => {
   const dispatch = useDispatch();
@@ -152,7 +152,7 @@ const PreTripFormSignature = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header
         title="Signature"
@@ -408,7 +408,7 @@ const PreTripFormSignature = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 

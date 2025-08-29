@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 import checkAnimation from "../../assets/lottie/check.json";
@@ -139,7 +140,7 @@ export default function NewPTORequestScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <View style={styles.header}>
@@ -334,7 +335,7 @@ export default function NewPTORequestScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 

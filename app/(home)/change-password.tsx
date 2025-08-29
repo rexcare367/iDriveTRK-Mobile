@@ -12,7 +12,6 @@ import {
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChangePasswordScreen() {
   const [loading, setLoading] = useState(false);

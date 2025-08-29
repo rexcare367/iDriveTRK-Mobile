@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SplashImage = ({ source, style }: any) => (
   <Image source={source} style={style} />
@@ -13,7 +14,10 @@ export default function SplashScreen() {
     require("../../assets/effect/splash4.png"),
   ];
   return (
-    <View style={styles.container} onTouchEnd={() => router.push("/pin")}>
+    <SafeAreaView
+      style={styles.container}
+      onTouchEnd={() => router.push("/pin")}
+    >
       {splashImages.map((image, index) => (
         <SplashImage
           key={index}
@@ -32,7 +36,7 @@ export default function SplashScreen() {
         Welcome to iDrive, where you get to optimize your productivity by using
         the application
       </Text>
-    </View>
+    </SafeAreaView>
   );
 }
 

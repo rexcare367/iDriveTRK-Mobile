@@ -2,8 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
-import { TouchableOpacity, Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
@@ -45,7 +46,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <View style={styles.header}>
         <TouchableOpacity
@@ -82,7 +83,7 @@ export default function ForgotPasswordScreen() {
           loading={loading}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

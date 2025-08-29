@@ -1,4 +1,5 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
@@ -10,7 +11,7 @@ export default function TimeSheetScreen() {
   const { currentUser } = useSelector((state: any) => state.user);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header />
       {currentUser.role === "MANAGER" ? (
@@ -19,7 +20,7 @@ export default function TimeSheetScreen() {
         <TimeSheetHomeScreen />
       )}
       <BottomTabBar activeTab={"TimeSheet"} />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
@@ -91,7 +92,7 @@ const VehicleSelectionScreen = () => {
   // console.log("vehicles", vehicles);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <Header
@@ -240,7 +241,7 @@ const VehicleSelectionScreen = () => {
       </View>
 
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 };
 

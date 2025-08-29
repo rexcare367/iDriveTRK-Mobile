@@ -1,5 +1,12 @@
 import React from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface ConfirmTripModalProps {
   visible: boolean;
@@ -7,6 +14,7 @@ interface ConfirmTripModalProps {
   message?: string;
   onCancel: () => void;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 const ConfirmTripModal: React.FC<ConfirmTripModalProps> = ({
@@ -15,6 +23,7 @@ const ConfirmTripModal: React.FC<ConfirmTripModalProps> = ({
   message = "Are you sure you want to clock out?",
   onCancel,
   onConfirm,
+  isLoading = false,
 }) => {
   return (
     <Modal
@@ -31,14 +40,24 @@ const ConfirmTripModal: React.FC<ConfirmTripModalProps> = ({
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
               onPress={onCancel}
+              disabled={isLoading}
             >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.confirmButton]}
+              style={[
+                styles.button,
+                styles.confirmButton,
+                isLoading && styles.disabledButton,
+              ]}
               onPress={onConfirm}
+              disabled={isLoading}
             >
-              <Text style={styles.confirmText}>Confirm</Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={styles.confirmText}>Confirm</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -93,6 +112,9 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     backgroundColor: "#F44336",
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   cancelText: {
     color: "#666",

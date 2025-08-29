@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { PinKeypad } from "../../components/PinKeypad";
 import { createPIN, signIn, verifyPIN } from "../../redux/actions/authActions";
@@ -105,7 +106,7 @@ export default function PinScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#004B87" />
@@ -150,7 +151,7 @@ export default function PinScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

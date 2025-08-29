@@ -4,6 +4,7 @@ import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
@@ -134,7 +135,7 @@ export default function TripDetailsHistoryScreen() {
   )} - ${moment(tripDetails.end_time).format("hh:mm A")}`;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header title="Trip Details" subtitle={subTitle} />
 
@@ -298,7 +299,7 @@ export default function TripDetailsHistoryScreen() {
       </View>
 
       <BottomTabBar activeTab="Trips" />
-    </View>
+    </SafeAreaView>
   );
 }
 

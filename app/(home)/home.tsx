@@ -16,6 +16,7 @@ import {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -316,7 +317,7 @@ function HomeScreen() {
   // };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <Header />
@@ -461,7 +462,7 @@ function HomeScreen() {
         hoursSinceLastShift={hoursSinceLastShift}
       />
       <BottomTabBar activeTab="Home" onTabPress={() => {}} />
-    </View>
+    </SafeAreaView>
   );
 }
 

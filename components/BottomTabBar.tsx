@@ -41,7 +41,7 @@ const BottomTabBar = ({ activeTab, onTabPress }: BottomTabBarProps) => {
         <Feather
           name="home"
           size={20}
-          color={activeTab === "Home" ? "#082640" : "#666"}
+          color={activeTab === "Home" ? "#2563eb" : "#6b7280"}
         />
         <Text
           style={[styles.tabText, activeTab === "Home" && styles.activeTabText]}
@@ -57,7 +57,7 @@ const BottomTabBar = ({ activeTab, onTabPress }: BottomTabBarProps) => {
         <Feather
           name="truck"
           size={20}
-          color={activeTab === "Trips" ? "#082640" : "#666"}
+          color={activeTab === "Trips" ? "#2563eb" : "#6b7280"}
         />
         <Text
           style={[
@@ -76,7 +76,7 @@ const BottomTabBar = ({ activeTab, onTabPress }: BottomTabBarProps) => {
         <Feather
           name="clock"
           size={20}
-          color={activeTab === "PTO" ? "#082640" : "#666"}
+          color={activeTab === "PTO" ? "#2563eb" : "#6b7280"}
         />
         <Text
           style={[styles.tabText, activeTab === "PTO" && styles.activeTabText]}
@@ -92,7 +92,7 @@ const BottomTabBar = ({ activeTab, onTabPress }: BottomTabBarProps) => {
         <Feather
           name="calendar"
           size={20}
-          color={activeTab === "TimeSheet" ? "#082640" : "#666"}
+          color={activeTab === "TimeSheet" ? "#2563eb" : "#6b7280"}
         />
         <Text
           style={[
@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
     height: 60,
     backgroundColor: "white",
     borderTopWidth: 1,
-    borderTopColor: "#eee",
+    borderTopColor: "#e0e0e0",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 8,
   },
   tabItem: {
     flex: 1,
@@ -126,17 +126,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTab: {
-    borderTopWidth: 2,
-    borderTopColor: "#082640",
+    borderTopWidth: 3,
+    borderTopColor: "#2563eb",
+    backgroundColor: "#f0f8ff",
   },
   tabText: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: 11,
+    color: "#6b7280",
     marginTop: 4,
+    fontWeight: "400",
   },
   activeTabText: {
-    color: "#082640",
-    fontWeight: "500",
+    color: "#2563eb",
+    fontWeight: "600",
   },
 });
 

@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../../components/EmptyState";
 import StatCard from "../../components/StatCard";
@@ -420,7 +421,7 @@ export default function TimeSheetHomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.statsContainer}>
           <StatCard
@@ -730,7 +731,7 @@ export default function TimeSheetHomeScreen() {
           onChange={handleDateTimeChange}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

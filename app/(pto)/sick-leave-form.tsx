@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Type definitions
 interface LeaveBalance {
@@ -127,7 +128,7 @@ export default function SickLeaveScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <Header />
@@ -249,7 +250,7 @@ export default function SickLeaveScreen() {
       </View>
 
       <BottomTabBar activeTab="PTO" />
-    </View>
+    </SafeAreaView>
   );
 }
 

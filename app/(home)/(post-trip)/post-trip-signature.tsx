@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Signature from "react-native-signature-canvas";
 import ViewShot from "react-native-view-shot";
 import { useDispatch, useSelector } from "react-redux";
@@ -170,7 +171,7 @@ const PostTripFormSignature = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header
         title="Signature"
@@ -427,7 +428,7 @@ const PostTripFormSignature = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 

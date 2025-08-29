@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 import BackgroundEffects from "../../components/BackgroundEffects";
@@ -738,7 +739,7 @@ export default function AssignedTripsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <Header />
@@ -802,7 +803,7 @@ export default function AssignedTripsScreen() {
       </View>
 
       <BottomTabBar activeTab="Trips" />
-    </View>
+    </SafeAreaView>
   );
 }
 

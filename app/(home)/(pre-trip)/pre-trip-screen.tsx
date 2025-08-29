@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import { startPreTrip } from "@/redux/actions/driverActions";
 import { router } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function PreTripScreen() {
@@ -20,7 +21,7 @@ export default function PreTripScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header
         title="Pre-trip Inspection"
@@ -38,7 +39,7 @@ export default function PreTripScreen() {
         </TouchableOpacity>
       </View>
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 }
 

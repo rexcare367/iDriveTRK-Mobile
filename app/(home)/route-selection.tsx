@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 const RouteSelectionScreen = () => {
@@ -64,7 +65,7 @@ const RouteSelectionScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header />
 
@@ -131,7 +132,7 @@ const RouteSelectionScreen = () => {
       </View>
 
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 };
 

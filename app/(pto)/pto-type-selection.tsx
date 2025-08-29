@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Type definitions
 interface LeaveType {
@@ -37,7 +38,7 @@ export default function LeaveTypeSelectionScreen() {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={28} />
       </TouchableOpacity>
@@ -78,7 +79,7 @@ export default function LeaveTypeSelectionScreen() {
       >
         <Text style={styles.nextButtonText}>Next</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 

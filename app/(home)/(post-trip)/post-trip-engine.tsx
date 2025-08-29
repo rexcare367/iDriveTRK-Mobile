@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function PostTripFormEngine() {
@@ -121,7 +122,7 @@ export default function PostTripFormEngine() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header
         title="Engine Compartment"
@@ -250,7 +251,7 @@ export default function PostTripFormEngine() {
       </ScrollView>
 
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 }
 

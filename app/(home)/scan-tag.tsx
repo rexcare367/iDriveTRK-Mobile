@@ -9,6 +9,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function ScanTagScreen() {
@@ -73,7 +74,7 @@ export default function ScanTagScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header />
 
@@ -123,7 +124,7 @@ export default function ScanTagScreen() {
       </View>
 
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 }
 

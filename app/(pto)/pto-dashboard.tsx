@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
@@ -99,7 +100,7 @@ export default function PTOScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
 
       <Header />
@@ -214,7 +215,7 @@ export default function PTOScreen() {
         </View>
       </View>
       <BottomTabBar activeTab="PTO" />
-    </View>
+    </SafeAreaView>
   );
 }
 

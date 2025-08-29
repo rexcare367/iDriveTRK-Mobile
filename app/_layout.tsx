@@ -1,3 +1,4 @@
+import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   DarkTheme,
   DefaultTheme,
@@ -10,9 +11,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { AlertNotificationRoot } from "react-native-alert-notification";
 import "react-native-reanimated";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
-
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { store } from "../redux/store";
 
 // Initialize Firebase early
@@ -39,23 +39,28 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider store={store}>
-      <AlertNotificationRoot theme="dark">
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(home)" options={{ headerShown: false }} />
-            <Stack.Screen name="(pto)" options={{ headerShown: false }} />
-            <Stack.Screen name="(trips)" options={{ headerShown: false }} />
-            <Stack.Screen name="(payroll)" options={{ headerShown: false }} />
-            <Stack.Screen name="(timesheet)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </AlertNotificationRoot>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <AlertNotificationRoot theme="dark">
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Stack>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(home)" options={{ headerShown: false }} />
+              <Stack.Screen name="(pto)" options={{ headerShown: false }} />
+              <Stack.Screen name="(trips)" options={{ headerShown: false }} />
+              <Stack.Screen name="(payroll)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(timesheet)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </AlertNotificationRoot>
+      </Provider>
+    </SafeAreaProvider>
   );
 }

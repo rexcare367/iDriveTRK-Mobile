@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 
 export default function TripDetailsScreen() {
@@ -91,7 +92,7 @@ export default function TripDetailsScreen() {
   }));
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header title="Trip Details" subtitle={tripName as string} />
       {loading ? (
@@ -294,7 +295,7 @@ export default function TripDetailsScreen() {
         </ScrollView>
       )}
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 }
 

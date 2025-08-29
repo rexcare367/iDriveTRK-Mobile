@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 const PreTripFormTrailerDetails = () => {
@@ -156,7 +157,7 @@ const PreTripFormTrailerDetails = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header title="Trailer(s)" subtitle="List of Trailers with Details" />
 
@@ -261,7 +262,7 @@ const PreTripFormTrailerDetails = () => {
       </ScrollView>
 
       <BottomTabBar activeTab="Home" />
-    </View>
+    </SafeAreaView>
   );
 };
 

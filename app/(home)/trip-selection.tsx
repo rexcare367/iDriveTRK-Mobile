@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import BottomTabBar from "../../components/BottomTabBar";
@@ -48,7 +49,7 @@ export default function TripSelectionScreen() {
       setSchedulesLoading(true);
       setSchedulesError(null);
       try {
-        const start_time = moment().toISOString();
+        const start_time = moment("2025-01-01").toISOString();
         const end_time = moment().add(1, "day").toISOString();
         const response = await api.get(
           `/api/schedules?user_id=${user.id}&start_time=${encodeURIComponent(
@@ -93,17 +94,17 @@ export default function TripSelectionScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header title="Select Trip" subtitle="Choose your trip for today" />
 
       <View style={styles.content}>
         <ScrollView style={styles.tripList}>
-          <Text
+          {/* <Text
             style={{ fontWeight: "bold", fontSize: 18, marginVertical: 12 }}
           >
             Today&apos;s Schedules
-          </Text>
+          </Text> */}
           {schedulesLoading && (
             <View style={{ alignItems: "center", marginVertical: 10 }}>
               <ActivityIndicator size="large" color="#007AFF" />
@@ -147,9 +148,9 @@ export default function TripSelectionScreen() {
                   />
                   <Text style={styles.tripName}>
                     {startTime && endTime
-                      ? `${startTime.format("h:mm A")} - ${endTime.format(
-                          "h:mm A"
-                        )}`
+                      ? `${startTime.format(
+                          "MMM DD h:mm A"
+                        )} - ${endTime.format("h:mm A")}`
                       : "Time not available"}
                   </Text>
                   <View style={styles.tripNameBadge}>
@@ -262,7 +263,7 @@ export default function TripSelectionScreen() {
       </View>
 
       <BottomTabBar activeTab="Home" onTabPress={handleTabPress} />
-    </View>
+    </SafeAreaView>
   );
 }
 

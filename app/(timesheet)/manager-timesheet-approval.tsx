@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import {
   approveTimesheet,
@@ -181,7 +182,7 @@ export default function ManagerApprovalScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.searchContainer}>
           <Ionicons
@@ -308,7 +309,7 @@ export default function ManagerApprovalScreen() {
       </View>
 
       {renderRejectionModal()}
-    </View>
+    </SafeAreaView>
   );
 }
 

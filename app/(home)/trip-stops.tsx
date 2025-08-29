@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectTripStop } from "@/redux/actions/driverActions";
@@ -84,7 +85,7 @@ export default function TripStopsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <BackgroundEffects />
       <Header />
 
@@ -255,7 +256,7 @@ export default function TripStopsScreen() {
       </View>
 
       <BottomTabBar activeTab="Trips" />
-    </View>
+    </SafeAreaView>
   );
 }
 
