@@ -41,12 +41,8 @@ export default function TimeSheetHomeScreen() {
   const [editClockIn, setEditClockIn] = useState("");
   const [editClockOut, setEditClockOut] = useState("");
   const [editBreaks, setEditBreaks] = useState<IBreak[]>([]);
-  const [pendingApprovals, setPendingApprovals] = useState(new Set<string>());
   const [approvalModalVisible, setApprovalModalVisible] = useState(false);
   const [approvalReason, setApprovalReason] = useState("");
-  const [editedEntries, setEditedEntries] = useState(new Set<string>());
-  const [show, setShow] = useState(false);
-  const [date, setDate] = useState(new Date());
 
   // Add new state for DateTimePicker
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
@@ -89,86 +85,105 @@ export default function TimeSheetHomeScreen() {
     setShowDateTimePicker(true);
   };
 
-  useEffect(() => {
-    const fetchTimesheets = async () => {
-      setLoading(true);
-      setError(null);
-      if (!user?.id) return;
+  // Calculate total working hours and overtime
+  const calculateWorkingHours = (timesheets: ITimesheet[]) => {
+    let totalWorkingHours = 0;
+    let totalOvertimeHours = 0;
 
-      try {
-        // Get current date range (current month) using moment
-        const startOfMonth = moment().startOf("month");
-        const endOfMonth = moment().add(1, "year").endOf("month");
+    timesheets.forEach((timesheet) => {
+      if (timesheet.clockin_time && timesheet.clockout_time) {
+        // Calculate working hours (clockout - clockin)
+        const clockIn = moment(timesheet.clockin_time);
+        const clockOut = moment(timesheet.clockout_time);
 
-        const startTime = startOfMonth.format("YYYY-MM-DD");
-        const endTime = endOfMonth.format("YYYY-MM-DD");
+        // Get working duration in hours
+        const workingDuration = moment.duration(clockOut.diff(clockIn));
+        const workingHours = workingDuration.asHours();
 
-        // Fetch timesheets from backend
-        const response = await api.get(
-          `/api/timesheets/by-user/${user?.id || "1"}`,
-          {
-            params: {
-              start_time: startTime,
-              end_time: endTime,
-              is_submitted: false,
-            },
-          }
-        );
+        // Add to total working hours
+        totalWorkingHours += workingHours;
 
-        if (response.data) {
-          setClockEntries(response.data);
+        // Calculate overtime based on schedule
+        if (
+          timesheet.schedule &&
+          timesheet.schedule.start_time &&
+          timesheet.schedule.end_time
+        ) {
+          const scheduleStart = moment(timesheet.schedule.start_time);
+          const scheduleEnd = moment(timesheet.schedule.end_time);
+
+          // Calculate scheduled hours
+          const scheduledDuration = moment.duration(
+            scheduleEnd.diff(scheduleStart)
+          );
+
+          const scheduledHours = scheduledDuration.asHours();
+          console.log("scheduledHours", scheduledHours);
+
+          // Calculate overtime (working hours - scheduled hours)
+          const overtime = Math.max(0, workingHours - scheduledHours);
+          totalOvertimeHours += overtime;
         }
-      } catch (error: any) {
-        console.error("Error fetching timesheets:", error);
-        setError(error.message || "Failed to fetch timesheet data");
-
-        // Show error alert to user
-        Alert.alert(
-          "Connection Error",
-          "Unable to fetch timesheet data. Please try again later.",
-          [{ text: "OK" }]
-        );
-      } finally {
-        setLoading(false);
       }
-    };
+    });
 
-    fetchTimesheets();
-  }, [user?.id]);
+    // Update state with calculated values
+    setTotalHours(Math.round(totalWorkingHours * 100) / 100); // Round to 2 decimal places
+    setOvertimeHours(Math.round(totalOvertimeHours * 100) / 100); // Round to 2 decimal places
+  };
 
-  // Function to refetch data (for retry button)
-  const refetchTimesheets = async () => {
+  const fetchTimesheets = async () => {
     setLoading(true);
     setError(null);
     if (!user?.id) return;
 
     try {
+      // Get current date range (current month) using moment
       const startOfMonth = moment().startOf("month");
       const endOfMonth = moment().endOf("month");
+      // const endOfMonth = moment().add(1, "year").endOf("month");
 
       const startTime = startOfMonth.format("YYYY-MM-DD");
       const endTime = endOfMonth.format("YYYY-MM-DD");
 
+      // Fetch timesheets from backend
       const response = await api.get(
         `/api/timesheets/by-user/${user?.id || "1"}`,
         {
           params: {
             start_time: startTime,
             end_time: endTime,
+            is_submitted: false,
           },
         }
       );
 
       if (response.data) {
-        setClockEntries(response.data || []);
+        setClockEntries(response.data);
+
+        console.log("response.data", response.data);
+
+        // Calculate total working hours and overtime
+        calculateWorkingHours(response.data);
       }
     } catch (error: any) {
       console.error("Error fetching timesheets:", error);
       setError(error.message || "Failed to fetch timesheet data");
+
+      // Show error alert to user
+      Alert.alert(
+        "Connection Error",
+        "Unable to fetch timesheet data. Please try again later.",
+        [{ text: "OK" }]
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTimesheets();
+  }, [user?.id]);
 
   const handleEditEntry = (entry: any) => {
     console.log("entry", entry);
@@ -229,8 +244,8 @@ export default function TimeSheetHomeScreen() {
         });
 
         // Update local state
-        setClockEntries((prevEntries) =>
-          prevEntries.map((timesheet) =>
+        setClockEntries((prevEntries) => {
+          const updatedEntries = prevEntries.map((timesheet) =>
             timesheet.id === editingEntry.timesheet_id
               ? {
                   ...timesheet,
@@ -238,8 +253,12 @@ export default function TimeSheetHomeScreen() {
                   updated_at: moment().toISOString(),
                 }
               : timesheet
-          )
-        );
+          );
+
+          // Recalculate working hours after update
+          calculateWorkingHours(updatedEntries);
+          return updatedEntries;
+        });
 
         Alert.alert("Success", "Clock in time updated successfully!");
       } else if (editingEntry.type === "clockout") {
@@ -254,8 +273,8 @@ export default function TimeSheetHomeScreen() {
         });
 
         // Update local state
-        setClockEntries((prevEntries) =>
-          prevEntries.map((timesheet) =>
+        setClockEntries((prevEntries) => {
+          const updatedEntries = prevEntries.map((timesheet) =>
             timesheet.id === editingEntry.timesheet_id
               ? {
                   ...timesheet,
@@ -263,8 +282,12 @@ export default function TimeSheetHomeScreen() {
                   updated_at: moment().toISOString(),
                 }
               : timesheet
-          )
-        );
+          );
+
+          // Recalculate working hours after update
+          calculateWorkingHours(updatedEntries);
+          return updatedEntries;
+        });
 
         Alert.alert("Success", "Clock out time updated successfully!");
       } else if (editingEntry.type === "break") {
@@ -294,8 +317,8 @@ export default function TimeSheetHomeScreen() {
         });
 
         // Update local state - find the timesheet and update the specific break
-        setClockEntries((prevEntries) =>
-          prevEntries.map((timesheet) => {
+        setClockEntries((prevEntries) => {
+          const updatedEntries = prevEntries.map((timesheet) => {
             if (timesheet.id === editingEntry.timesheet_id) {
               const updatedBreaks = timesheet.breaks.map((breakItem) =>
                 breakItem.id === editingEntry.id
@@ -316,17 +339,15 @@ export default function TimeSheetHomeScreen() {
               };
             }
             return timesheet;
-          })
-        );
+          });
+
+          // Recalculate working hours after update
+          calculateWorkingHours(updatedEntries);
+          return updatedEntries;
+        });
 
         Alert.alert("Success", "Break time updated successfully!");
       }
-
-      // Mark as edited for approval tracking
-      setEditedEntries(
-        (prev) =>
-          new Set([...prev, editingEntry.timesheet_id || editingEntry.id])
-      );
 
       // Close modal and reset state
       setEditModalVisible(false);
@@ -360,7 +381,6 @@ export default function TimeSheetHomeScreen() {
     };
 
     dispatch(submitForApproval(approvalData) as any);
-    setPendingApprovals((prev) => new Set([...prev, editingEntry?.id || ""]));
     setApprovalModalVisible(false);
     setApprovalReason("");
 
@@ -409,7 +429,7 @@ export default function TimeSheetHomeScreen() {
 
               Alert.alert("Success", "Timesheet submitted successfully!");
               // Refresh timesheet data
-              refetchTimesheets();
+              fetchTimesheets();
             } catch (error) {
               Alert.alert("Error", "Failed to submit timesheet.");
               console.error(error);
@@ -454,7 +474,7 @@ export default function TimeSheetHomeScreen() {
           />
           <TouchableOpacity
             style={styles.refreshButton}
-            onPress={refetchTimesheets}
+            onPress={fetchTimesheets}
             disabled={loading}
           >
             <Ionicons
@@ -483,7 +503,7 @@ export default function TimeSheetHomeScreen() {
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity
                 style={styles.retryButton}
-                onPress={refetchTimesheets}
+                onPress={fetchTimesheets}
               >
                 <Text style={styles.retryButtonText}>Retry</Text>
               </TouchableOpacity>

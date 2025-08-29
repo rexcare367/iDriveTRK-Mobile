@@ -280,8 +280,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 6,
-    backgroundColor: "#dc3545",
+    backgroundColor: "#F64848",
     flex: 1,
+    minHeight: 44,
   },
   confirmButton: {
     backgroundColor: "#28a745",
@@ -299,6 +300,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#333",
     flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    minHeight: 44,
   },
   viewTripButtonText: {
     fontSize: 14,

@@ -60,15 +60,18 @@ export default function TripCompleteHistoryScreen() {
       setLoading(true);
 
       // Use moment to handle dates properly
-      const now = moment();
       const startTime = moment()
         .startOf("year")
         .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"); // Start of current year
-      const endTime = now.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"); // Current time
+      const endTime = moment()
+        .endOf("year")
+        .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"); // Current time
 
       const response = await api.get(
         `/api/schedules?user_id=${user.id}&start_time=${startTime}&end_time=${endTime}&status=completed`
       );
+
+      console.log("response.data.length", response.data.length);
 
       if (response.data && response.data.length > 0) {
         setCompletedTrips(response.data);

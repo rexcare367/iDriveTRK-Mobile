@@ -87,6 +87,8 @@ export default function TripDetailsHistoryScreen() {
           `/api/timesheets/by-schedule/${schedule_id}`
         );
 
+        console.log("timesheetResponse.data", timesheetResponse.data);
+
         if (timesheetResponse.data) {
           setTimesheet(timesheetResponse.data);
         } else {
@@ -261,19 +263,13 @@ export default function TripDetailsHistoryScreen() {
 
             <View style={styles.truckContainer}>
               <Image
-                source={
-                  timesheet?.truck?.photo
-                    ? {
-                        uri:
-                          process.env.EXPO_PUBLIC_STORAGE_URL +
-                          timesheet.truck.photo,
-                      }
-                    : require("../../assets/car.png")
-                }
+                source={{
+                  uri: timesheet.truck.photo,
+                }}
                 style={styles.truckImage}
               />
               <View style={styles.truckDetails}>
-                <Text style={styles.truckName}>{timesheet?.truck?.name}</Text>
+                <Text style={styles.truckName}>{timesheet?.truck?.make}</Text>
                 <View style={styles.truckSpecs}>
                   <View style={styles.truckSpec}>
                     <Ionicons
@@ -282,13 +278,7 @@ export default function TripDetailsHistoryScreen() {
                       color="#666"
                     />
                     <Text style={styles.truckSpecText}>
-                      {timesheet?.truck?.speed} km/h
-                    </Text>
-                  </View>
-                  <View style={styles.truckSpec}>
-                    <Ionicons name="water-outline" size={16} color="#666" />
-                    <Text style={styles.truckSpecText}>
-                      {timesheet?.truck?.fuel} L
+                      {timesheet?.truck?.unit_number}
                     </Text>
                   </View>
                 </View>
