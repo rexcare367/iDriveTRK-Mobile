@@ -304,6 +304,14 @@ export const verifyPIN = (pin: string) => {
       // Fetch full user info from backend
       if (!user.pin) throw new Error("PIN not set for user");
       if (user.pin !== pin) throw new Error("Incorrect PIN");
+      const response = await api.post("api/activity/log", {
+            user_id: user.id,
+            category: "auth",
+            type: "login",
+            description: "PIN verified",
+            level: "2",
+            tags: ["auth"],
+      });
       dispatch({
         type: CREATE_PIN_SUCCESS,
         payload: user,

@@ -141,6 +141,7 @@ export const completePreTrip =
         type: COMPLETE_PRE_TRIP,
         payload: {
           ...formData,
+          userId,
           timestamp: new Date().toISOString(),
         },
       });

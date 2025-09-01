@@ -29,9 +29,10 @@ import { api } from "@/utils";
 
 const PostTripFormSignature = () => {
   const dispatch = useDispatch();
-  const { user, postTripFormData, clockInFormData } = useSelector(
+  const { postTripFormData, clockInFormData } = useSelector(
     (state: any) => state.driver
   );
+  const { user } = useSelector((state: any) => state.auth);
 
   const signatureRef = useRef(null);
   const typedSignatureViewRef = useRef(null);
@@ -76,7 +77,7 @@ const PostTripFormSignature = () => {
     const schedule_id = clockInFormData?.schedule_id;
 
     // Call backend API to store post-trip inspection
-    await api.post("api/truck-inspection", {
+      const response = await api.post("api/truck-inspection", {
       userId,
       ...updatedPostTripFormData,
     });
@@ -85,7 +86,7 @@ const PostTripFormSignature = () => {
     await api.patch(`api/schedules/${schedule_id}`, {
       status: "completed",
     });
-    dispatch(completePostTrip(updatedPostTripFormData));
+    dispatch(completePostTrip({...updatedPostTripFormData}));
 
     setLoading(false);
     setShowSuccessModal(true);

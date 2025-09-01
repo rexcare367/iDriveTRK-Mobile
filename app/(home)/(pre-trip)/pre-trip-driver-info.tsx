@@ -29,7 +29,7 @@ export default function PreTripFormDriverInfo() {
   });
 
   const handleNext = () => {
-    dispatch(updatePreTripForm(formData));
+    dispatch(updatePreTripForm({...preTripFormData, ...formData}));
     router.push("/pre-trip-vehicle-info");
   };
 

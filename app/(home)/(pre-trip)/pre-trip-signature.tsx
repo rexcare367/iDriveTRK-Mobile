@@ -4,10 +4,7 @@ import BottomTabBar from "@/components/BottomTabBar";
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
 import Header from "@/components/Header";
-import {
-  completePreTrip,
-  updatePreTripForm,
-} from "@/redux/actions/driverActions";
+import { completePreTrip, updatePreTripForm } from "@/redux/actions/driverActions";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -31,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 const PreTripFormSignature = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
+  const { user } = useSelector((state: any) => state.auth);
 
   const signatureRef = useRef(null);
   const typedSignatureViewRef = useRef(null);
@@ -59,30 +57,24 @@ const PreTripFormSignature = () => {
         console.warn("Failed to capture typed signature image", e);
       }
     }
+    const updatedPreTripFormData = {
+      ...preTripFormData,
+      signature: {
+        signatureType: formData.signatureType,
+        typedSignature: formData.typedSignature,
+        signatureText: formData.signatureText,
+        drawnSignature: formData.drawnSignature,
+        typedSignatureImage,
+      },
+      userId: user?.id,
+    };
+
 
     dispatch(
-      updatePreTripForm({
-        ...preTripFormData,
-        signature: {
-          signatureType: formData.signatureType,
-          typedSignature: formData.typedSignature,
-          signatureText: formData.signatureText,
-          drawnSignature: formData.drawnSignature,
-          typedSignatureImage,
-        },
-      })
+      updatePreTripForm(updatedPreTripFormData)
     );
     const result = await dispatch(
-      completePreTrip({
-        ...preTripFormData,
-        signature: {
-          signatureType: formData.signatureType,
-          typedSignature: formData.typedSignature,
-          signatureText: formData.signatureText,
-          drawnSignature: formData.drawnSignature,
-          typedSignatureImage,
-        },
-      })
+      completePreTrip(updatedPreTripFormData)
     );
     setLoading(false);
     if (result?.success) {

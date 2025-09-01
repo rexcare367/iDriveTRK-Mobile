@@ -43,10 +43,6 @@ const PreTripFormLights = () => {
     (!formData.tailDash || formData.tailDashDetails.trim() !== "") &&
     (!formData.turnIndicators || formData.turnIndicatorsDetails.trim() !== "");
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNext = () => {
     dispatch(
       updatePreTripForm({
