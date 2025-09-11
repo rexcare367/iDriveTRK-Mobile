@@ -1,6 +1,7 @@
+import { IScheduler, IUser } from "@/redux/types";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 
@@ -10,16 +11,23 @@ interface HeaderProps {
 }
 
 const Header = ({ title = "", subtitle = "" }: HeaderProps) => {
-  const { user } = useSelector((state: any) => state.auth);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const { user, currentScheduler }: { user: IUser | null; currentScheduler: string | null } = useSelector((state: any) => state.auth);
 
-  const toggleDrawer = () => {
-    setIsDrawerVisible(!isDrawerVisible);
+  // Helper function to get the current scheduler
+  const getCurrentScheduler = (): IScheduler | null => {
+    if (!user?.schedulers || user.schedulers.length === 0) return null;
+
+    // If currentScheduler is set, find it in the schedulers array
+    if (currentScheduler) {
+      const scheduler = user.schedulers.find((s: IScheduler) => s.id === currentScheduler);
+      if (scheduler) return scheduler;
+    }
+
+    // If no currentScheduler is set or not found, return the first scheduler
+    return user.schedulers[0] || null;
   };
 
-  const closeDrawer = () => {
-    setIsDrawerVisible(false);
-  };
+  const currentSchedulerObj = getCurrentScheduler();
 
   const handleBack = () => {
     router.back();
@@ -55,14 +63,13 @@ const Header = ({ title = "", subtitle = "" }: HeaderProps) => {
           <View style={styles.notificationContainer}>
             <View style={styles.bellBackground}>
               <Ionicons name="notifications-outline" size={24} color="#222" />
-              {/* <View style={styles.notificationBadge}>
+              <View style={styles.notificationBadge}>
                 <Text style={styles.notificationCount}>1</Text>
-              </View> */}
+              </View>
             </View>
           </View>
-          <View style={styles.profileOuterBorder}>
             <View style={styles.profileInnerBorder}>
-              <TouchableOpacity onPress={() => router.push("/(home)/profile")}>
+              <TouchableOpacity style={styles.profileContainer} onPress={() => router.push("/(home)/profile")}>
                 <Image
                   source={
                     user?.avatar
@@ -71,9 +78,16 @@ const Header = ({ title = "", subtitle = "" }: HeaderProps) => {
                   }
                   style={styles.profileImage}
                 />
+                <View style={styles.profileNameContainer}>
+                  <Text style={styles.profileName}>
+                    {user?.firstName} {user?.lastName}
+                  </Text>
+                  <Text style={styles.schedulerName}>
+                    {currentSchedulerObj?.title || "--"}
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
-          </View>
         </View>
       </View>
     </View>
@@ -148,14 +162,11 @@ const styles = StyleSheet.create({
     lineHeight: 13,
   },
   profileImage: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: 20,
-  },
-  profileOuterBorder: {
     borderWidth: 1,
     borderColor: "#082640",
-    borderRadius: 25,
     padding: 1,
   },
   profileInnerBorder: {
@@ -164,12 +175,33 @@ const styles = StyleSheet.create({
     borderRadius: 23,
     overflow: "hidden",
   },
+  profileName: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#002B49",
+  },
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginRight: 8,
+  },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     flexWrap: "wrap",
   },
   subtitle: {
+    fontSize: 12,
+    color: "#666",
+    flexWrap: "wrap",
+    marginTop: 2,
+  },
+  profileNameContainer: {
+    flexDirection: "column",
+    gap: 1,
+  },
+  schedulerName: {
     fontSize: 12,
     color: "#666",
     flexWrap: "wrap",

@@ -102,7 +102,7 @@ function NextSchedule() {
           <Text
             style={{ textAlign: "center", color: "#888", marginVertical: 20 }}
           >
-            Loading uncompleted trips...
+            Loading scheduled trips...
           </Text>
         ) : schedulesError ? (
           <EmptyState
@@ -122,8 +122,8 @@ function NextSchedule() {
         ) : (
           <EmptyState
             icon="alarm-outline"
-            text="No uncompleted trips found."
-            subtext="Clock in to start tracking your time"
+            text="No scheduled trips"
+            subtext=""
           />
         )}
       </View>
@@ -160,8 +160,8 @@ function NextSchedule() {
         ) : (
           <EmptyState
             icon="alarm-outline"
-            text="No uncompleted trips found."
-            subtext="Clock in to start tracking your time"
+            text="No uncompleted trips"
+            subtext=""
           />
         )}
       </View>

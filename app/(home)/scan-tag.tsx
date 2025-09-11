@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 export default function ScanTagScreen() {
   const params = useLocalSearchParams();
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
   const { tripStops } = useSelector((state: any) => state.driver);
   const { stopId, stopName, tripName } = params;
   const [scanning, setScanning] = useState(false);

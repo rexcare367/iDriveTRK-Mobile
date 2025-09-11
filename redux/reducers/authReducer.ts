@@ -1,8 +1,7 @@
 import {
   CREATE_PIN_FAILURE,
   CREATE_PIN_REQUEST,
-  CREATE_PIN_SUCCESS,
-  LOGIN_FAILURE,
+  CREATE_PIN_SUCCESS, IUser, LOGIN_FAILURE,
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGOUT,
@@ -12,6 +11,7 @@ import {
   SIGNUP_FAILURE,
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
+  SWITCH_SCHEDULER,
   UPDATE_PROFILE_PHOTO_FAILURE,
   UPDATE_PROFILE_PHOTO_REQUEST,
   UPDATE_PROFILE_PHOTO_SUCCESS,
@@ -20,11 +20,11 @@ import {
   UPDATE_USER_SUCCESS,
   VERIFY_OTP_FAILURE,
   VERIFY_OTP_REQUEST,
-  VERIFY_OTP_SUCCESS,
+  VERIFY_OTP_SUCCESS
 } from "../types";
 
 interface AuthState {
-  user: any | null;
+  user: IUser | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -34,6 +34,7 @@ interface AuthState {
   firstName: string | null;
   lastName: string | null;
   profilePicture: string | null;
+  currentScheduler: string | null;
 }
 
 const initialState: AuthState = {
@@ -47,6 +48,7 @@ const initialState: AuthState = {
   firstName: null,
   lastName: null,
   profilePicture: null,
+  currentScheduler: null,
 };
 
 export default function authReducer(
@@ -68,11 +70,16 @@ export default function authReducer(
       };
 
     case LOGIN_SUCCESS:
+      const loginUserData = action.payload;
       return {
         ...state,
         loading: false,
         isAuthenticated: true,
-        user: action.payload,
+        user: loginUserData,
+        // Initialize currentScheduler if user has schedulers and none is set
+        currentScheduler: loginUserData?.schedulers && loginUserData.schedulers.length > 0
+          ? (state.currentScheduler || loginUserData.schedulers[0].id)
+          : state.currentScheduler,
         error: null,
       };
 
@@ -104,11 +111,16 @@ export default function authReducer(
       };
 
     case CREATE_PIN_SUCCESS:
+      const userData = action.payload;
       return {
         ...state,
         loading: false,
         isAuthenticated: true,
-        user: action.payload,
+        user: userData,
+        // Initialize currentScheduler if user has schedulers and none is set
+        currentScheduler: userData?.schedulers && userData.schedulers.length > 0
+          ? (state.currentScheduler || userData.schedulers[0].id)
+          : state.currentScheduler,
         error: null,
       };
 
@@ -146,6 +158,12 @@ export default function authReducer(
 
     case LOGOUT:
       return initialState;
+
+    case SWITCH_SCHEDULER:
+      return {
+        ...state,
+        currentScheduler: action.payload,
+      };
 
     default:
       return state;

@@ -8,34 +8,21 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import uuid from "react-native-uuid";
 import { auth } from "../../firebase/config";
 import { api } from "../../utils";
-
 import {
   CREATE_PIN_FAILURE,
   CREATE_PIN_REQUEST,
-  CREATE_PIN_SUCCESS,
-  LOGIN_FAILURE,
+  CREATE_PIN_SUCCESS, IUser, LOGIN_FAILURE,
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGOUT,
   SIGNUP_FAILURE,
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
+  SWITCH_SCHEDULER,
   VERIFY_OTP_FAILURE,
   VERIFY_OTP_REQUEST,
-  VERIFY_OTP_SUCCESS,
+  VERIFY_OTP_SUCCESS
 } from "../types";
-
-interface User {
-  id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  emergency_contact?: string;
-  avatar?: string;
-  pin?: string;
-  uid?: string;
-}
 
 export const signIn = (email: string, password: string) => {
   return async (dispatch: any) => {
@@ -69,6 +56,26 @@ export const signIn = (email: string, password: string) => {
         type: LOGIN_SUCCESS,
         payload: userData,
       });
+
+      // Initialize currentScheduler if not set and user has schedulers
+      if (userData?.schedulers && userData.schedulers.length > 0) {
+        const storedSchedulerId = await AsyncStorage.getItem("currentScheduler");
+        if (!storedSchedulerId || !userData.schedulers.find((s: any) => s.id === storedSchedulerId)) {
+          // Set first scheduler as default if no stored scheduler or stored scheduler doesn't exist
+          const defaultSchedulerId = userData.schedulers[0].id;
+          await AsyncStorage.setItem("currentScheduler", defaultSchedulerId);
+          dispatch({
+            type: SWITCH_SCHEDULER,
+            payload: defaultSchedulerId,
+          });
+        } else {
+          // Restore the stored scheduler
+          dispatch({
+            type: SWITCH_SCHEDULER,
+            payload: storedSchedulerId,
+          });
+        }
+      }
 
       return true;
     } catch (error) {
@@ -210,10 +217,10 @@ export const setupAccount = (
   };
 };
 
-export const updateUser = (userData: Partial<User>) => {
+export const updateUser = (userData: Partial<IUser>) => {
   return async (
     dispatch: (action: any) => void,
-    getState: () => { auth: { user: User } }
+    getState: () => { auth: { user: IUser } }
   ) => {
     dispatch({ type: "UPDATE_USER_REQUEST" });
 
@@ -298,13 +305,34 @@ export const verifyPIN = (pin: string) => {
   return async (dispatch: any, getState: any) => {
     dispatch({ type: CREATE_PIN_REQUEST });
     try {
-      const { user } = getState().auth;
+      const user = JSON.parse(await AsyncStorage.getItem(
+        "user"
+      ) || "");
       if (!user) throw new Error("User not found");
-      console.log("user", user);
+      const userData = await api.get(`/api/users/by-uid/${user.uid}`).then((res) => res.data).catch((err) => {
+        console.log("err", err);
+        return null;
+      });
+
+      console.log('userData', userData)
+      try {
+        await AsyncStorage.setItem(
+          "user",
+          JSON.stringify({ password: user?.password, ...userData })
+        );
+      } catch (storageError) {
+        console.warn("Failed to save user to storage:", storageError);
+      }
+
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: userData,
+      });
       // Fetch full user info from backend
       if (!user.pin) throw new Error("PIN not set for user");
       if (user.pin !== pin) throw new Error("Incorrect PIN");
-      const response = await api.post("api/activity/log", {
+      
+      await api.post("api/activity/log", {
             user_id: user.id,
             category: "auth",
             type: "login",
@@ -312,10 +340,32 @@ export const verifyPIN = (pin: string) => {
             level: "2",
             tags: ["auth"],
       });
+
       dispatch({
         type: CREATE_PIN_SUCCESS,
         payload: user,
       });
+
+      // Initialize currentScheduler if not set and user has schedulers
+      if (userData?.schedulers && userData.schedulers.length > 0) {
+        const storedSchedulerId = await AsyncStorage.getItem("currentScheduler");
+        if (!storedSchedulerId || !userData.schedulers.find((s: any) => s.id === storedSchedulerId)) {
+          // Set first scheduler as default if no stored scheduler or stored scheduler doesn't exist
+          const defaultSchedulerId = userData.schedulers[0].id;
+          await AsyncStorage.setItem("currentScheduler", defaultSchedulerId);
+          dispatch({
+            type: SWITCH_SCHEDULER,
+            payload: defaultSchedulerId,
+          });
+        } else {
+          // Restore the stored scheduler
+          dispatch({
+            type: SWITCH_SCHEDULER,
+            payload: storedSchedulerId,
+          });
+        }
+      }
+
       return true;
     } catch (error) {
       dispatch({
@@ -341,6 +391,45 @@ export const logout = () => {
       dispatch({ type: LOGOUT });
     } catch (error) {
       console.error("Logout failed:", error);
+    }
+  };
+};
+
+export const switchScheduler = (schedulerId: string) => {
+  return async (dispatch: any) => {
+    try {
+      // Store the current scheduler ID in AsyncStorage
+      await AsyncStorage.setItem("currentScheduler", schedulerId);
+
+      // Dispatch the action to update Redux state
+      dispatch({
+        type: SWITCH_SCHEDULER,
+        payload: schedulerId,
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Failed to switch scheduler:", error);
+      return false;
+    }
+  };
+};
+
+export const initializeCurrentScheduler = () => {
+  return async (dispatch: any) => {
+    try {
+      // Try to get the current scheduler from AsyncStorage
+      const storedSchedulerId = await AsyncStorage.getItem("currentScheduler");
+
+      if (storedSchedulerId) {
+        dispatch({
+          type: SWITCH_SCHEDULER,
+          payload: storedSchedulerId,
+        });
+      }
+      // If no stored scheduler, we'll handle this in the component when user data is available
+    } catch (error) {
+      console.error("Failed to initialize current scheduler:", error);
     }
   };
 };

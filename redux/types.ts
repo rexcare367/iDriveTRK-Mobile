@@ -52,6 +52,21 @@ export interface IUser {
     sick_leave: number;
     non_paid_absence: number;
   };
+  schedulers: IScheduler[];
+}
+
+export interface IScheduler {
+  id: string;
+  created_at: string;
+  status: 'active' | 'inactive' | 'archived';
+  title: string;
+  admins: string[]; // UUID array
+  assigned: string[]; // UUID array
+  users: IUser[];
+  managers: IUser[];
+  pay_period_type: 'biweekly' | 'monthly';
+  pay_period_day?: number; // For monthly: 1 or 15
+  [key: string]: any;
 }
 
 export interface ITruck {
@@ -142,6 +157,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  user: IUser | null;
+  currentScheduler: string | null;
 }
 
 export interface DriverState {
@@ -181,6 +198,7 @@ export const CREATE_PIN_REQUEST = "CREATE_PIN_REQUEST";
 export const CREATE_PIN_SUCCESS = "CREATE_PIN_SUCCESS";
 export const CREATE_PIN_FAILURE = "CREATE_PIN_FAILURE";
 export const LOGOUT = "LOGOUT";
+export const SWITCH_SCHEDULER = "SWITCH_SCHEDULER";
 
 // User Types
 

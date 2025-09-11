@@ -17,7 +17,7 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Header from "@/components/Header";
-import { logout } from "@/redux/actions/authActions";
+import { logout, switchScheduler } from "@/redux/actions/authActions";
 import { switchUserRole } from "@/redux/actions/userActions";
 import { api } from "@/utils";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,15 +25,32 @@ import { useDispatch, useSelector } from "react-redux";
 export default function ProfileScreen() {
   const dispatch = useDispatch();
 
-  const { user, loading } = useSelector((state: any) => state.auth);
-  const { currentUser } = useSelector((state: any) => state.user);
-  const isManager = currentUser?.role === "MANAGER";
+  const { user, loading, currentScheduler } = useSelector((state: any) => state.auth);
+  const isManager = user?.employeeRole === "MANAGER";
 
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{ uri: string } | null>(
     null
   );
+
+  // Scheduler selection state
+  const [schedulerModalVisible, setSchedulerModalVisible] = useState(false);
+  const [selectedSchedulerId, setSelectedSchedulerId] = useState<string | null>(currentScheduler);
+
+  // Get current scheduler object
+  const getCurrentScheduler = () => {
+    if (!user?.schedulers || user.schedulers.length === 0) return null;
+
+    if (currentScheduler) {
+      const scheduler = user.schedulers.find((s: any) => s.id === currentScheduler);
+      if (scheduler) return scheduler;
+    }
+
+    return user.schedulers[0] || null;
+  };
+
+  const currentSchedulerObj = getCurrentScheduler();
 
   const handleRoleSwitch = () => {
     const newRole = isManager ? "EMPLOYEE" : "MANAGER";
@@ -138,6 +155,45 @@ export default function ProfileScreen() {
     setSelectedImage(null);
   };
 
+  const handleSchedulerSelect = (schedulerId: string) => {
+    setSelectedSchedulerId(schedulerId);
+  };
+
+  const handleSchedulerSwitch = async () => {
+    if (!selectedSchedulerId) return;
+
+    try {
+      const result = await (dispatch as any)(switchScheduler(selectedSchedulerId));
+
+      if (result) {
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: "Success",
+          textBody: "Scheduler switched successfully!",
+        });
+        setSchedulerModalVisible(false);
+      } else {
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: "Error",
+          textBody: "Failed to switch scheduler. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to switch scheduler:", error);
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Error",
+        textBody: "Failed to switch scheduler. Please try again.",
+      });
+    }
+  };
+
+  const openSchedulerModal = () => {
+    setSelectedSchedulerId(currentScheduler);
+    setSchedulerModalVisible(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Profile" subtitle="Manage your account settings" />
@@ -195,6 +251,22 @@ export default function ProfileScreen() {
                 value={isManager}
               />
             </TouchableOpacity>
+
+            {/* Scheduler Selection */}
+            
+              <TouchableOpacity
+                style={styles.settingItem}
+                onPress={openSchedulerModal}
+              >
+                <Ionicons name="business-outline" size={24} color="#666" />
+                <View style={styles.settingContent}>
+                  <Text style={styles.settingTitle}>Current Scheduler</Text>
+                  <Text style={styles.settingSubtitle}>
+                    {currentSchedulerObj?.title || "Select Scheduler"}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color="#666" />
+              </TouchableOpacity>
           </View>
 
           {/* Features */}
@@ -346,6 +418,89 @@ export default function ProfileScreen() {
               >
                 <Text style={styles.continueModalButtonText}>
                   {loading ? "Uploading..." : "Continue"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Scheduler Selection Modal */}
+      <Modal
+        visible={schedulerModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setSchedulerModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Scheduler</Text>
+              <TouchableOpacity
+                onPress={() => setSchedulerModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.schedulerList}>
+              {user?.schedulers?.map((scheduler: any) => (
+                <TouchableOpacity
+                  key={scheduler.id}
+                  style={[
+                    styles.schedulerItem,
+                    selectedSchedulerId === scheduler.id && styles.selectedSchedulerItem,
+                  ]}
+                  onPress={() => handleSchedulerSelect(scheduler.id)}
+                >
+                  <View style={styles.schedulerInfo}>
+                    <Ionicons
+                      name="business-outline"
+                      size={24}
+                      color={selectedSchedulerId === scheduler.id ? "#007AFF" : "#666"}
+                    />
+                    <View style={styles.schedulerDetails}>
+                      <Text
+                        style={[
+                          styles.schedulerTitle,
+                          selectedSchedulerId === scheduler.id && styles.selectedSchedulerTitle,
+                        ]}
+                      >
+                        {scheduler.title}
+                      </Text>
+                      <Text style={styles.schedulerStatus}>
+                        Status: {scheduler.status}
+                      </Text>
+                    </View>
+                  </View>
+                  {selectedSchedulerId === scheduler.id && (
+                    <Ionicons name="checkmark" size={24} color="#007AFF" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelModalButton]}
+                onPress={() => setSchedulerModalVisible(false)}
+              >
+                <Text style={styles.cancelModalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.continueModalButton]}
+                onPress={handleSchedulerSwitch}
+                disabled={!selectedSchedulerId}
+              >
+                <Ionicons name="arrow-forward" size={16} color="#fff" />
+                <Text
+                  style={[
+                    styles.continueModalButtonText,
+                    !selectedSchedulerId && styles.disabledButtonText,
+                  ]}
+                >
+                  Switch
                 </Text>
               </TouchableOpacity>
             </View>
@@ -532,116 +687,168 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    paddingHorizontal: 20,
   },
   modalContent: {
     backgroundColor: "#fff",
-    borderRadius: 10,
-    width: "80%",
-    maxWidth: 400,
-    padding: 20,
-    alignItems: "center",
+    borderRadius: 16,
+    width: "100%",
+    maxWidth: 380,
+    maxHeight: "80%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
   },
   modalHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    width: "100%",
-    marginBottom: 15,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    position: "relative",
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    flex: 1,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#002B49",
     textAlign: "center",
   },
   closeButton: {
-    padding: 5,
+    position: "absolute",
+    right: 20,
+    top: 20,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "#f8f9fa",
   },
   modalBody: {
     width: "100%",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
     alignItems: "center",
-    marginBottom: 20,
   },
   imagePreviewContainer: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     overflow: "hidden",
-    marginBottom: 15,
-    borderWidth: 2,
-    borderColor: "#ddd",
+    marginBottom: 20,
+    borderWidth: 3,
+    borderColor: "#002B49",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   imagePreview: {
     width: "100%",
     height: "100%",
-    borderRadius: 75,
+    borderRadius: 60,
   },
   changeImageButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    backgroundColor: "#002B49",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
     alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   changeImageText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   uploadArea: {
     width: "100%",
-    height: 150,
+    height: 160,
     borderWidth: 2,
-    borderColor: "#ddd",
+    borderColor: "#e1e5e9",
     borderStyle: "dashed",
-    borderRadius: 10,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 20,
+    backgroundColor: "#fafbfc",
   },
   uploadText: {
     fontSize: 16,
-    color: "#666",
-    marginTop: 10,
+    fontWeight: "600",
+    color: "#002B49",
+    marginTop: 12,
   },
   uploadSubtext: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 5,
+    fontSize: 13,
+    color: "#666",
+    marginTop: 6,
+    fontWeight: "500",
   },
   modalFooter: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     width: "100%",
-    marginTop: 15,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+    gap: 12,
   },
   modalButton: {
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     flex: 1,
     alignItems: "center",
-    marginHorizontal: 5,
+    flexDirection: "row",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   continueModalButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#002B49",
   },
   cancelModalButton: {
-    backgroundColor: "#dc3545",
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#e1e5e9",
   },
   continueModalButtonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "600",
+    marginLeft: 6,
   },
   cancelModalButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#666",
+    fontSize: 14,
+    fontWeight: "600",
   },
   disabledButton: {
-    opacity: 0.7,
+    opacity: 0.5,
   },
   securityItem: {
     flexDirection: "row",
@@ -675,5 +882,75 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 24,
+  },
+  // Scheduler Modal Styles
+  schedulerList: {
+    maxHeight: 280,
+    paddingHorizontal: 4,
+  },
+  schedulerItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginVertical: 4,
+    marginHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#f5f5f5",
+  },
+  selectedSchedulerItem: {
+    backgroundColor: "#f8fbff",
+    borderColor: "#007AFF",
+    borderWidth: 2,
+    shadowColor: "#007AFF",
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  schedulerInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  schedulerDetails: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  schedulerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#002B49",
+    marginBottom: 4,
+  },
+  selectedSchedulerTitle: {
+    color: "#007AFF",
+    fontWeight: "700",
+  },
+  schedulerStatus: {
+    fontSize: 13,
+    color: "#666",
+    fontWeight: "500",
+  },
+  disabledButtonText: {
+    color: "#ccc",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+    gap: 12,
   },
 });
