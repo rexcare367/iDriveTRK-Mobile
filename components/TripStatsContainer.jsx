@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
@@ -8,6 +9,7 @@ const TripStatsContainer = ({
   onCompleteHistoryPress,
   onAssignedTripPress,
   variant = "default", // 'default' or 'reversed'
+  selectedPayPeriod = null,
 }) => {
   const { user } = useSelector((state) => state.auth);
   const [stats, setStats] = useState({
@@ -17,14 +19,23 @@ const TripStatsContainer = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (selectedPayPeriod) {
+      fetchStats();
+    }
+  }, [selectedPayPeriod]);
 
   const fetchStats = async () => {
+    if (!selectedPayPeriod) return;
+
     try {
       setLoading(true);
+
+      // Use moment to format the pay-period dates
+      const startTime = moment(selectedPayPeriod.start_date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+      const endTime = moment(selectedPayPeriod.end_date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
       const response = await api.get(
-        `/api/analytic/schedules?user_id=${user.id}`
+        `/api/analytic/schedules?user_id=${user.id}&start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}`
       );
 
       if (response.data) {
@@ -49,12 +60,7 @@ const TripStatsContainer = ({
         ]}
         onPress={onCompleteHistoryPress}
       >
-        <Ionicons
-          name="car"
-          size={24}
-          color={variant === "reversed" ? "#082640" : "#fff"}
-        />
-        {
+          <View style={styles.cardIcon}>
           <Text
             style={[
               styles.statNumber,
@@ -63,8 +69,13 @@ const TripStatsContainer = ({
           >
             {loading ? "..." : stats.completedTrips}
           </Text>
-        }
-        <Text
+        <Ionicons
+          name="car"
+          size={48}
+          color={variant === "reversed" ? "#082640" : "#fff"}
+        />
+          </View>
+          <Text
           style={[
             styles.statLabel,
             variant === "reversed" ? styles.statLabelDark : null,
@@ -82,11 +93,7 @@ const TripStatsContainer = ({
         ]}
         onPress={onAssignedTripPress}
       >
-        <Ionicons
-          name="document-text"
-          size={24}
-          color={variant === "reversed" ? "#fff" : "#082640"}
-        />
+          <View style={styles.cardIcon}>
 
         <Text
           style={[
@@ -96,6 +103,14 @@ const TripStatsContainer = ({
         >
           {loading ? "..." : stats.assignedTrips}
         </Text>
+        <Ionicons
+          name="document-text"
+          size={48}
+          color={variant === "reversed" ? "#fff" : "#082640"}
+        />
+    </View>
+
+
 
         <Text
           style={[
@@ -123,8 +138,16 @@ const styles = StyleSheet.create({
     width: "48%",
     alignItems: "flex-start",
   },
+  cardIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
   statBoxLight: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "rgba(240, 240, 240, 0.7)",
+    borderWidth: 1,
+    borderColor: "rgba(8, 38, 64, 0.3)",
     display: "flex",
     justifyContent: "space-between",
   },

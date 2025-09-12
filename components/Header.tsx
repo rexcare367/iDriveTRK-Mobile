@@ -1,4 +1,4 @@
-import { IScheduler, IUser } from "@/redux/types";
+import { IScheduler, IUser, RootState } from "@/redux/types";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -11,7 +11,8 @@ interface HeaderProps {
 }
 
 const Header = ({ title = "", subtitle = "" }: HeaderProps) => {
-  const { user, currentScheduler }: { user: IUser | null; currentScheduler: string | null } = useSelector((state: any) => state.auth);
+  const { user, currentScheduler }: { user: IUser | null; currentScheduler: string | null } = useSelector((state: RootState) => state.auth);
+  const { unreadCount } = useSelector((state: RootState) => state.notification);
 
   // Helper function to get the current scheduler
   const getCurrentScheduler = (): IScheduler | null => {
@@ -60,14 +61,18 @@ const Header = ({ title = "", subtitle = "" }: HeaderProps) => {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <View style={styles.notificationContainer}>
+          <TouchableOpacity style={styles.notificationContainer} onPress={() => router.push("/(home)/notifications")}>
             <View style={styles.bellBackground}>
               <Ionicons name="notifications-outline" size={24} color="#222" />
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationCount}>1</Text>
-              </View>
+              {unreadCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationCount}>
+                    {unreadCount > 99 ? '99+' : unreadCount.toString()}
+                  </Text>
+                </View>
+              )}
             </View>
-          </View>
+          </TouchableOpacity>
             <View style={styles.profileInnerBorder}>
               <TouchableOpacity style={styles.profileContainer} onPress={() => router.push("/(home)/profile")}>
                 <Image
@@ -128,8 +133,8 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   bellBackground: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: 20,
     backgroundColor: "#fff",
     justifyContent: "center",

@@ -25,7 +25,7 @@ const BottomTabBar = ({ activeTab, onTabPress }: BottomTabBarProps) => {
         router.push("/(timesheet)/timesheet-dashboard");
         break;
       case "Trips":
-        router.push("/(trips)/assigned-trips");
+        router.push("/(trips)/main");
         break;
       default:
         break;

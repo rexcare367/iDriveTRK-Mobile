@@ -10,17 +10,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
-import BackgroundEffects from "@/components/BackgroundEffects";
-import BottomTabBar from "@/components/BottomTabBar";
-import Header from "@/components/Header";
-import TripStatsContainer from "@/components/TripStatsContainer";
 
 import api from "@/utils/apiClient";
 
-export default function TripCompleteHistoryScreen() {
+interface TripCompleteHistoryScreenProps {
+  payPeriods: any[];
+  payPeriodsLoading: boolean;
+  payPeriodsError: string | null;
+  selectedPayPeriod?: any;
+}
+
+export default function TripCompleteHistoryScreen({
+  payPeriods = [],
+  payPeriodsLoading = false,
+  payPeriodsError,
+  selectedPayPeriod
+}: TripCompleteHistoryScreenProps) {
   const { user } = useSelector((state: any) => state.auth);
   const [completedTrips, setCompletedTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -56,16 +63,14 @@ export default function TripCompleteHistoryScreen() {
 
   // Function to fetch completed trips from backend
   const fetchCompletedTrips = async () => {
+    if (!selectedPayPeriod) return;
+
     try {
       setLoading(true);
 
-      // Use moment to handle dates properly
-      const startTime = moment()
-        .startOf("year")
-        .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"); // Start of current year
-      const endTime = moment()
-        .endOf("year")
-        .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"); // Current time
+      // Use pay-period dates instead of year-long range
+      const startTime = moment(selectedPayPeriod.start_date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+      const endTime = moment(selectedPayPeriod.end_date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
       const response = await api.get(
         `/api/schedules?user_id=${user.id}&start_time=${startTime}&end_time=${endTime}&status=completed`
@@ -75,6 +80,8 @@ export default function TripCompleteHistoryScreen() {
 
       if (response.data && response.data.length > 0) {
         setCompletedTrips(response.data);
+      } else {
+        setCompletedTrips([]);
       }
     } catch (error) {
       console.error("Error fetching completed trips:", error);
@@ -83,12 +90,12 @@ export default function TripCompleteHistoryScreen() {
     }
   };
 
-  // Fetch completed trips when component mounts
+  // Fetch completed trips when component mounts or pay-period changes
   useEffect(() => {
-    if (user && user.id) {
+    if (user && user.id && selectedPayPeriod) {
       fetchCompletedTrips();
     }
-  }, [user]);
+  }, [user, selectedPayPeriod]);
 
   const handleTripSelect = (trip: any) => {
     router.push({
@@ -97,26 +104,8 @@ export default function TripCompleteHistoryScreen() {
     });
   };
 
-  const handleCompleteHistory = () => {
-    router.push("/(trips)/trip-complete-history");
-  };
-
-  const handleAssignedTrip = () => {
-    router.push("/(trips)/assigned-trips");
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      <BackgroundEffects />
-
-      <Header />
-
-      <View style={styles.content}>
-        <TripStatsContainer
-          onCompleteHistoryPress={handleCompleteHistory}
-          onAssignedTripPress={handleAssignedTrip}
-          variant="default"
-        />
+    <View style={styles.content}>
 
         <View style={styles.searchContainer}>
           <Ionicons
@@ -135,7 +124,7 @@ export default function TripCompleteHistoryScreen() {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.monthLabel}>May 2025</Text>
+        <Text style={styles.monthLabel}>{moment().format("MMMM YYYY")}</Text>
 
         <ScrollView style={styles.tripList}>
           {loading ? (
@@ -187,9 +176,6 @@ export default function TripCompleteHistoryScreen() {
           <View style={styles.divider} />
         </ScrollView>
       </View>
-
-      <BottomTabBar activeTab="Trips" />
-    </SafeAreaView>
   );
 }
 
@@ -200,7 +186,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
   },
 
   searchContainer: {

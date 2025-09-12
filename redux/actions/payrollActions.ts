@@ -1,22 +1,26 @@
+import api from "../../utils/apiClient"
 import {
-  CALCULATE_PAYROLL_PERIOD_REQUEST,
-  CALCULATE_PAYROLL_PERIOD_SUCCESS,
-  CALCULATE_PAYROLL_PERIOD_FAILURE,
-  SUBMIT_PAYROLL_REQUEST,
-  SUBMIT_PAYROLL_SUCCESS,
-  SUBMIT_PAYROLL_FAILURE,
-  FETCH_PAYROLL_HISTORY_REQUEST,
-  FETCH_PAYROLL_HISTORY_SUCCESS,
-  FETCH_PAYROLL_HISTORY_FAILURE,
-  FETCH_ALL_PAYROLL_SUBMISSIONS_REQUEST,
-  FETCH_ALL_PAYROLL_SUBMISSIONS_SUCCESS,
-  FETCH_ALL_PAYROLL_SUBMISSIONS_FAILURE,
+  APPROVE_PAYROLL_SUBMISSION_FAILURE,
   APPROVE_PAYROLL_SUBMISSION_REQUEST,
   APPROVE_PAYROLL_SUBMISSION_SUCCESS,
-  APPROVE_PAYROLL_SUBMISSION_FAILURE,
+  CALCULATE_PAYROLL_PERIOD_FAILURE,
+  CALCULATE_PAYROLL_PERIOD_REQUEST,
+  CALCULATE_PAYROLL_PERIOD_SUCCESS,
+  FETCH_ALL_PAYROLL_SUBMISSIONS_FAILURE,
+  FETCH_ALL_PAYROLL_SUBMISSIONS_REQUEST,
+  FETCH_ALL_PAYROLL_SUBMISSIONS_SUCCESS,
+  FETCH_PAY_PERIODS_FAILURE,
+  FETCH_PAY_PERIODS_REQUEST,
+  FETCH_PAY_PERIODS_SUCCESS,
+  FETCH_PAYROLL_HISTORY_FAILURE,
+  FETCH_PAYROLL_HISTORY_REQUEST,
+  FETCH_PAYROLL_HISTORY_SUCCESS,
+  REJECT_PAYROLL_SUBMISSION_FAILURE,
   REJECT_PAYROLL_SUBMISSION_REQUEST,
   REJECT_PAYROLL_SUBMISSION_SUCCESS,
-  REJECT_PAYROLL_SUBMISSION_FAILURE,
+  SUBMIT_PAYROLL_FAILURE,
+  SUBMIT_PAYROLL_REQUEST,
+  SUBMIT_PAYROLL_SUCCESS,
 } from "../types"
 
 // Helper function to calculate bi-weekly periods
@@ -351,6 +355,32 @@ export const rejectPayrollSubmission = (submissionId, reason = "") => {
         type: REJECT_PAYROLL_SUBMISSION_FAILURE,
         payload: error.message,
       })
+      throw error
+    }
+  }
+}
+
+export const fetchPayPeriods = (schedulerId: string) => {
+  return async (dispatch: any) => {
+    dispatch({ type: FETCH_PAY_PERIODS_REQUEST })
+
+    try {
+      const response = await api.get(`api/pay-periods?scheduler_id=${schedulerId}`)
+
+      dispatch({
+        type: FETCH_PAY_PERIODS_SUCCESS,
+        payload: response.data.periods,
+      })
+
+      return response.data
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch pay periods"
+
+      dispatch({
+        type: FETCH_PAY_PERIODS_FAILURE,
+        payload: errorMessage,
+      })
+
       throw error
     }
   }

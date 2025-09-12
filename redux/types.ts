@@ -146,6 +146,26 @@ export interface ITimesheet {
 
 export interface ITrip {}
 
+export interface INotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'error' | 'success' | 'trip' | 'timesheet' | 'payroll' | 'system';
+  isRead: boolean;
+  createdAt: string;
+  userId: string;
+  schedulerId: string;
+  actionUrl?: string;
+  metadata?: any;
+}
+
+export interface NotificationState {
+  notifications: INotification[];
+  unreadCount: number;
+  loading: boolean;
+  error: string | null;
+}
+
 export interface UserState {
   currentUser: IUser | null;
   loading: boolean;
@@ -169,8 +189,22 @@ export interface TimesheetState {
   // Add timesheet-specific state properties here
 }
 
+export interface IPayPeriod {
+  id: string;
+  scheduler_id: string;
+  start_date: string;
+  end_date: string;
+  status: 'active' | 'closed' | 'processing';
+  pay_period_type: 'biweekly' | 'monthly';
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PayrollState {
-  // Add payroll-specific state properties here
+  payPeriods: IPayPeriod[];
+  loading: boolean;
+  error: string | null;
+  // Add other payroll-specific state properties here
 }
 
 export interface RootState {
@@ -179,6 +213,7 @@ export interface RootState {
   driver: DriverState;
   timesheet: TimesheetState;
   payroll: PayrollState;
+  notification: NotificationState;
 }
 
 // Auth Types
@@ -294,3 +329,29 @@ export const REJECT_PAYROLL_SUBMISSION_SUCCESS =
   "REJECT_PAYROLL_SUBMISSION_SUCCESS";
 export const REJECT_PAYROLL_SUBMISSION_FAILURE =
   "REJECT_PAYROLL_SUBMISSION_FAILURE";
+
+// Pay Periods Action Types
+export const FETCH_PAY_PERIODS_REQUEST = "FETCH_PAY_PERIODS_REQUEST";
+export const FETCH_PAY_PERIODS_SUCCESS = "FETCH_PAY_PERIODS_SUCCESS";
+export const FETCH_PAY_PERIODS_FAILURE = "FETCH_PAY_PERIODS_FAILURE";
+
+// Notification Action Types
+export const FETCH_NOTIFICATIONS_REQUEST = "FETCH_NOTIFICATIONS_REQUEST";
+export const FETCH_NOTIFICATIONS_SUCCESS = "FETCH_NOTIFICATIONS_SUCCESS";
+export const FETCH_NOTIFICATIONS_FAILURE = "FETCH_NOTIFICATIONS_FAILURE";
+
+export const MARK_NOTIFICATION_READ_REQUEST = "MARK_NOTIFICATION_READ_REQUEST";
+export const MARK_NOTIFICATION_READ_SUCCESS = "MARK_NOTIFICATION_READ_SUCCESS";
+export const MARK_NOTIFICATION_READ_FAILURE = "MARK_NOTIFICATION_READ_FAILURE";
+
+export const MARK_NOTIFICATION_UNREAD_REQUEST = "MARK_NOTIFICATION_UNREAD_REQUEST";
+export const MARK_NOTIFICATION_UNREAD_SUCCESS = "MARK_NOTIFICATION_UNREAD_SUCCESS";
+export const MARK_NOTIFICATION_UNREAD_FAILURE = "MARK_NOTIFICATION_UNREAD_FAILURE";
+
+export const DELETE_NOTIFICATION_REQUEST = "DELETE_NOTIFICATION_REQUEST";
+export const DELETE_NOTIFICATION_SUCCESS = "DELETE_NOTIFICATION_SUCCESS";
+export const DELETE_NOTIFICATION_FAILURE = "DELETE_NOTIFICATION_FAILURE";
+
+export const MARK_ALL_NOTIFICATIONS_READ_REQUEST = "MARK_ALL_NOTIFICATIONS_READ_REQUEST";
+export const MARK_ALL_NOTIFICATIONS_READ_SUCCESS = "MARK_ALL_NOTIFICATIONS_READ_SUCCESS";
+export const MARK_ALL_NOTIFICATIONS_READ_FAILURE = "MARK_ALL_NOTIFICATIONS_READ_FAILURE";

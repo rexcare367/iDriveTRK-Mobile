@@ -9,16 +9,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
-import BackgroundEffects from "../../components/BackgroundEffects";
-import BottomTabBar from "../../components/BottomTabBar";
-import Header from "../../components/Header";
-import TripStatsContainer from "../../components/TripStatsContainer";
 import { api } from "../../utils";
 
-export default function AssignedTripsScreen() {
+interface AssignedTripsScreenProps {
+  payPeriods: any[];
+  payPeriodsLoading: boolean;
+  payPeriodsError: string | null;
+  selectedPayPeriod?: any;
+}
+
+export default function AssignedTripsScreen({
+  payPeriods = [],
+  payPeriodsLoading = false,
+  payPeriodsError,
+  selectedPayPeriod
+}: AssignedTripsScreenProps) {
   const { user } = useSelector((state: any) => state.auth);
   const [activeView, setActiveView] = useState("day");
   const [weekScrollReady, setWeekScrollReady] = useState(false);
@@ -120,17 +127,21 @@ export default function AssignedTripsScreen() {
 
   // Fetch schedules from API
   const fetchSchedules = async () => {
-    if (!user?.id) return;
+    if (!user?.id || !selectedPayPeriod) return;
 
     setLoading(true);
     setError("");
 
     try {
-      console.log("startTime, endTime, user.id", startTime, endTime, user.id);
+      // Use pay-period dates instead of custom date ranges
+      const payPeriodStartTime = moment(selectedPayPeriod.start_date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+      const payPeriodEndTime = moment(selectedPayPeriod.end_date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
+      console.log("Pay period startTime, endTime, user.id", payPeriodStartTime, payPeriodEndTime, user.id);
       const response = await api.get(
         `/api/schedules?user_id=${user.id}&start_time=${encodeURIComponent(
-          startTime
-        )}&end_time=${encodeURIComponent(endTime)}&status=scheduled`
+          payPeriodStartTime
+        )}&end_time=${encodeURIComponent(payPeriodEndTime)}&status=scheduled`
       );
       console.log("Schedules response:", response.data);
       setSchedules(response.data || []);
@@ -157,27 +168,25 @@ export default function AssignedTripsScreen() {
 
       setStartTime(start);
       setEndTime(end);
-    } else if (activeView === "week" && weeksInMonth.length > 0) {
-      const selectedWeek = weeksInMonth[selectedWeekIndex];
-      if (selectedWeek) {
-        const start = selectedWeek.start
-          .clone()
-          .startOf("day")
-          .format("YYYY-MM-DD HH:mm:ss");
-        const end = selectedWeek.end
-          .clone()
-          .endOf("day")
-          .format("YYYY-MM-DD HH:mm:ss");
+    } else if (activeView === "week" && selectedPayPeriod) {
+      // Use the entire pay period range
+      const start = moment(selectedPayPeriod.start_date)
+        .startOf("day")
+        .format("YYYY-MM-DD HH:mm:ss");
+      const end = moment(selectedPayPeriod.end_date)
+        .endOf("day")
+        .format("YYYY-MM-DD HH:mm:ss");
 
-        setStartTime(start);
-        setEndTime(end);
-      }
+      setStartTime(start);
+      setEndTime(end);
     }
-  }, [activeView, selectedDay, selectedWeekIndex, weeksInMonth]);
+  }, [activeView, selectedDay, selectedPayPeriod]);
 
   useEffect(() => {
-    fetchSchedules();
-  }, [user?.id, startTime, endTime]);
+    if (selectedPayPeriod) {
+      fetchSchedules();
+    }
+  }, [user?.id, selectedPayPeriod]);
 
   useEffect(() => {
     if (currentWeekIndex !== -1 && weeksInMonth.length > 0) {
@@ -292,29 +301,11 @@ export default function AssignedTripsScreen() {
       .filter(Boolean); // Remove any null entries
   };
 
-  const getTripsForSelectedWeek = () => {
+  const getTripsForPayPeriod = () => {
     if (!schedules || schedules.length === 0) return [];
 
-    const selectedWeek = weeksInMonth[selectedWeekIndex];
-    if (!selectedWeek) return [];
-
+    // Return all schedules since fetchSchedules already filters by pay period
     return schedules
-      .filter((schedule) => {
-        try {
-          const scheduleDate = moment(
-            schedule.start_time || schedule.date || schedule.scheduled_date
-          );
-          return scheduleDate.isBetween(
-            selectedWeek.start,
-            selectedWeek.end,
-            "day",
-            "[]"
-          );
-        } catch (error) {
-          console.error("Error parsing schedule date:", error);
-          return false;
-        }
-      })
       .map((schedule) => {
         try {
           const startTime = moment(schedule.start_time || schedule.start_date);
@@ -336,7 +327,11 @@ export default function AssignedTripsScreen() {
           return null;
         }
       })
-      .filter(Boolean); // Remove any null entries
+      .filter(Boolean) // Remove any null entries
+      .sort((a, b) => {
+        if (!a || !b) return 0;
+        return moment(a.date, "MMM D").diff(moment(b.date, "MMM D"));
+      }); // Sort by date
   };
 
   const handleTripSelect = (trip: any) => {
@@ -364,14 +359,12 @@ export default function AssignedTripsScreen() {
       setStartTime(start);
       setEndTime(end);
     } else if (view === "week") {
-      const selectedWeek = weeksInMonth[selectedWeekIndex];
-      if (selectedWeek) {
-        const start = selectedWeek.start
-          .clone()
+      // Use the entire pay period range
+      if (selectedPayPeriod) {
+        const start = moment(selectedPayPeriod.start_date)
           .startOf("day")
           .format("YYYY-MM-DD HH:mm:ss");
-        const end = selectedWeek.end
-          .clone()
+        const end = moment(selectedPayPeriod.end_date)
           .endOf("day")
           .format("YYYY-MM-DD HH:mm:ss");
 
@@ -617,8 +610,8 @@ export default function AssignedTripsScreen() {
     );
   };
 
-  const renderWeeklyView = () => {
-    const trips = getTripsForSelectedWeek();
+  const renderPayPeriodView = () => {
+    const trips = getTripsForPayPeriod();
 
     if (loading) {
       return (
@@ -653,11 +646,10 @@ export default function AssignedTripsScreen() {
 
     return (
       <View style={{ flex: 1 }}>
-        {renderWeekPicker()}
         <ScrollView style={styles.tripList}>
           {trips.length === 0 ? (
             <Text style={{ textAlign: "center", marginTop: 40, color: "#888" }}>
-              No trips assigned for this week.
+              No trips assigned for this pay period.
             </Text>
           ) : (
             trips.map((trip: any) => (
@@ -723,14 +715,6 @@ export default function AssignedTripsScreen() {
     );
   };
 
-  const handleCompleteHistory = () => {
-    router.push("/(trips)/trip-complete-history");
-  };
-
-  const handleAssignedTrip = () => {
-    router.push("/(trips)/assigned-trips");
-  };
-
   const handleRefresh = () => {
     // Reset date range and fetch all schedules
     setStartTime("");
@@ -739,17 +723,7 @@ export default function AssignedTripsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <BackgroundEffects />
-
-      <Header />
-
-      <View style={styles.content}>
-        <TripStatsContainer
-          onCompleteHistoryPress={handleCompleteHistory}
-          onAssignedTripPress={handleAssignedTrip}
-          variant="reversed"
-        />
+    <View style={styles.content}>
 
         <View style={styles.viewSelectorContainer}>
           <View style={styles.viewSelector}>
@@ -782,7 +756,7 @@ export default function AssignedTripsScreen() {
                   activeView === "week" && styles.viewButtonTextActive,
                 ]}
               >
-                Weekly View
+                Pay Period View
               </Text>
             </TouchableOpacity>
           </View>
@@ -799,11 +773,8 @@ export default function AssignedTripsScreen() {
           </TouchableOpacity>
         </View>
 
-        {activeView === "day" ? renderDailyView() : renderWeeklyView()}
+        {activeView === "day" ? renderDailyView() : renderPayPeriodView()}
       </View>
-
-      <BottomTabBar activeTab="Trips" />
-    </SafeAreaView>
   );
 }
 
@@ -851,7 +822,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
   },
 
   title: {

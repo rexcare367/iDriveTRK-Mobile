@@ -1,31 +1,37 @@
 import {
-  CALCULATE_PAYROLL_PERIOD_REQUEST,
-  CALCULATE_PAYROLL_PERIOD_SUCCESS,
-  CALCULATE_PAYROLL_PERIOD_FAILURE,
-  SUBMIT_PAYROLL_REQUEST,
-  SUBMIT_PAYROLL_SUCCESS,
-  SUBMIT_PAYROLL_FAILURE,
-  FETCH_PAYROLL_HISTORY_REQUEST,
-  FETCH_PAYROLL_HISTORY_SUCCESS,
-  FETCH_PAYROLL_HISTORY_FAILURE,
-  FETCH_ALL_PAYROLL_SUBMISSIONS_REQUEST,
-  FETCH_ALL_PAYROLL_SUBMISSIONS_SUCCESS,
-  FETCH_ALL_PAYROLL_SUBMISSIONS_FAILURE,
+  APPROVE_PAYROLL_SUBMISSION_FAILURE,
   APPROVE_PAYROLL_SUBMISSION_REQUEST,
   APPROVE_PAYROLL_SUBMISSION_SUCCESS,
-  APPROVE_PAYROLL_SUBMISSION_FAILURE,
+  CALCULATE_PAYROLL_PERIOD_FAILURE,
+  CALCULATE_PAYROLL_PERIOD_REQUEST,
+  CALCULATE_PAYROLL_PERIOD_SUCCESS,
+  FETCH_ALL_PAYROLL_SUBMISSIONS_FAILURE,
+  FETCH_ALL_PAYROLL_SUBMISSIONS_REQUEST,
+  FETCH_ALL_PAYROLL_SUBMISSIONS_SUCCESS,
+  FETCH_PAY_PERIODS_FAILURE,
+  FETCH_PAY_PERIODS_REQUEST,
+  FETCH_PAY_PERIODS_SUCCESS,
+  FETCH_PAYROLL_HISTORY_FAILURE,
+  FETCH_PAYROLL_HISTORY_REQUEST,
+  FETCH_PAYROLL_HISTORY_SUCCESS,
+  REJECT_PAYROLL_SUBMISSION_FAILURE,
   REJECT_PAYROLL_SUBMISSION_REQUEST,
   REJECT_PAYROLL_SUBMISSION_SUCCESS,
-  REJECT_PAYROLL_SUBMISSION_FAILURE
+  SUBMIT_PAYROLL_FAILURE,
+  SUBMIT_PAYROLL_REQUEST,
+  SUBMIT_PAYROLL_SUCCESS
 } from "../types";
 
 const initialState = {
   payrollPeriods: [],
+  payPeriods: [],
   payrollHistory: [],
   payrollSubmissions: [],
   isLoading: false,
   isSubmitting: false,
+  payPeriodsLoading: false,
   error: null,
+  payPeriodsError: null,
   lastCalculated: null,
   exportData: null
 };
@@ -178,6 +184,28 @@ const payrollReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         error: action.payload
+      };
+
+    case FETCH_PAY_PERIODS_REQUEST:
+      return {
+        ...state,
+        payPeriodsLoading: true,
+        payPeriodsError: null
+      };
+
+    case FETCH_PAY_PERIODS_SUCCESS:
+      return {
+        ...state,
+        payPeriodsLoading: false,
+        payPeriods: action.payload,
+        payPeriodsError: null
+      };
+
+    case FETCH_PAY_PERIODS_FAILURE:
+      return {
+        ...state,
+        payPeriodsLoading: false,
+        payPeriodsError: action.payload
       };
 
     default:

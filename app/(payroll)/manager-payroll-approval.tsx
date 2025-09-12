@@ -2,30 +2,31 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  Alert,
-  FlatList,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import BackgroundEffects from "../../components/BackgroundEffects";
 import {
-  approvePayrollSubmission,
-  fetchAllPayrollSubmissions,
-  rejectPayrollSubmission,
+    approvePayrollSubmission,
+    fetchAllPayrollSubmissions,
+    rejectPayrollSubmission,
 } from "../../redux/actions/payrollActions";
 
 export default function AdminPayrollDashboard() {
   const dispatch = useDispatch();
-  const { payrollSubmissions, isLoading } = useSelector(
+  const { payrollSubmissions, isLoading, payPeriods, payPeriodsLoading, payPeriodsError } = useSelector(
     (state: any) => state.payroll
   );
+  const { currentScheduler } = useSelector((state: any) => state.auth);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [detailModalVisible, setDetailModalVisible] = useState(false);
@@ -258,6 +259,45 @@ export default function AdminPayrollDashboard() {
           </Text>
           <Text style={styles.summaryLabel}>Overtime</Text>
         </View>
+      </View>
+
+      {/* Pay Periods Section */}
+      <View style={styles.payPeriodsContainer}>
+        <Text style={styles.sectionTitle}>Current Pay Periods</Text>
+        {payPeriodsLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading pay periods...</Text>
+          </View>
+        ) : payPeriodsError ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>Error loading pay periods: {payPeriodsError}</Text>
+          </View>
+        ) : payPeriods && payPeriods.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.payPeriodsList}>
+            {payPeriods.map((period: any) => (
+              <View key={period.id} style={styles.payPeriodCard}>
+                <Text style={styles.payPeriodType}>
+                  {period.pay_period_type === 'biweekly' ? 'Bi-weekly' : 'Monthly'}
+                </Text>
+                <Text style={styles.payPeriodDates}>
+                  {formatDate(period.start_date)} - {formatDate(period.end_date)}
+                </Text>
+                <View style={[styles.payPeriodStatus, {
+                  backgroundColor: period.status === 'active' ? '#4CAF50' :
+                                   period.status === 'closed' ? '#FF9800' : '#2196F3'
+                }]}>
+                  <Text style={styles.payPeriodStatusText}>
+                    {period.status.charAt(0).toUpperCase() + period.status.slice(1)}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No pay periods found</Text>
+          </View>
+        )}
       </View>
 
       {/* Filters */}
@@ -876,5 +916,76 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     lineHeight: 16,
+  },
+
+  // Pay Periods Styles
+  payPeriodsContainer: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 12,
+  },
+  payPeriodsList: {
+    marginBottom: 8,
+  },
+  payPeriodCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginRight: 12,
+    minWidth: 200,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  payPeriodType: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#666",
+    textTransform: "uppercase",
+    marginBottom: 8,
+  },
+  payPeriodDates: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
+  },
+  payPeriodStatus: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  payPeriodStatusText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  loadingContainer: {
+    padding: 20,
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  errorContainer: {
+    padding: 20,
+    backgroundColor: "#FFF3F3",
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#F44336",
   },
 });
