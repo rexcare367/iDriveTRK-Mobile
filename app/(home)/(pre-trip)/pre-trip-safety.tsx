@@ -17,18 +17,24 @@ const PreTripFormSafety = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get safety inspection data from the new structure
+  const getSafetyInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "safety");
+  };
+
+  const safetyInspection = getSafetyInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.safety?.allFunctioning ?? true,
-    fireExtinguisher: preTripFormData?.safety?.fireExtinguisher || false,
-    flagsFlares: preTripFormData?.safety?.flagsFlares || false,
-    reflectiveTriangles: preTripFormData?.safety?.reflectiveTriangles || false,
-    fireExtinguisherDetails:
-      preTripFormData?.safety?.fireExtinguisherDetails || "",
-    flagsFlaresDetails: preTripFormData?.safety?.flagsFlaresDetails || "",
-    reflectiveTrianglesDetails:
-      preTripFormData?.safety?.reflectiveTrianglesDetails || "",
-    others: preTripFormData?.safety?.others || "noOtherNotes",
-    othersDefectDetails: preTripFormData?.safety?.othersDefectDetails || "",
+    allFunctioning: safetyInspection?.allFunctioning ?? true,
+    fireExtinguisher: safetyInspection?.items?.find((item: any) => item.name === "fireExtinguisher")?.status === "missing" || false,
+    flagsFlares: safetyInspection?.items?.find((item: any) => item.name === "flagsFlares")?.status === "missing" || false,
+    reflectiveTriangles: safetyInspection?.items?.find((item: any) => item.name === "reflectiveTriangles")?.status === "missing" || false,
+    fireExtinguisherDetails: safetyInspection?.items?.find((item: any) => item.name === "fireExtinguisher")?.details || "",
+    flagsFlaresDetails: safetyInspection?.items?.find((item: any) => item.name === "flagsFlares")?.details || "",
+    reflectiveTrianglesDetails: safetyInspection?.items?.find((item: any) => item.name === "reflectiveTriangles")?.details || "",
+    others: safetyInspection?.items?.find((item: any) => item.name === "others")?.status || "noOtherNotes",
+    othersDefectDetails: safetyInspection?.items?.find((item: any) => item.name === "others")?.details || "",
   });
 
   const isAnyChecked =
@@ -43,16 +49,49 @@ const PreTripFormSafety = () => {
     (!formData.flagsFlares || formData.flagsFlaresDetails.trim() !== "") &&
     (!formData.reflectiveTriangles ||
       formData.reflectiveTrianglesDetails.trim() !== "") &&
-    (formData.others !== "requiresRepair" ||
+    (formData.others !== "defective" ||
       formData.othersDefectDetails.trim() !== "");
 
   const isNextDisabled = !isAnyChecked || !areDetailsValid;
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const safetyInspectionData = {
+      type: "safety",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "fireExtinguisher",
+          status: formData.fireExtinguisher ? "missing" : "normal",
+          details: formData.fireExtinguisherDetails
+        },
+        {
+          name: "flagsFlares",
+          status: formData.flagsFlares ? "missing" : "normal",
+          details: formData.flagsFlaresDetails
+        },
+        {
+          name: "reflectiveTriangles",
+          status: formData.reflectiveTriangles ? "missing" : "normal",
+          details: formData.reflectiveTrianglesDetails
+        },
+        {
+          name: "others",
+          status: formData.others,
+          details: formData.othersDefectDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "safety");
+    updatedInspection.push(safetyInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        safety: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-trailer");
@@ -89,11 +128,13 @@ const PreTripFormSafety = () => {
   };
 
   const handleRadioToggle = (value) => {
+    // Map "requiresRepair" to "defective" for consistency
+    const statusValue = value === "requiresRepair" ? "defective" : value;
     setFormData({
       ...formData,
-      others: value,
+      others: statusValue,
       othersDefectDetails:
-        value === "requiresRepair" ? formData.othersDefectDetails : "",
+        statusValue === "defective" ? formData.othersDefectDetails : "",
     });
   };
 
@@ -230,13 +271,13 @@ const PreTripFormSafety = () => {
             />
             <CustomRadioButton
               label="Requires Repair"
-              selected={formData.others === "requiresRepair"}
+              selected={formData.others === "defective"}
               onPress={() => handleRadioToggle("requiresRepair")}
               style={styles.radioOption}
               labelStyle={styles.radioText}
             />
           </View>
-          {formData.others === "requiresRepair" && (
+          {formData.others === "defective" && (
             <CustomInput
               label="Other Defect Details"
               placeholder="Enter details for other defect"

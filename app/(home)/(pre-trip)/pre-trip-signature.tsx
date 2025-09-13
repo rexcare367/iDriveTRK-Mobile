@@ -34,23 +34,26 @@ const PreTripFormSignature = () => {
   const typedSignatureViewRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    signatureText: preTripFormData?.signature?.signatureText || "",
-    signatureType: preTripFormData?.signature?.signatureType || "typing",
-    drawnSignature: preTripFormData?.signature?.drawnSignature || "",
-    typedSignature: preTripFormData?.signature?.typedSignature || "",
+    signature: preTripFormData?.signature || {
+      signatureText: "",
+      signatureType: "typing",
+      drawnSignature: "",
+      typedSignature: "",
+      typedSignatureImage: ""
+    }
   });
   const [signatureKey, setSignatureKey] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isSubmitDisabled =
-    !formData.signatureText ||
-    (!formData.drawnSignature && !formData.typedSignature);
+    !formData.signature.signatureText ||
+    (!formData.signature.drawnSignature && !formData.signature.typedSignature);
 
   const handleSubmit = async () => {
     setLoading(true);
-    let typedSignatureImage = formData.typedSignatureImage || "";
-    if (formData.signatureType === "typing" && typedSignatureViewRef.current) {
+    let typedSignatureImage = formData.signature.typedSignatureImage || "";
+    if (formData.signature.signatureType === "typing" && typedSignatureViewRef.current) {
       try {
         typedSignatureImage = await typedSignatureViewRef.current.capture();
       } catch (e) {
@@ -60,10 +63,10 @@ const PreTripFormSignature = () => {
     const updatedPreTripFormData = {
       ...preTripFormData,
       signature: {
-        signatureType: formData.signatureType,
-        typedSignature: formData.typedSignature,
-        signatureText: formData.signatureText,
-        drawnSignature: formData.drawnSignature,
+        signatureType: formData.signature.signatureType,
+        typedSignature: formData.signature.typedSignature,
+        signatureText: formData.signature.signatureText,
+        drawnSignature: formData.signature.drawnSignature,
         typedSignatureImage,
       },
       userId: user?.id,
@@ -88,23 +91,38 @@ const PreTripFormSignature = () => {
   };
 
   const handleSignature = (signature) => {
-    setFormData({ ...formData, drawnSignature: signature });
+    setFormData({
+      ...formData,
+      signature: {
+        ...formData.signature,
+        drawnSignature: signature
+      }
+    });
   };
 
   const handleClearSignature = () => {
     if (signatureRef.current) {
       signatureRef.current.clearSignature();
     }
-    setFormData({ ...formData, drawnSignature: "" });
+    setFormData({
+      ...formData,
+      signature: {
+        ...formData.signature,
+        drawnSignature: ""
+      }
+    });
     setSignatureKey((prev) => prev + 1);
   };
 
   const handleSignatureTypeChange = (type) => {
     setFormData({
       ...formData,
-      signatureType: type,
-      typedSignature: "",
-      drawnSignature: "",
+      signature: {
+        ...formData.signature,
+        signatureType: type,
+        typedSignature: "",
+        drawnSignature: "",
+      }
     });
   };
 
@@ -163,9 +181,15 @@ const PreTripFormSignature = () => {
               </>
             }
             placeholder="Enter your name here"
-            value={formData.signatureText}
+            value={formData.signature.signatureText}
             onChangeText={(text: string) =>
-              setFormData({ ...formData, signatureText: text })
+              setFormData({
+                ...formData,
+                signature: {
+                  ...formData.signature,
+                  signatureText: text
+                }
+              })
             }
             icon={<Ionicons name="person-outline" size={20} color="#082640" />}
           />
@@ -176,7 +200,7 @@ const PreTripFormSignature = () => {
             <TouchableOpacity
               style={[
                 styles.signatureTypeButton,
-                formData.signatureType === "typing" &&
+                formData.signature.signatureType === "typing" &&
                   styles.signatureTypeButtonActive,
               ]}
               onPress={() => handleSignatureTypeChange("typing")}
@@ -184,20 +208,20 @@ const PreTripFormSignature = () => {
               <Text
                 style={[
                   styles.signatureTypeText,
-                  formData.signatureType === "typing" &&
+                  formData.signature.signatureType === "typing" &&
                     styles.signatureTypeTextActive,
                 ]}
               >
                 Type Signature
               </Text>
-              {formData.signatureType === "typing" && (
+              {formData.signature.signatureType === "typing" && (
                 <View style={styles.tabUnderline} />
               )}
             </TouchableOpacity>
             <TouchableOpacity
               style={[
                 styles.signatureTypeButton,
-                formData.signatureType === "draw" &&
+                formData.signature.signatureType === "draw" &&
                   styles.signatureTypeButtonActive,
               ]}
               onPress={() => handleSignatureTypeChange("draw")}
@@ -205,25 +229,25 @@ const PreTripFormSignature = () => {
               <Text
                 style={[
                   styles.signatureTypeText,
-                  formData.signatureType === "draw" &&
+                  formData.signature.signatureType === "draw" &&
                     styles.signatureTypeTextActive,
                 ]}
               >
                 Draw Signature
               </Text>
-              {formData.signatureType === "draw" && (
+              {formData.signature.signatureType === "draw" && (
                 <View style={styles.tabUnderline} />
               )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.signatureBox}>
-            {formData.signatureType === "draw" ? (
+            {formData.signature.signatureType === "draw" ? (
               <>
-                {formData.drawnSignature ? (
+                {formData.signature.drawnSignature ? (
                   <View style={{ flex: 1, width: "100%" }}>
                     <Image
-                      source={{ uri: formData.drawnSignature }}
+                      source={{ uri: formData.signature.drawnSignature }}
                       style={{
                         width: "100%",
                         height: 180,
@@ -281,16 +305,28 @@ const PreTripFormSignature = () => {
                   <TouchableOpacity
                     style={styles.clearButton}
                     onPress={() =>
-                      setFormData({ ...formData, typedSignature: "" })
+                      setFormData({
+                        ...formData,
+                        signature: {
+                          ...formData.signature,
+                          typedSignature: ""
+                        }
+                      })
                     }
                   >
                     <Ionicons name="close" size={24} color="#000" />
                   </TouchableOpacity>
                   <TextInput
                     style={styles.typedSignatureInput}
-                    value={formData.typedSignature}
+                    value={formData.signature.typedSignature}
                     onChangeText={(text: string) =>
-                      setFormData({ ...formData, typedSignature: text })
+                      setFormData({
+                        ...formData,
+                        signature: {
+                          ...formData.signature,
+                          typedSignature: text
+                        }
+                      })
                     }
                     placeholder="Type your signature"
                     placeholderTextColor="#bbb"
@@ -305,10 +341,10 @@ const PreTripFormSignature = () => {
                   <Text
                     style={[
                       styles.signaturePreview,
-                      !formData.typedSignature && { color: "#bbb" },
+                      !formData.signature.typedSignature && { color: "#bbb" },
                     ]}
                   >
-                    {formData.typedSignature || "Your Signature"}
+                    {formData.signature.typedSignature || "Your Signature"}
                   </Text>
                   <View style={styles.signatureLine} />
                 </ViewShot>
@@ -317,7 +353,7 @@ const PreTripFormSignature = () => {
           </View>
           <View style={styles.signatureDivider} />
           <Text style={styles.signatureBoxCaption}>
-            {formData.signatureType === "draw"
+            {formData.signature.signatureType === "draw"
               ? "Draw Your Signature"
               : "Type Your Signature"}
           </Text>

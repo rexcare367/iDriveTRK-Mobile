@@ -18,76 +18,84 @@ const PreTripFormTrailerDetails = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get trailer details inspection data from the new structure
+  const getTrailerDetailsInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "trailerDetails");
+  };
+
+  const trailerDetailsInspection = getTrailerDetailsInspection();
+
   const [formData, setFormData] = useState({
-    brakeConnections:
-      preTripFormData?.trailerDetails?.brakeConnections || "normal",
-    brakes: preTripFormData?.trailerDetails?.brakes || "normal",
-    couplingDevices:
-      preTripFormData?.trailerDetails?.couplingDevices || "normal",
-    couplingKingPin:
-      preTripFormData?.trailerDetails?.couplingKingPin || "normal",
-    doors: preTripFormData?.trailerDetails?.doors || "normal",
-    hitch: preTripFormData?.trailerDetails?.hitch || "normal",
-    landingGear: preTripFormData?.trailerDetails?.landingGear || "normal",
-    lightsUp: preTripFormData?.trailerDetails?.lightsUp || "normal",
-    reflectors: preTripFormData?.trailerDetails?.reflectors || "normal",
-    reflectiveTape: preTripFormData?.trailerDetails?.reflectiveTape || "normal",
-    roof: preTripFormData?.trailerDetails?.roof || "normal",
-    suspensionSystem:
-      preTripFormData?.trailerDetails?.suspensionSystem || "normal",
-    straps: preTripFormData?.trailerDetails?.straps || "normal",
-    tarpaulin: preTripFormData?.trailerDetails?.tarpaulin || "normal",
-    tires: preTripFormData?.trailerDetails?.tires || "normal",
-    wheelsRims1: preTripFormData?.trailerDetails?.wheelsRims1 || "normal",
-    wheelsRims2: preTripFormData?.trailerDetails?.wheelsRims2 || "normal",
-    brakeConnectionsDefectDetails:
-      preTripFormData?.trailerDetails?.brakeConnectionsDefectDetails || "",
-    brakesDefectDetails:
-      preTripFormData?.trailerDetails?.brakesDefectDetails || "",
-    couplingDevicesDefectDetails:
-      preTripFormData?.trailerDetails?.couplingDevicesDefectDetails || "",
-    couplingKingPinDefectDetails:
-      preTripFormData?.trailerDetails?.couplingKingPinDefectDetails || "",
-    doorsDefectDetails:
-      preTripFormData?.trailerDetails?.doorsDefectDetails || "",
-    hitchDefectDetails:
-      preTripFormData?.trailerDetails?.hitchDefectDetails || "",
-    landingGearDefectDetails:
-      preTripFormData?.trailerDetails?.landingGearDefectDetails || "",
-    lightsUpDefectDetails:
-      preTripFormData?.trailerDetails?.lightsUpDefectDetails || "",
-    reflectorsDefectDetails:
-      preTripFormData?.trailerDetails?.reflectorsDefectDetails || "",
-    reflectiveTapeDefectDetails:
-      preTripFormData?.trailerDetails?.reflectiveTapeDefectDetails || "",
-    roofDefectDetails: preTripFormData?.trailerDetails?.roofDefectDetails || "",
-    suspensionSystemDefectDetails:
-      preTripFormData?.trailerDetails?.suspensionSystemDefectDetails || "",
-    strapsDefectDetails:
-      preTripFormData?.trailerDetails?.strapsDefectDetails || "",
-    tarpaulinDefectDetails:
-      preTripFormData?.trailerDetails?.tarpaulinDefectDetails || "",
-    tiresDefectDetails:
-      preTripFormData?.trailerDetails?.tiresDefectDetails || "",
-    wheelsRims1DefectDetails:
-      preTripFormData?.trailerDetails?.wheelsRims1DefectDetails || "",
-    wheelsRims2DefectDetails:
-      preTripFormData?.trailerDetails?.wheelsRims2DefectDetails || "",
+    brakeConnections: trailerDetailsInspection?.items?.find((item: any) => item.name === "brakeConnections")?.status || "normal",
+    brakes: trailerDetailsInspection?.items?.find((item: any) => item.name === "brakes")?.status || "normal",
+    couplingDevices: trailerDetailsInspection?.items?.find((item: any) => item.name === "couplingDevices")?.status || "normal",
+    couplingKingPin: trailerDetailsInspection?.items?.find((item: any) => item.name === "couplingKingPin")?.status || "normal",
+    doors: trailerDetailsInspection?.items?.find((item: any) => item.name === "doors")?.status || "normal",
+    hitch: trailerDetailsInspection?.items?.find((item: any) => item.name === "hitch")?.status || "normal",
+    landingGear: trailerDetailsInspection?.items?.find((item: any) => item.name === "landingGear")?.status || "normal",
+    lightsUp: trailerDetailsInspection?.items?.find((item: any) => item.name === "lightsUp")?.status || "normal",
+    reflectors: trailerDetailsInspection?.items?.find((item: any) => item.name === "reflectors")?.status || "normal",
+    reflectiveTape: trailerDetailsInspection?.items?.find((item: any) => item.name === "reflectiveTape")?.status || "normal",
+    roof: trailerDetailsInspection?.items?.find((item: any) => item.name === "roof")?.status || "normal",
+    suspensionSystem: trailerDetailsInspection?.items?.find((item: any) => item.name === "suspensionSystem")?.status || "normal",
+    straps: trailerDetailsInspection?.items?.find((item: any) => item.name === "straps")?.status || "normal",
+    tarpaulin: trailerDetailsInspection?.items?.find((item: any) => item.name === "tarpaulin")?.status || "normal",
+    tires: trailerDetailsInspection?.items?.find((item: any) => item.name === "tires")?.status || "normal",
+    wheelsRims1: trailerDetailsInspection?.items?.find((item: any) => item.name === "wheelsRims1")?.status || "normal",
+    wheelsRims2: trailerDetailsInspection?.items?.find((item: any) => item.name === "wheelsRims2")?.status || "normal",
+    brakeConnectionsDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "brakeConnections")?.details || "",
+    brakesDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "brakes")?.details || "",
+    couplingDevicesDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "couplingDevices")?.details || "",
+    couplingKingPinDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "couplingKingPin")?.details || "",
+    doorsDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "doors")?.details || "",
+    hitchDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "hitch")?.details || "",
+    landingGearDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "landingGear")?.details || "",
+    lightsUpDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "lightsUp")?.details || "",
+    reflectorsDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "reflectors")?.details || "",
+    reflectiveTapeDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "reflectiveTape")?.details || "",
+    roofDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "roof")?.details || "",
+    suspensionSystemDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "suspensionSystem")?.details || "",
+    strapsDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "straps")?.details || "",
+    tarpaulinDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "tarpaulin")?.details || "",
+    tiresDefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "tires")?.details || "",
+    wheelsRims1DefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "wheelsRims1")?.details || "",
+    wheelsRims2DefectDetails: trailerDetailsInspection?.items?.find((item: any) => item.name === "wheelsRims2")?.details || "",
   });
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const trailerDetailsInspectionData = {
+      type: "trailerDetails",
+      allFunctioning: allComponents.every(component => formData[component.id] === "normal"),
+      items: allComponents.map(component => ({
+        name: component.id,
+        status: formData[component.id],
+        details: formData[`${component.id}DefectDetails`]
+      }))
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "trailerDetails");
+    updatedInspection.push(trailerDetailsInspectionData);
+
+    console.log('preTripFormData', preTripFormData)
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        trailerDetails: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-signature");
   };
 
   const handleRadioToggle = (field, value) => {
+    // Map "repair" to "defective" for consistency
+    const statusValue = value === "repair" ? "defective" : value;
     setFormData({
       ...formData,
-      [field]: value,
+      [field]: statusValue,
     });
   };
 
@@ -152,7 +160,7 @@ const PreTripFormTrailerDetails = () => {
   const allComponents = [...trailerComponents1, ...trailerComponents2];
   const isNextDisabled = allComponents.some(
     (component) =>
-      formData[component.id] === "repair" &&
+      formData[component.id] === "defective" &&
       !formData[`${component.id}DefectDetails`].trim()
   );
 
@@ -177,13 +185,13 @@ const PreTripFormTrailerDetails = () => {
                 label="Checked - Normal"
               />
               <RadioButton
-                selected={formData[component.id] === "repair"}
+                selected={formData[component.id] === "defective"}
                 onPress={() => handleRadioToggle(component.id, "repair")}
                 label="Requires Repair"
                 style={{ marginLeft: 20 }}
               />
             </View>
-            {formData[component.id] === "repair" && (
+            {formData[component.id] === "defective" && (
               <CustomInput
                 label={`${component.label.replace("*", "")} Defect Details`}
                 placeholder={`Enter ${component.label.replace(
@@ -222,13 +230,13 @@ const PreTripFormTrailerDetails = () => {
                 label="Checked - Normal"
               />
               <RadioButton
-                selected={formData[component.id] === "repair"}
+                selected={formData[component.id] === "defective"}
                 onPress={() => handleRadioToggle(component.id, "repair")}
                 label="Requires Repair"
                 style={{ marginLeft: 20 }}
               />
             </View>
-            {formData[component.id] === "repair" && (
+            {formData[component.id] === "defective" && (
               <CustomInput
                 label={`${component.label.replace("*", "")} Defect Details`}
                 placeholder={`Enter ${component.label.replace(

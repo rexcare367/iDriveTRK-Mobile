@@ -24,17 +24,19 @@ const PreTripFormPhotos = () => {
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
   const [formData, setFormData] = useState({
-    frontPhoto: preTripFormData?.frontPhoto || null,
-    leftSidePhoto: preTripFormData?.leftSidePhoto || null,
-    rearPhoto: preTripFormData?.rearPhoto || null,
-    rightSidePhoto: preTripFormData?.rightSidePhoto || null,
+    photos: preTripFormData?.photos || {
+      frontPhoto: null,
+      leftSidePhoto: null,
+      rearPhoto: null,
+      rightSidePhoto: null,
+    }
   });
 
   const allPhotosUploaded =
-    !!formData.frontPhoto &&
-    !!formData.leftSidePhoto &&
-    !!formData.rearPhoto &&
-    !!formData.rightSidePhoto;
+    !!formData.photos.frontPhoto &&
+    !!formData.photos.leftSidePhoto &&
+    !!formData.photos.rearPhoto &&
+    !!formData.photos.rightSidePhoto;
 
   const handleNext = () => {
     dispatch(updatePreTripForm({ ...preTripFormData, ...formData }));
@@ -111,7 +113,10 @@ const PreTripFormPhotos = () => {
 
       setFormData({
         ...formData,
-        [photoType]: uri,
+        photos: {
+          ...formData.photos,
+          [photoType]: uri,
+        }
       });
     }
   };
@@ -170,9 +175,9 @@ const PreTripFormPhotos = () => {
             style={styles.photoUpload}
             onPress={() => handleUpload("frontPhoto")}
           >
-            {formData.frontPhoto ? (
+            {formData.photos.frontPhoto ? (
               <Image
-                source={{ uri: formData.frontPhoto }}
+                source={{ uri: formData.photos.frontPhoto }}
                 style={styles.photoPreview}
               />
             ) : (
@@ -194,9 +199,9 @@ const PreTripFormPhotos = () => {
             style={styles.photoUpload}
             onPress={() => handleUpload("leftSidePhoto")}
           >
-            {formData.leftSidePhoto ? (
+            {formData.photos.leftSidePhoto ? (
               <Image
-                source={{ uri: formData.leftSidePhoto }}
+                source={{ uri: formData.photos.leftSidePhoto }}
                 style={styles.photoPreview}
               />
             ) : (
@@ -218,9 +223,9 @@ const PreTripFormPhotos = () => {
             style={styles.photoUpload}
             onPress={() => handleUpload("rearPhoto")}
           >
-            {formData.rearPhoto ? (
+            {formData.photos.rearPhoto ? (
               <Image
-                source={{ uri: formData.rearPhoto }}
+                source={{ uri: formData.photos.rearPhoto }}
                 style={styles.photoPreview}
               />
             ) : (
@@ -242,9 +247,9 @@ const PreTripFormPhotos = () => {
             style={styles.photoUpload}
             onPress={() => handleUpload("rightSidePhoto")}
           >
-            {formData.rightSidePhoto ? (
+            {formData.photos.rightSidePhoto ? (
               <Image
-                source={{ uri: formData.rightSidePhoto }}
+                source={{ uri: formData.photos.rightSidePhoto }}
                 style={styles.photoPreview}
               />
             ) : (

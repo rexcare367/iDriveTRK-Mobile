@@ -16,16 +16,24 @@ const PreTripFormRearVehicle = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get rear vehicle inspection data from the new structure
+  const getRearVehicleInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "rearVehicle");
+  };
+
+  const rearVehicleInspection = getRearVehicleInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.rearVehicle?.allFunctioning ?? true,
-    exhaust: preTripFormData?.rearVehicle?.exhaust || false,
-    muffler: preTripFormData?.rearVehicle?.muffler || false,
-    rearDoorLatch: preTripFormData?.rearVehicle?.rearDoorLatch || false,
-    padlock: preTripFormData?.rearVehicle?.padlock || false,
-    exhaustDetails: preTripFormData?.rearVehicle?.exhaustDetails || "",
-    mufflerDetails: preTripFormData?.rearVehicle?.mufflerDetails || "",
-    rearDoorDetails: preTripFormData?.rearVehicle?.rearDoorDetails || "",
-    padlockDetails: preTripFormData?.rearVehicle?.padlockDetails || "",
+    allFunctioning: rearVehicleInspection?.allFunctioning ?? true,
+    exhaust: rearVehicleInspection?.items?.find((item: any) => item.name === "exhaust")?.status === "defective" || false,
+    muffler: rearVehicleInspection?.items?.find((item: any) => item.name === "muffler")?.status === "defective" || false,
+    rearDoorLatch: rearVehicleInspection?.items?.find((item: any) => item.name === "rearDoorLatch")?.status === "defective" || false,
+    padlock: rearVehicleInspection?.items?.find((item: any) => item.name === "padlock")?.status === "defective" || false,
+    exhaustDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "exhaust")?.details || "",
+    mufflerDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "muffler")?.details || "",
+    rearDoorDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "rearDoorLatch")?.details || "",
+    padlockDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "padlock")?.details || "",
   });
 
   const isAnyChecked =
@@ -42,10 +50,43 @@ const PreTripFormRearVehicle = () => {
     (!formData.padlock || formData.padlockDetails.trim() !== "");
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const rearVehicleInspectionData = {
+      type: "rearVehicle",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "exhaust",
+          status: formData.exhaust ? "defective" : "normal",
+          details: formData.exhaustDetails
+        },
+        {
+          name: "muffler",
+          status: formData.muffler ? "defective" : "normal",
+          details: formData.mufflerDetails
+        },
+        {
+          name: "rearDoorLatch",
+          status: formData.rearDoorLatch ? "defective" : "normal",
+          details: formData.rearDoorDetails
+        },
+        {
+          name: "padlock",
+          status: formData.padlock ? "defective" : "normal",
+          details: formData.padlockDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "rearVehicle");
+    updatedInspection.push(rearVehicleInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        rearVehicle: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-cab");

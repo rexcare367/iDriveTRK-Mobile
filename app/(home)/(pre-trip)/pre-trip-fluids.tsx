@@ -17,19 +17,26 @@ const PreTripFormFluids = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get fluids inspection data from the new structure
+  const getFluidsInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "fluids");
+  };
+
+  const fluidsInspection = getFluidsInspection();
+
   const [formData, setFormData] = useState<any>({
-    allFunctioning: preTripFormData?.fluids?.allFunctioning || true,
-    frameAssembly: preTripFormData?.fluids?.frameAssembly || false,
-    frontAxle: preTripFormData?.fluids?.frontAxle || false,
-    driveLine: preTripFormData?.fluids?.driveLine || false,
-    frameAssemblyDetails: preTripFormData?.fluids?.frameAssemblyDetails || "",
-    frontAxleDetails: preTripFormData?.fluids?.frontAxleDetails || "",
-    driveLineDetails: preTripFormData?.fluids?.driveLineDetails || "",
-    suspensionSystem: preTripFormData?.fluids?.suspensionSystem || "normal",
-    steering: preTripFormData?.fluids?.steering || "normal",
-    suspensionSystemDefectDetails:
-      preTripFormData?.fluids?.suspensionSystemDefectDetails || "",
-    steeringDefectDetails: preTripFormData?.fluids?.steeringDefectDetails || "",
+    allFunctioning: fluidsInspection?.allFunctioning ?? true,
+    frameAssembly: fluidsInspection?.items?.find((item: any) => item.name === "frameAssembly")?.status === "defective" || false,
+    frontAxle: fluidsInspection?.items?.find((item: any) => item.name === "frontAxle")?.status === "defective" || false,
+    driveLine: fluidsInspection?.items?.find((item: any) => item.name === "driveLine")?.status === "defective" || false,
+    frameAssemblyDetails: fluidsInspection?.items?.find((item: any) => item.name === "frameAssembly")?.details || "",
+    frontAxleDetails: fluidsInspection?.items?.find((item: any) => item.name === "frontAxle")?.details || "",
+    driveLineDetails: fluidsInspection?.items?.find((item: any) => item.name === "driveLine")?.details || "",
+    suspensionSystem: fluidsInspection?.items?.find((item: any) => item.name === "suspensionSystem")?.status || "normal",
+    steering: fluidsInspection?.items?.find((item: any) => item.name === "steering")?.status || "normal",
+    suspensionSystemDefectDetails: fluidsInspection?.items?.find((item: any) => item.name === "suspensionSystem")?.details || "",
+    steeringDefectDetails: fluidsInspection?.items?.find((item: any) => item.name === "steering")?.details || "",
   });
 
   const isAnyChecked =
@@ -42,18 +49,56 @@ const PreTripFormFluids = () => {
     (!formData.frameAssembly || formData.frameAssemblyDetails.trim() !== "") &&
     (!formData.frontAxle || formData.frontAxleDetails.trim() !== "") &&
     (!formData.driveLine || formData.driveLineDetails.trim() !== "") &&
-    (formData.suspensionSystem !== "repair" ||
+    (formData.suspensionSystem !== "defective" ||
       formData.suspensionSystemDefectDetails.trim() !== "") &&
-    (formData.steering !== "repair" ||
+    (formData.steering !== "defective" ||
       formData.steeringDefectDetails.trim() !== "");
 
   const isNextDisabled = !isAnyChecked || !areDetailsValid;
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const fluidsInspectionData = {
+      type: "fluids",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "frameAssembly",
+          status: formData.frameAssembly ? "defective" : "normal",
+          details: formData.frameAssemblyDetails
+        },
+        {
+          name: "frontAxle",
+          status: formData.frontAxle ? "defective" : "normal",
+          details: formData.frontAxleDetails
+        },
+        {
+          name: "driveLine",
+          status: formData.driveLine ? "defective" : "normal",
+          details: formData.driveLineDetails
+        },
+        {
+          name: "suspensionSystem",
+          status: formData.suspensionSystem, // "normal" or "defective"
+          details: formData.suspensionSystemDefectDetails
+        },
+        {
+          name: "steering",
+          status: formData.steering, // "normal" or "defective"
+          details: formData.steeringDefectDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "fluids");
+    updatedInspection.push(fluidsInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        fluids: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-wheels");
@@ -86,13 +131,15 @@ const PreTripFormFluids = () => {
   };
 
   const handleRadioToggle = (field: string, value: string) => {
+    // Map "repair" to "defective" for consistency with new structure
+    const statusValue = value === "repair" ? "defective" : value;
     setFormData({
       ...formData,
-      [field]: value,
-      ...(field === "suspensionSystem" && value === "normal"
+      [field]: statusValue,
+      ...(field === "suspensionSystem" && statusValue === "normal"
         ? { suspensionSystemDefectDetails: "" }
         : {}),
-      ...(field === "steering" && value === "normal"
+      ...(field === "steering" && statusValue === "normal"
         ? { steeringDefectDetails: "" }
         : {}),
     });
@@ -229,13 +276,13 @@ const PreTripFormFluids = () => {
             />
             <CustomRadioButton
               label="Requires Repair"
-              selected={formData.suspensionSystem === "repair"}
+              selected={formData.suspensionSystem === "defective"}
               onPress={() => handleRadioToggle("suspensionSystem", "repair")}
               style={styles.radioOption}
               labelStyle={styles.radioText}
             />
           </View>
-          {formData.suspensionSystem === "repair" && (
+          {formData.suspensionSystem === "defective" && (
             <CustomInput
               label="Suspension System Defect Details"
               placeholder="Enter Suspension System Defect Details"
@@ -270,13 +317,13 @@ const PreTripFormFluids = () => {
             />
             <CustomRadioButton
               label="Requires Repair"
-              selected={formData.steering === "repair"}
+              selected={formData.steering === "defective"}
               onPress={() => handleRadioToggle("steering", "repair")}
               style={styles.radioOption}
               labelStyle={styles.radioText}
             />
           </View>
-          {formData.steering === "repair" && (
+          {formData.steering === "defective" && (
             <CustomInput
               label="Steering Defect Details"
               placeholder="Enter Steering Defect Details"

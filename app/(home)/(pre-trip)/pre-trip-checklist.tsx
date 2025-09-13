@@ -18,16 +18,24 @@ const PreTripFormChecklist = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get checklist inspection data from the new structure
+  const getChecklistInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "checklist");
+  };
+
+  const checklistInspection = getChecklistInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.checklist?.allFunctioning ?? true,
-    clutch: preTripFormData?.checklist?.clutch || false,
-    parkingBreak: preTripFormData?.checklist?.parkingBreak || false,
-    serviceBreak: preTripFormData?.checklist?.serviceBreak || false,
-    starter: preTripFormData?.checklist?.starter || false,
-    clutchDetails: preTripFormData?.checklist?.clutchDetails || "",
-    parkingBreakDetails: preTripFormData?.checklist?.parkingBreakDetails || "",
-    serviceBreakDetails: preTripFormData?.checklist?.serviceBreakDetails || "",
-    starterDetails: preTripFormData?.checklist?.starterDetails || "",
+    allFunctioning: checklistInspection?.allFunctioning ?? true,
+    clutch: checklistInspection?.items?.find((item: any) => item.name === "clutch")?.status === "defective" || false,
+    parkingBreak: checklistInspection?.items?.find((item: any) => item.name === "parkingBreak")?.status === "defective" || false,
+    serviceBreak: checklistInspection?.items?.find((item: any) => item.name === "serviceBreak")?.status === "defective" || false,
+    starter: checklistInspection?.items?.find((item: any) => item.name === "starter")?.status === "defective" || false,
+    clutchDetails: checklistInspection?.items?.find((item: any) => item.name === "clutch")?.details || "",
+    parkingBreakDetails: checklistInspection?.items?.find((item: any) => item.name === "parkingBreak")?.details || "",
+    serviceBreakDetails: checklistInspection?.items?.find((item: any) => item.name === "serviceBreak")?.details || "",
+    starterDetails: checklistInspection?.items?.find((item: any) => item.name === "starter")?.details || "",
   });
 
   const isAnyChecked =
@@ -44,10 +52,43 @@ const PreTripFormChecklist = () => {
     (!formData.starter || formData.starterDetails.trim() !== "");
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const checklistInspectionData = {
+      type: "checklist",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "clutch",
+          status: formData.clutch ? "defective" : "normal",
+          details: formData.clutchDetails
+        },
+        {
+          name: "parkingBreak",
+          status: formData.parkingBreak ? "defective" : "normal",
+          details: formData.parkingBreakDetails
+        },
+        {
+          name: "serviceBreak",
+          status: formData.serviceBreak ? "defective" : "normal",
+          details: formData.serviceBreakDetails
+        },
+        {
+          name: "starter",
+          status: formData.starter ? "defective" : "normal",
+          details: formData.starterDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "checklist");
+    updatedInspection.push(checklistInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        checklist: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-safety");

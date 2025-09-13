@@ -18,18 +18,26 @@ export default function PostTripFormWheels() {
   const dispatch = useDispatch();
   const { postTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get wheels inspection data from the new structure
+  const getWheelsInspection = () => {
+    const inspection = postTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "wheels");
+  };
+
+  const wheelsInspection = getWheelsInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: postTripFormData?.wheels?.allFunctioning || true,
-    wheels: postTripFormData?.wheels?.wheels || false,
-    rims: postTripFormData?.wheels?.rims || false,
-    lugs: postTripFormData?.wheels?.lugs || false,
-    tires: postTripFormData?.wheels?.tires || false,
-    tireChains: postTripFormData?.wheels?.tireChains || false,
-    wheelsDetails: postTripFormData?.wheels?.wheelsDetails || "",
-    rimsDetails: postTripFormData?.wheels?.rimsDetails || "",
-    lugsDetails: postTripFormData?.wheels?.lugsDetails || "",
-    tiresDetails: postTripFormData?.wheels?.tiresDetails || "",
-    tireChainsDetails: postTripFormData?.wheels?.tireChainsDetails || "",
+    allFunctioning: wheelsInspection?.allFunctioning ?? true,
+    wheels: wheelsInspection?.items?.find((item: any) => item.name === "wheels")?.status === "defective" || false,
+    rims: wheelsInspection?.items?.find((item: any) => item.name === "rims")?.status === "defective" || false,
+    lugs: wheelsInspection?.items?.find((item: any) => item.name === "lugs")?.status === "defective" || false,
+    tires: wheelsInspection?.items?.find((item: any) => item.name === "tires")?.status === "defective" || false,
+    tireChains: wheelsInspection?.items?.find((item: any) => item.name === "tireChains")?.status === "missing" || false,
+    wheelsDetails: wheelsInspection?.items?.find((item: any) => item.name === "wheels")?.details || "",
+    rimsDetails: wheelsInspection?.items?.find((item: any) => item.name === "rims")?.details || "",
+    lugsDetails: wheelsInspection?.items?.find((item: any) => item.name === "lugs")?.details || "",
+    tiresDetails: wheelsInspection?.items?.find((item: any) => item.name === "tires")?.details || "",
+    tireChainsDetails: wheelsInspection?.items?.find((item: any) => item.name === "tireChains")?.details || "",
   });
 
   const isAnyChecked =
@@ -48,10 +56,48 @@ export default function PostTripFormWheels() {
     (!formData.tireChains || formData.tireChainsDetails.trim() !== "");
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const wheelsInspectionData = {
+      type: "wheels",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "wheels",
+          status: formData.wheels ? "defective" : "normal",
+          details: formData.wheelsDetails
+        },
+        {
+          name: "rims",
+          status: formData.rims ? "defective" : "normal",
+          details: formData.rimsDetails
+        },
+        {
+          name: "lugs",
+          status: formData.lugs ? "defective" : "normal",
+          details: formData.lugsDetails
+        },
+        {
+          name: "tires",
+          status: formData.tires ? "defective" : "normal",
+          details: formData.tiresDetails
+        },
+        {
+          name: "tireChains",
+          status: formData.tireChains ? "missing" : "normal",
+          details: formData.tireChainsDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in postTripFormData
+    const existingInspection = postTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "wheels");
+    updatedInspection.push(wheelsInspectionData);
+
     dispatch(
       updatePostTripForm({
         ...postTripFormData,
-        wheels: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/post-trip-rear-vehicle");
@@ -77,12 +123,13 @@ export default function PostTripFormWheels() {
       });
     } else {
       const isUnchecking = formData[field];
+      const detailsField = `${field}Details`;
       setFormData({
         ...formData,
         [field]: !formData[field],
         allFunctioning: false,
         ...(isUnchecking && {
-          [`${field}Details`]: "",
+          [detailsField]: "",
         }),
       });
     }

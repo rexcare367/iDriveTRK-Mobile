@@ -26,6 +26,26 @@ export default function PreTripFormDriverInfo() {
     firstName: preTripFormData?.firstName || user?.firstName || "",
     lastName: preTripFormData?.lastName || user?.lastName || "",
     email: preTripFormData?.email || user?.email || "",
+    // Initialize inspection array if it doesn't exist
+    inspection: preTripFormData?.inspection || [],
+    // Initialize other sections if they don't exist
+    photos: preTripFormData?.photos || {
+      leftSidePhoto: "",
+      rearPhoto: "",
+      rightSidePhoto: "",
+      frontPhoto: ""
+    },
+    signature: preTripFormData?.signature || {
+      signatureType: "typing",
+      typedSignature: "",
+      signatureText: "",
+      drawnSignature: "",
+      typedSignatureImage: ""
+    },
+    trailer: preTripFormData?.trailer || {
+      trailerNumber1: "",
+      trailerNumber2: ""
+    }
   });
 
   const handleNext = () => {

@@ -18,18 +18,26 @@ const PreTripFormWheels = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get wheels inspection data from the new structure
+  const getWheelsInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "wheels");
+  };
+
+  const wheelsInspection = getWheelsInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.wheels?.allFunctioning || true,
-    wheels: preTripFormData?.wheels?.wheels || false,
-    rims: preTripFormData?.wheels?.rims || false,
-    lugs: preTripFormData?.wheels?.lugs || false,
-    tires: preTripFormData?.wheels?.tires || false,
-    tireChains: preTripFormData?.wheels?.tireChains || false,
-    wheelsDetails: preTripFormData?.wheels?.wheelsDetails || "",
-    rimsDetails: preTripFormData?.wheels?.rimsDetails || "",
-    lugsDetails: preTripFormData?.wheels?.lugsDetails || "",
-    tiresDetails: preTripFormData?.wheels?.tiresDetails || "",
-    tireChainsDetails: preTripFormData?.wheels?.tireChainsDetails || "",
+    allFunctioning: wheelsInspection?.allFunctioning ?? true,
+    wheels: wheelsInspection?.items?.find((item: any) => item.name === "wheels")?.status === "defective" || false,
+    rims: wheelsInspection?.items?.find((item: any) => item.name === "rims")?.status === "defective" || false,
+    lugs: wheelsInspection?.items?.find((item: any) => item.name === "lugs")?.status === "defective" || false,
+    tires: wheelsInspection?.items?.find((item: any) => item.name === "tires")?.status === "defective" || false,
+    tireChains: wheelsInspection?.items?.find((item: any) => item.name === "tireChains")?.status === "missing" || false,
+    wheelsDetails: wheelsInspection?.items?.find((item: any) => item.name === "wheels")?.details || "",
+    rimsDetails: wheelsInspection?.items?.find((item: any) => item.name === "rims")?.details || "",
+    lugsDetails: wheelsInspection?.items?.find((item: any) => item.name === "lugs")?.details || "",
+    tiresDetails: wheelsInspection?.items?.find((item: any) => item.name === "tires")?.details || "",
+    tireChainsDetails: wheelsInspection?.items?.find((item: any) => item.name === "tireChains")?.details || "",
   });
 
   const isAnyChecked =
@@ -48,10 +56,48 @@ const PreTripFormWheels = () => {
     (!formData.tireChains || formData.tireChainsDetails.trim() !== "");
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const wheelsInspectionData = {
+      type: "wheels",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "wheels",
+          status: formData.wheels ? "defective" : "normal",
+          details: formData.wheelsDetails
+        },
+        {
+          name: "rims",
+          status: formData.rims ? "defective" : "normal",
+          details: formData.rimsDetails
+        },
+        {
+          name: "lugs",
+          status: formData.lugs ? "defective" : "normal",
+          details: formData.lugsDetails
+        },
+        {
+          name: "tires",
+          status: formData.tires ? "defective" : "normal",
+          details: formData.tiresDetails
+        },
+        {
+          name: "tireChains",
+          status: formData.tireChains ? "missing" : "normal",
+          details: formData.tireChainsDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "wheels");
+    updatedInspection.push(wheelsInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        wheels: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-rear-vehicle");

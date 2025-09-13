@@ -16,14 +16,22 @@ const PreTripFormLights = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get lights inspection data from the new structure
+  const getLightsInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "lights");
+  };
+
+  const lightsInspection = getLightsInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.lights?.allFunctioning ?? true,
-    headStop: preTripFormData?.lights?.headStop || false,
-    tailDash: preTripFormData?.lights?.tailDash || false,
-    turnIndicators: preTripFormData?.lights?.turnIndicators || false,
-    headStopDetails: preTripFormData?.lights?.headStopDetails || "",
-    tailDashDetails: preTripFormData?.lights?.tailDashDetails || "",
-    turnIndicatorsDetails: preTripFormData?.lights?.turnIndicatorsDetails || "",
+    allFunctioning: lightsInspection?.allFunctioning ?? true,
+    headStop: lightsInspection?.items?.find((item: any) => item.name === "headStop")?.status === "defective" || false,
+    tailDash: lightsInspection?.items?.find((item: any) => item.name === "tailDash")?.status === "defective" || false,
+    turnIndicators: lightsInspection?.items?.find((item: any) => item.name === "turnIndicators")?.status === "defective" || false,
+    headStopDetails: lightsInspection?.items?.find((item: any) => item.name === "headStop")?.details || "",
+    tailDashDetails: lightsInspection?.items?.find((item: any) => item.name === "tailDash")?.details || "",
+    turnIndicatorsDetails: lightsInspection?.items?.find((item: any) => item.name === "turnIndicators")?.details || "",
   });
 
   const [showDetails, setShowDetails] = useState({
@@ -44,10 +52,38 @@ const PreTripFormLights = () => {
     (!formData.turnIndicators || formData.turnIndicatorsDetails.trim() !== "");
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const lightsInspectionData = {
+      type: "lights",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "headStop",
+          status: formData.headStop ? "defective" : "normal",
+          details: formData.headStopDetails
+        },
+        {
+          name: "tailDash",
+          status: formData.tailDash ? "defective" : "normal",
+          details: formData.tailDashDetails
+        },
+        {
+          name: "turnIndicators",
+          status: formData.turnIndicators ? "defective" : "normal",
+          details: formData.turnIndicatorsDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "lights");
+    updatedInspection.push(lightsInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        lights: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-checklist");

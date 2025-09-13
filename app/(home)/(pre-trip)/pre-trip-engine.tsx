@@ -16,18 +16,26 @@ const PreTripFormEngine = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get engine inspection data from the new structure
+  const getEngineInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "engine");
+  };
+
+  const engineInspection = getEngineInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.engine?.allFunctioning || true,
-    engine: preTripFormData?.engine?.engine || false,
-    alternator: preTripFormData?.engine?.alternator || false,
-    transmission: preTripFormData?.engine?.transmission || false,
-    battery: preTripFormData?.engine?.battery || false,
-    beltAndHoses: preTripFormData?.engine?.beltAndHoses || false,
-    engineDetails: preTripFormData?.engine?.engineDetails || "",
-    alternatorDetails: preTripFormData?.engine?.alternatorDetails || "",
-    transmissionDetails: preTripFormData?.engine?.transmissionDetails || "",
-    batteryDetails: preTripFormData?.engine?.batteryDetails || "",
-    beltAndHosesDetails: preTripFormData?.engine?.beltAndHosesDetails || "",
+    allFunctioning: engineInspection?.allFunctioning ?? true,
+    engine: engineInspection?.items?.find((item: any) => item.name === "engine")?.status === "defective" || false,
+    alternator: engineInspection?.items?.find((item: any) => item.name === "alternator")?.status === "defective" || false,
+    transmission: engineInspection?.items?.find((item: any) => item.name === "transmission")?.status === "defective" || false,
+    battery: engineInspection?.items?.find((item: any) => item.name === "battery")?.status === "defective" || false,
+    beltAndHoses: engineInspection?.items?.find((item: any) => item.name === "beltAndHoses")?.status === "defective" || false,
+    engineDetails: engineInspection?.items?.find((item: any) => item.name === "engine")?.details || "",
+    alternatorDetails: engineInspection?.items?.find((item: any) => item.name === "alternator")?.details || "",
+    transmissionDetails: engineInspection?.items?.find((item: any) => item.name === "transmission")?.details || "",
+    batteryDetails: engineInspection?.items?.find((item: any) => item.name === "battery")?.details || "",
+    beltAndHosesDetails: engineInspection?.items?.find((item: any) => item.name === "beltAndHoses")?.details || "",
   });
 
   const isAnyChecked =
@@ -46,10 +54,48 @@ const PreTripFormEngine = () => {
     (!formData.beltAndHoses || formData.beltAndHosesDetails.trim() !== "");
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const engineInspectionData = {
+      type: "engine",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "engine",
+          status: formData.engine ? "defective" : "normal",
+          details: formData.engineDetails
+        },
+        {
+          name: "alternator",
+          status: formData.alternator ? "defective" : "normal",
+          details: formData.alternatorDetails
+        },
+        {
+          name: "transmission",
+          status: formData.transmission ? "defective" : "normal",
+          details: formData.transmissionDetails
+        },
+        {
+          name: "battery",
+          status: formData.battery ? "defective" : "normal",
+          details: formData.batteryDetails
+        },
+        {
+          name: "beltAndHoses",
+          status: formData.beltAndHoses ? "defective" : "normal",
+          details: formData.beltAndHosesDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "engine");
+    updatedInspection.push(engineInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        engine: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-fluids");
@@ -75,12 +121,13 @@ const PreTripFormEngine = () => {
       });
     } else {
       const isUnchecking = formData[field];
+      const detailsField = `${field}Details`;
       setFormData({
         ...formData,
         [field]: !formData[field],
         allFunctioning: false,
         ...(isUnchecking && {
-          [`${field}Details`]: "",
+          [detailsField]: "",
         }),
       });
     }

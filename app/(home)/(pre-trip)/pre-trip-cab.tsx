@@ -18,18 +18,26 @@ const PreTripFormCab = () => {
   const dispatch = useDispatch();
   const { preTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get cab inspection data from the new structure
+  const getCabInspection = () => {
+    const inspection = preTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "cab");
+  };
+
+  const cabInspection = getCabInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: preTripFormData?.cab?.allFunctioning ?? true,
-    windshieldClean: preTripFormData?.cab?.windshieldClean || false,
-    wipersFunctional: preTripFormData?.cab?.wipersFunctional || false,
-    gauges: preTripFormData?.cab?.gauges || false,
-    horn: preTripFormData?.cab?.horn || false,
-    defrostHeater: preTripFormData?.cab?.defrostHeater || false,
-    windshieldDetails: preTripFormData?.cab?.windshieldDetails || "",
-    wipersDetails: preTripFormData?.cab?.wipersDetails || "",
-    gaugesDetails: preTripFormData?.cab?.gaugesDetails || "",
-    hornDetails: preTripFormData?.cab?.hornDetails || "",
-    defrostHeaterDetails: preTripFormData?.cab?.defrostHeaterDetails || "",
+    allFunctioning: cabInspection?.allFunctioning ?? true,
+    windshieldClean: cabInspection?.items?.find((item: any) => item.name === "windshieldClean")?.status === "defective" || false,
+    wipersFunctional: cabInspection?.items?.find((item: any) => item.name === "wipersFunctional")?.status === "defective" || false,
+    gauges: cabInspection?.items?.find((item: any) => item.name === "gauges")?.status === "defective" || false,
+    horn: cabInspection?.items?.find((item: any) => item.name === "horn")?.status === "defective" || false,
+    defrostHeater: cabInspection?.items?.find((item: any) => item.name === "defrostHeater")?.status === "defective" || false,
+    windshieldDetails: cabInspection?.items?.find((item: any) => item.name === "windshieldClean")?.details || "",
+    wipersDetails: cabInspection?.items?.find((item: any) => item.name === "wipersFunctional")?.details || "",
+    gaugesDetails: cabInspection?.items?.find((item: any) => item.name === "gauges")?.details || "",
+    hornDetails: cabInspection?.items?.find((item: any) => item.name === "horn")?.details || "",
+    defrostHeaterDetails: cabInspection?.items?.find((item: any) => item.name === "defrostHeater")?.details || "",
   });
 
   const isAnyChecked =
@@ -52,10 +60,48 @@ const PreTripFormCab = () => {
   };
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const cabInspectionData = {
+      type: "cab",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "windshieldClean",
+          status: formData.windshieldClean ? "defective" : "normal",
+          details: formData.windshieldDetails
+        },
+        {
+          name: "wipersFunctional",
+          status: formData.wipersFunctional ? "defective" : "normal",
+          details: formData.wipersDetails
+        },
+        {
+          name: "gauges",
+          status: formData.gauges ? "defective" : "normal",
+          details: formData.gaugesDetails
+        },
+        {
+          name: "horn",
+          status: formData.horn ? "defective" : "normal",
+          details: formData.hornDetails
+        },
+        {
+          name: "defrostHeater",
+          status: formData.defrostHeater ? "defective" : "normal",
+          details: formData.defrostHeaterDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in preTripFormData
+    const existingInspection = preTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "cab");
+    updatedInspection.push(cabInspectionData);
+
     dispatch(
       updatePreTripForm({
         ...preTripFormData,
-        cab: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/pre-trip-lights");

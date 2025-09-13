@@ -73,14 +73,7 @@ const PostTripFormSignature = () => {
       },
     };
 
-    const userId = user?.id;
     const schedule_id = clockInFormData?.schedule_id;
-
-    // Call backend API to store post-trip inspection
-      const response = await api.post("api/truck-inspection", {
-      userId,
-      ...updatedPostTripFormData,
-    });
 
     // Update schedule status to 'completed'
     await api.patch(`api/schedules/${schedule_id}`, {

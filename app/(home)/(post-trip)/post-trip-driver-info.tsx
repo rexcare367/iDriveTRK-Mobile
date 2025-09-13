@@ -28,6 +28,26 @@ export default function PostTripFormDriverInfo() {
     firstName: postTripFormData?.firstName || user?.firstName || "",
     lastName: postTripFormData?.lastName || user?.lastName || "",
     email: postTripFormData?.email || user?.email || "",
+    // Initialize inspection array if it doesn't exist
+    inspection: postTripFormData?.inspection || [],
+    // Initialize other sections if they don't exist
+    photos: postTripFormData?.photos || {
+      leftSidePhoto: "",
+      rearPhoto: "",
+      rightSidePhoto: "",
+      frontPhoto: ""
+    },
+    signature: postTripFormData?.signature || {
+      signatureType: "typing",
+      typedSignature: "",
+      signatureText: "",
+      drawnSignature: "",
+      typedSignatureImage: ""
+    },
+    trailer: postTripFormData?.trailer || {
+      trailerNumber1: "",
+      trailerNumber2: ""
+    }
   });
 
   const handleNext = () => {

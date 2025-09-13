@@ -16,16 +16,24 @@ const PostTripFormRearVehicle = () => {
   const dispatch = useDispatch();
   const { postTripFormData } = useSelector((state: any) => state.driver);
 
+  // Helper function to get rear vehicle inspection data from the new structure
+  const getRearVehicleInspection = () => {
+    const inspection = postTripFormData?.inspection || [];
+    return inspection.find((item: any) => item.type === "rearVehicle");
+  };
+
+  const rearVehicleInspection = getRearVehicleInspection();
+
   const [formData, setFormData] = useState({
-    allFunctioning: postTripFormData?.rearVehicle?.allFunctioning ?? true,
-    exhaust: postTripFormData?.rearVehicle?.exhaust || false,
-    muffler: postTripFormData?.rearVehicle?.muffler || false,
-    rearDoorLatch: postTripFormData?.rearVehicle?.rearDoorLatch || false,
-    padlock: postTripFormData?.rearVehicle?.padlock || false,
-    exhaustDetails: postTripFormData?.rearVehicle?.exhaustDetails || "",
-    mufflerDetails: postTripFormData?.rearVehicle?.mufflerDetails || "",
-    rearDoorDetails: postTripFormData?.rearVehicle?.rearDoorDetails || "",
-    padlockDetails: postTripFormData?.rearVehicle?.padlockDetails || "",
+    allFunctioning: rearVehicleInspection?.allFunctioning ?? true,
+    exhaust: rearVehicleInspection?.items?.find((item: any) => item.name === "exhaust")?.status === "defective" || false,
+    muffler: rearVehicleInspection?.items?.find((item: any) => item.name === "muffler")?.status === "defective" || false,
+    rearDoorLatch: rearVehicleInspection?.items?.find((item: any) => item.name === "rearDoorLatch")?.status === "defective" || false,
+    padlock: rearVehicleInspection?.items?.find((item: any) => item.name === "padlock")?.status === "defective" || false,
+    exhaustDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "exhaust")?.details || "",
+    mufflerDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "muffler")?.details || "",
+    rearDoorDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "rearDoorLatch")?.details || "",
+    padlockDetails: rearVehicleInspection?.items?.find((item: any) => item.name === "padlock")?.details || "",
   });
 
   const isAnyChecked =
@@ -46,10 +54,43 @@ const PostTripFormRearVehicle = () => {
   };
 
   const handleNext = () => {
+    // Transform the form data into the new inspection structure
+    const rearVehicleInspectionData = {
+      type: "rearVehicle",
+      allFunctioning: formData.allFunctioning,
+      items: [
+        {
+          name: "exhaust",
+          status: formData.exhaust ? "defective" : "normal",
+          details: formData.exhaustDetails
+        },
+        {
+          name: "muffler",
+          status: formData.muffler ? "defective" : "normal",
+          details: formData.mufflerDetails
+        },
+        {
+          name: "rearDoorLatch",
+          status: formData.rearDoorLatch ? "defective" : "normal",
+          details: formData.rearDoorDetails
+        },
+        {
+          name: "padlock",
+          status: formData.padlock ? "defective" : "normal",
+          details: formData.padlockDetails
+        }
+      ]
+    };
+
+    // Update the inspection array in postTripFormData
+    const existingInspection = postTripFormData?.inspection || [];
+    const updatedInspection = existingInspection.filter((item: any) => item.type !== "rearVehicle");
+    updatedInspection.push(rearVehicleInspectionData);
+
     dispatch(
       updatePostTripForm({
         ...postTripFormData,
-        rearVehicle: formData,
+        inspection: updatedInspection,
       })
     );
     router.push("/post-trip-cab");

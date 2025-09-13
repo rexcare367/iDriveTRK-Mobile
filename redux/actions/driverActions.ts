@@ -127,21 +127,46 @@ export const updatePreTripForm = (formData: any) => {
 
 export const completePreTrip =
   (formData: any) => async (dispatch: any, getState: any) => {
-    const { auth } = getState();
+    const { auth, driver } = getState();
     const userId = auth?.user?.id || "testUser";
+    const truck_id = driver?.clockInFormData?.truck_id || "";
 
     try {
-      // Call backend API to store pre-trip inspection
-      await api.post("api/truck-inspection", {
+      // Transform the form data to match the new structure
+      const transformedData = {
+        powerUnit: formData.powerUnit || "",
+        odometerReading: formData.odometerReading || "",
+        location: formData.location || "",
+        type: "pre-trip",
         userId,
-        ...formData,
-      });
+        truck_id,
+        inspection: formData.inspection || [],
+        photos: formData.photos || {
+          leftSidePhoto: "",
+          rearPhoto: "",
+          rightSidePhoto: "",
+          frontPhoto: ""
+        },
+        signature: formData.signature || {
+          signatureType: "typing",
+          typedSignature: "",
+          signatureText: "",
+          drawnSignature: "",
+          typedSignatureImage: ""
+        },
+        trailer: formData.trailer || {
+          trailerNumber1: "",
+          trailerNumber2: ""
+        }
+      };
+
+      // Call backend API to store pre-trip inspection
+      await api.post("api/truck-inspection", transformedData);
 
       dispatch({
         type: COMPLETE_PRE_TRIP,
         payload: {
-          ...formData,
-          userId,
+          ...transformedData,
           timestamp: new Date().toISOString(),
         },
       });
@@ -170,15 +195,57 @@ export const updatePostTripForm = (formData: any) => {
   };
 };
 
-export const completePostTrip = (formData: any) => {
-  return {
-    type: COMPLETE_POST_TRIP,
-    payload: {
-      ...formData,
-      timestamp: new Date().toISOString(),
-    },
+export const completePostTrip =
+  (formData: any) => async (dispatch: any, getState: any) => {
+    const { auth, driver } = getState();
+    const userId = auth?.user?.id || "testUser";
+    const truck_id = driver?.clockInFormData?.truck_id || "";
+
+    try {
+      // Transform the form data to match the new structure
+      const transformedData = {
+        powerUnit: formData.powerUnit || "",
+        odometerReading: formData.odometerReading || "",
+        location: formData.location || "",
+        type: "post-trip",
+        userId,
+        truck_id,
+        inspection: formData.inspection || [],
+        photos: formData.photos || {
+          leftSidePhoto: "",
+          rearPhoto: "",
+          rightSidePhoto: "",
+          frontPhoto: ""
+        },
+        signature: formData.signature || {
+          signatureType: "typing",
+          typedSignature: "",
+          signatureText: "",
+          drawnSignature: "",
+          typedSignatureImage: ""
+        },
+        trailer: formData.trailer || {
+          trailerNumber1: "",
+          trailerNumber2: ""
+        }
+      };
+
+      // Call backend API to store post-trip inspection
+      await api.post("api/truck-inspection", transformedData);
+
+      dispatch({
+        type: COMPLETE_POST_TRIP,
+        payload: {
+          ...transformedData,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      return { success: true };
+    } catch (error) {
+      console.error("Error saving post-trip inspection:", error);
+      return { success: false, error };
+    }
   };
-};
 
 export const selectTripStop = (stop: any) => {
   return {
